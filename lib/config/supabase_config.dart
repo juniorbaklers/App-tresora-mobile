@@ -3,6 +3,6 @@
 /// L'app mobile et l'app web pointent vers la MÊME base : les données
 /// saisies d'un côté apparaissent en temps réel de l'autre.
 class SupabaseConfig {
-  static const String url = 'https://VOTRE-PROJET.supabase.co';
-  static const String anonKey = 'VOTRE_CLE_ANON_PUBLIC';
+  static const String url = 'https://oilvgouoipdrripczigj.supabase.co';
+  static const String anonKey = 'sb_publishable_HxuIZqE1noDB3YkRiLBX1g_oayOUk9q';
 }
