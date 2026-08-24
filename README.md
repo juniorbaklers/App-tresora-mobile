@@ -30,7 +30,17 @@ d'exercice, gestion des caisses par le Trésorier Principal, mode hors-ligne.
 - [`fl_chart`](https://pub.dev/packages/fl_chart) — graphiques (équivalent
   mobile de Chart.js)
 
-## Mise en route
+## Récupérer un APK sans installer Flutter
+
+Un workflow GitHub Actions (`.github/workflows/build-apk.yml`) compile un
+APK release à chaque push sur `main` : onglet **Actions** du repo → dernier
+run → section **Artifacts** → `tresora-mobile-apk`. Cet APK est signé en
+debug (non publiable sur le Play Store tel quel) et pointe vers les
+identifiants Supabase présents dans le dépôt au moment du build — remplace
+`lib/config/supabase_config.dart` par tes vraies valeurs avant de t'en
+servir pour de vrai.
+
+## Mise en route (développement local)
 
 1. Installe le [SDK Flutter](https://docs.flutter.dev/get-started/install)
 2. Renseigne `lib/config/supabase_config.dart` avec l'URL et la clé publique
