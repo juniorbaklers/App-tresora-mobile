@@ -1,0 +1,32 @@
+name: app_tresora_mobile
+description: "App mobile Trésora — gestion de trésorerie d'église (recettes, dépenses, membres), connectée en temps réel à Supabase."
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ^3.5.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+
+  # Backend Supabase (auth, base Postgres, temps réel) — même base que la version web
+  supabase_flutter: ^2.8.0
+
+  # Gestion d'état
+  flutter_riverpod: ^2.6.1
+
+  # Graphiques du tableau de bord (équivalent Chart.js)
+  fl_chart: ^0.70.2
+
+  # Formatage dates / montants (FCFA)
+  intl: ^0.19.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
