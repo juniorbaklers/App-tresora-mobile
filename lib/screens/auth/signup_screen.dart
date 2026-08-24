@@ -53,7 +53,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                   ? Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.mark_email_read, size: 56, color: AppColors.vert),
+                        const Icon(Icons.mark_email_read, size: 56, color: AppColors.palme),
                         const SizedBox(height: 16),
                         const Text(
                           'Compte créé. Vérifie ta boîte mail pour confirmer ton adresse, '
@@ -94,7 +94,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                           ),
                           if (_erreur != null) ...[
                             const SizedBox(height: 12),
-                            Text(_erreur!, style: const TextStyle(color: AppColors.rouge)),
+                            Text(_erreur!, style: const TextStyle(color: AppColors.terre)),
                           ],
                           const SizedBox(height: 24),
                           ElevatedButton(

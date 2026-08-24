@@ -173,7 +173,7 @@ class _MouvementFormScreenState extends ConsumerState<MouvementFormScreen> {
                 ),
                 if (_erreur != null) ...[
                   const SizedBox(height: 12),
-                  Text(_erreur!, style: const TextStyle(color: AppColors.rouge)),
+                  Text(_erreur!, style: const TextStyle(color: AppColors.terre)),
                 ],
                 const SizedBox(height: 24),
                 ElevatedButton(

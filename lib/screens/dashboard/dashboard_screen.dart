@@ -5,6 +5,7 @@ import '../../providers/data_providers.dart';
 import '../../theme/app_theme.dart';
 import '../../utils/format.dart';
 import '../../utils/tresorerie.dart';
+import '../../widgets/motif.dart';
 import '../../widgets/stat_card.dart';
 
 class DashboardScreen extends ConsumerWidget {
@@ -51,20 +52,23 @@ class DashboardScreen extends ConsumerWidget {
                         titre: 'TOTAL ENTRÉES',
                         montant: totalEntrees,
                         sousTitre: 'Caisse générale',
-                        couleurFond: AppColors.vert,
+                        couleurFond: AppColors.palme,
                         couleurTexte: Colors.white,
+                        tonalite: Tonalite.palme,
                       ),
                       StatCard(
                         titre: 'TOTAL DÉPENSES',
                         montant: totalDepenses,
                         sousTitre: 'Caisse générale',
-                        couleurFond: AppColors.rouge,
+                        couleurFond: AppColors.terre,
                         couleurTexte: Colors.white,
+                        tonalite: Tonalite.terre,
                       ),
                       StatCard(
                         titre: 'SOLDE GLOBAL',
                         montant: solde,
                         sousTitre: 'Caisse générale',
+                        tonalite: Tonalite.indigo,
                       ),
                       if (caissesSeparees.isNotEmpty)
                         StatCard(
@@ -73,6 +77,7 @@ class DashboardScreen extends ConsumerWidget {
                           sousTitre: 'Caisse séparée',
                           couleurFond: AppColors.or,
                           couleurTexte: Colors.white,
+                          tonalite: Tonalite.mixte,
                         ),
                     ],
                   ),
@@ -87,6 +92,7 @@ class DashboardScreen extends ConsumerWidget {
                               sousTitre: 'Caisse séparée',
                               couleurFond: AppColors.or,
                               couleurTexte: Colors.white,
+                              tonalite: Tonalite.mixte,
                             ),
                           ),
                         ),
@@ -141,8 +147,8 @@ class _GraphiqueMensuel extends StatelessWidget {
           return BarChartGroupData(
             x: i,
             barRods: [
-              BarChartRodData(toY: entrees[i], color: AppColors.vert, width: 6),
-              BarChartRodData(toY: depenses[i], color: AppColors.rouge, width: 6),
+              BarChartRodData(toY: entrees[i], color: AppColors.palme, width: 6),
+              BarChartRodData(toY: depenses[i], color: AppColors.terre, width: 6),
             ],
           );
         }),

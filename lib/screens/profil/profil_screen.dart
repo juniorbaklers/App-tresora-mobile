@@ -21,7 +21,7 @@ class ProfilScreen extends ConsumerWidget {
           children: [
             CircleAvatar(
               radius: 36,
-              backgroundColor: AppColors.bleu,
+              backgroundColor: AppColors.indigoProfond,
               child: Text(
                 (profil?.nomComplet.isNotEmpty == true ? profil!.nomComplet[0] : '?').toUpperCase(),
                 style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),
@@ -49,8 +49,8 @@ class ProfilScreen extends ConsumerWidget {
               icon: const Icon(Icons.logout),
               label: const Text('Se déconnecter'),
               style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.rouge,
-                side: const BorderSide(color: AppColors.rouge),
+                foregroundColor: AppColors.terre,
+                side: const BorderSide(color: AppColors.terre),
                 padding: const EdgeInsets.symmetric(vertical: 14),
               ),
             ),

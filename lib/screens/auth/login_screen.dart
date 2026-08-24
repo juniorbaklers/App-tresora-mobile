@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/auth_providers.dart';
 import '../../theme/app_theme.dart';
+import '../../widgets/motif.dart';
 import 'signup_screen.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -57,23 +58,32 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const Icon(Icons.church, size: 56, color: AppColors.bleu),
-                    const SizedBox(height: 12),
+                    Container(
+                      width: 64,
+                      height: 64,
+                      decoration: BoxDecoration(
+                        color: AppColors.indigoProfond,
+                        borderRadius: BorderRadius.circular(18),
+                      ),
+                      child: const Icon(Icons.church, size: 32, color: AppColors.or),
+                    ),
+                    const SizedBox(height: 16),
                     Text(
                       'Trésora',
                       textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.bleu,
-                          ),
+                      style: AppFonts.heading(fontSize: 30, color: AppColors.indigoProfond),
                     ),
                     const SizedBox(height: 4),
                     const Text(
                       'Gestion de trésorerie d\'église',
                       textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.black54),
+                      style: TextStyle(color: AppColors.texteSecondaire),
                     ),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 20),
+                    const Center(
+                      child: SizedBox(width: 120, child: BandeTissee(tonalite: Tonalite.mixte, epaisseur: 4)),
+                    ),
+                    const SizedBox(height: 28),
                     TextFormField(
                       controller: _emailCtrl,
                       keyboardType: TextInputType.emailAddress,
@@ -89,7 +99,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                     if (_erreur != null) ...[
                       const SizedBox(height: 12),
-                      Text(_erreur!, style: const TextStyle(color: AppColors.rouge)),
+                      Text(_erreur!, style: const TextStyle(color: AppColors.terre)),
                     ],
                     const SizedBox(height: 24),
                     ElevatedButton(

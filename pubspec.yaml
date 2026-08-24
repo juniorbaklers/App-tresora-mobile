@@ -23,6 +23,9 @@ dependencies:
   # Formatage dates / montants (FCFA)
   intl: ^0.19.0
 
+  # Typographie de marque (Fraunces, Plus Jakarta Sans, IBM Plex Mono)
+  google_fonts: ^6.2.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

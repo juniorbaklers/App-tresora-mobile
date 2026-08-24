@@ -148,7 +148,7 @@ class _MouvementTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final estEntree = mouvement.type == TypeMouvement.entree;
-    final couleur = estEntree ? AppColors.vert : AppColors.rouge;
+    final couleur = estEntree ? AppColors.palme : AppColors.terre;
     return Card(
       child: ListTile(
         leading: CircleAvatar(
