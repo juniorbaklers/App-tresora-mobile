@@ -1,8 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/cotisation.dart';
+import '../models/evenement.dart';
 import '../models/membre.dart';
 import '../models/tresorerie.dart';
 import '../services/cotisations_service.dart';
+import '../services/evenements_service.dart';
 import '../services/membres_service.dart';
 import '../services/tresorerie_service.dart';
 import 'espace_providers.dart';
@@ -13,6 +15,7 @@ final paiementsCotisationServiceProvider = Provider((ref) => PaiementsCotisation
 final tranchesServiceProvider = Provider((ref) => TranchesService());
 final recettesServiceProvider = Provider((ref) => RecettesService());
 final depensesServiceProvider = Provider((ref) => DepensesService());
+final evenementsServiceProvider = Provider((ref) => EvenementsService());
 
 /// Tous les providers de données ci-dessous sont scopés à l'espace
 /// sélectionné (currentEspaceIdProvider) : flux vide tant qu'aucun espace
@@ -40,6 +43,12 @@ final depensesStreamProvider = StreamProvider<List<Depense>>((ref) {
   final espaceId = ref.watch(currentEspaceIdProvider);
   if (espaceId == null) return Stream.value(<Depense>[]);
   return ref.watch(depensesServiceProvider).streamDepenses(espaceId);
+});
+
+final evenementsStreamProvider = StreamProvider<List<Evenement>>((ref) {
+  final espaceId = ref.watch(currentEspaceIdProvider);
+  if (espaceId == null) return Stream.value(<Evenement>[]);
+  return ref.watch(evenementsServiceProvider).streamEvenements(espaceId);
 });
 
 /// Paiements d'une cotisation précise — provider "family" paramétré par

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../cotisations/cotisations_list_screen.dart';
 import '../dashboard/dashboard_screen.dart';
+import '../evenements/evenements_list_screen.dart';
 import '../membres/membres_list_screen.dart';
 import '../profil/profil_screen.dart';
 import '../tresorerie/tresorerie_list_screen.dart';
@@ -21,6 +22,7 @@ class _HomeShellState extends State<HomeShell> {
     DashboardScreen(),
     TresorerieListScreen(),
     CotisationsListScreen(),
+    EvenementsListScreen(),
     MembresListScreen(),
     ProfilScreen(),
   ];
@@ -37,6 +39,7 @@ class _HomeShellState extends State<HomeShell> {
           BottomNavigationBarItem(icon: Icon(Icons.dashboard_outlined), label: 'Tableau de bord'),
           BottomNavigationBarItem(icon: Icon(Icons.receipt_long_outlined), label: 'Trésorerie'),
           BottomNavigationBarItem(icon: Icon(Icons.savings_outlined), label: 'Cotisations'),
+          BottomNavigationBarItem(icon: Icon(Icons.celebration_outlined), label: 'Événements'),
           BottomNavigationBarItem(icon: Icon(Icons.people_outline), label: 'Membres'),
           BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: 'Profil'),
         ],
