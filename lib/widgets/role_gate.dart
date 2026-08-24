@@ -1,14 +1,15 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/role.dart';
-import '../providers/auth_providers.dart';
+import '../providers/espace_providers.dart';
 
-/// N'affiche `child` que si le profil courant satisfait [peutAcceder].
-/// Purement cosmétique : la vraie barrière de sécurité est la Row Level
-/// Security côté Supabase (schema.sql / schema_4_cloture.sql) — un appel
-/// direct à l'API resterait bloqué même si ce widget était contourné.
+/// N'affiche `child` que si le rôle de l'utilisateur dans l'espace courant
+/// satisfait [peutAcceder]. Purement cosmétique : la vraie barrière de
+/// sécurité est la Row Level Security côté Supabase (supabase/schema_3_rls.sql)
+/// — un appel direct à l'API resterait bloqué même si ce widget était
+/// contourné.
 class RoleGate extends ConsumerWidget {
-  final bool Function(RoleUtilisateur role) peutAcceder;
+  final bool Function(RoleEspace role) peutAcceder;
   final Widget child;
   final Widget? remplacement;
 
@@ -21,8 +22,8 @@ class RoleGate extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final profil = ref.watch(monProfilProvider).valueOrNull;
-    if (profil != null && peutAcceder(profil.role)) return child;
+    final role = ref.watch(currentRoleProvider);
+    if (peutAcceder(role)) return child;
     return remplacement ?? const SizedBox.shrink();
   }
 }

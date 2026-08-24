@@ -2,9 +2,9 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/data_providers.dart';
+import '../../providers/espace_providers.dart';
 import '../../theme/app_theme.dart';
 import '../../utils/format.dart';
-import '../../utils/tresorerie.dart';
 import '../../widgets/motif.dart';
 import '../../widgets/stat_card.dart';
 
@@ -13,29 +13,37 @@ class DashboardScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final caissesAsync = ref.watch(caissesStreamProvider);
-    final mouvementsAsync = ref.watch(mouvementsStreamProvider);
+    final espace = ref.watch(currentEspaceProvider)?.espace;
+    final recettesAsync = ref.watch(recettesStreamProvider);
+    final depensesAsync = ref.watch(depensesStreamProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Tableau de bord')),
-      body: caissesAsync.when(
+      appBar: AppBar(title: Text(espace?.nom ?? 'Tableau de bord')),
+      body: recettesAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Erreur : $e')),
-        data: (caisses) => mouvementsAsync.when(
+        data: (recettes) => depensesAsync.when(
           loading: () => const Center(child: CircularProgressIndicator()),
           error: (e, _) => Center(child: Text('Erreur : $e')),
-          data: (mouvements) {
+          data: (depenses) {
             final annee = DateTime.now().year;
-            final totalEntrees = Tresorerie.totalEntreesCaisseGenerale(caisses, mouvements);
-            final totalDepenses = Tresorerie.totalDepensesCaisseGenerale(mouvements);
-            final solde = totalEntrees - totalDepenses;
-            final parMois = Tresorerie.parMoisCaisseGenerale(caisses, mouvements, annee);
-            final caissesSeparees = caisses.where((c) => !c.incluseCaisseGenerale).toList();
+            final totalRecettes = recettes.fold(0.0, (a, r) => a + r.montant);
+            final totalDepenses = depenses.fold(0.0, (a, d) => a + d.montant);
+            final solde = (espace?.soldeInitial ?? 0) + totalRecettes - totalDepenses;
+
+            final entreesParMois = List<double>.filled(12, 0);
+            final depensesParMois = List<double>.filled(12, 0);
+            for (final r in recettes) {
+              if (r.date.year == annee) entreesParMois[r.date.month - 1] += r.montant;
+            }
+            for (final d in depenses) {
+              if (d.date.year == annee) depensesParMois[d.date.month - 1] += d.montant;
+            }
 
             return RefreshIndicator(
               onRefresh: () async {
-                ref.invalidate(caissesStreamProvider);
-                ref.invalidate(mouvementsStreamProvider);
+                ref.invalidate(recettesStreamProvider);
+                ref.invalidate(depensesStreamProvider);
               },
               child: ListView(
                 padding: const EdgeInsets.all(16),
@@ -49,9 +57,9 @@ class DashboardScreen extends ConsumerWidget {
                     childAspectRatio: 1.5,
                     children: [
                       StatCard(
-                        titre: 'TOTAL ENTRÉES',
-                        montant: totalEntrees,
-                        sousTitre: 'Caisse générale',
+                        titre: 'TOTAL RECETTES',
+                        montant: totalRecettes,
+                        sousTitre: 'Cette année',
                         couleurFond: AppColors.palme,
                         couleurTexte: Colors.white,
                         tonalite: Tonalite.palme,
@@ -59,50 +67,25 @@ class DashboardScreen extends ConsumerWidget {
                       StatCard(
                         titre: 'TOTAL DÉPENSES',
                         montant: totalDepenses,
-                        sousTitre: 'Caisse générale',
+                        sousTitre: 'Cette année',
                         couleurFond: AppColors.terre,
                         couleurTexte: Colors.white,
                         tonalite: Tonalite.terre,
                       ),
                       StatCard(
-                        titre: 'SOLDE GLOBAL',
+                        titre: 'SOLDE',
                         montant: solde,
-                        sousTitre: 'Caisse générale',
+                        sousTitre: espace?.nom ?? '',
                         tonalite: Tonalite.indigo,
                       ),
-                      if (caissesSeparees.isNotEmpty)
-                        StatCard(
-                          titre: caissesSeparees.first.nom.toUpperCase(),
-                          montant: Tresorerie.soldeCaisse(caissesSeparees.first.id, mouvements),
-                          sousTitre: 'Caisse séparée',
-                          couleurFond: AppColors.or,
-                          couleurTexte: Colors.white,
-                          tonalite: Tonalite.mixte,
-                        ),
                     ],
                   ),
-                  if (caissesSeparees.length > 1) ...[
-                    const SizedBox(height: 12),
-                    ...caissesSeparees.skip(1).map(
-                          (c) => Padding(
-                            padding: const EdgeInsets.only(bottom: 12),
-                            child: StatCard(
-                              titre: c.nom.toUpperCase(),
-                              montant: Tresorerie.soldeCaisse(c.id, mouvements),
-                              sousTitre: 'Caisse séparée',
-                              couleurFond: AppColors.or,
-                              couleurTexte: Colors.white,
-                              tonalite: Tonalite.mixte,
-                            ),
-                          ),
-                        ),
-                  ],
                   const SizedBox(height: 24),
-                  Text('Entrées / Dépenses $annee', style: Theme.of(context).textTheme.titleMedium),
+                  Text('Recettes / Dépenses $annee', style: Theme.of(context).textTheme.titleMedium),
                   const SizedBox(height: 12),
                   SizedBox(
                     height: 260,
-                    child: _GraphiqueMensuel(entrees: parMois.entrees, depenses: parMois.depenses),
+                    child: _GraphiqueMensuel(entrees: entreesParMois, depenses: depensesParMois),
                   ),
                 ],
               ),

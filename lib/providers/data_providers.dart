@@ -1,23 +1,54 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../models/caisse.dart';
+import '../models/cotisation.dart';
 import '../models/membre.dart';
-import '../models/mouvement.dart';
-import '../services/caisses_service.dart';
+import '../models/tresorerie.dart';
+import '../services/cotisations_service.dart';
 import '../services/membres_service.dart';
-import '../services/mouvements_service.dart';
+import '../services/tresorerie_service.dart';
+import 'espace_providers.dart';
 
-final caissesServiceProvider = Provider((ref) => CaissesService());
 final membresServiceProvider = Provider((ref) => MembresService());
-final mouvementsServiceProvider = Provider((ref) => MouvementsService());
+final cotisationsServiceProvider = Provider((ref) => CotisationsService());
+final paiementsCotisationServiceProvider = Provider((ref) => PaiementsCotisationService());
+final tranchesServiceProvider = Provider((ref) => TranchesService());
+final recettesServiceProvider = Provider((ref) => RecettesService());
+final depensesServiceProvider = Provider((ref) => DepensesService());
 
-final caissesStreamProvider = StreamProvider<List<Caisse>>((ref) {
-  return ref.watch(caissesServiceProvider).streamCaisses();
-});
+/// Tous les providers de données ci-dessous sont scopés à l'espace
+/// sélectionné (currentEspaceIdProvider) : flux vide tant qu'aucun espace
+/// n'est choisi.
 
 final membresStreamProvider = StreamProvider<List<Membre>>((ref) {
-  return ref.watch(membresServiceProvider).streamMembres();
+  final espaceId = ref.watch(currentEspaceIdProvider);
+  if (espaceId == null) return Stream.value(<Membre>[]);
+  return ref.watch(membresServiceProvider).streamMembres(espaceId);
 });
 
-final mouvementsStreamProvider = StreamProvider<List<Mouvement>>((ref) {
-  return ref.watch(mouvementsServiceProvider).streamMouvements();
+final cotisationsStreamProvider = StreamProvider<List<Cotisation>>((ref) {
+  final espaceId = ref.watch(currentEspaceIdProvider);
+  if (espaceId == null) return Stream.value(<Cotisation>[]);
+  return ref.watch(cotisationsServiceProvider).streamCotisations(espaceId);
+});
+
+final recettesStreamProvider = StreamProvider<List<Recette>>((ref) {
+  final espaceId = ref.watch(currentEspaceIdProvider);
+  if (espaceId == null) return Stream.value(<Recette>[]);
+  return ref.watch(recettesServiceProvider).streamRecettes(espaceId);
+});
+
+final depensesStreamProvider = StreamProvider<List<Depense>>((ref) {
+  final espaceId = ref.watch(currentEspaceIdProvider);
+  if (espaceId == null) return Stream.value(<Depense>[]);
+  return ref.watch(depensesServiceProvider).streamDepenses(espaceId);
+});
+
+/// Paiements d'une cotisation précise — provider "family" paramétré par
+/// l'id de la cotisation (utilisé sur l'écran de détail).
+final paiementsCotisationProvider =
+    StreamProvider.family((ref, String cotisationId) {
+  return ref.watch(paiementsCotisationServiceProvider).streamPaiements(cotisationId);
+});
+
+final tranchesProvider = StreamProvider.family((ref, String paiementCotisationId) {
+  return ref.watch(tranchesServiceProvider).streamTranches(paiementCotisationId);
 });

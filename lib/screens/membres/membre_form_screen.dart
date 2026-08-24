@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../models/membre.dart';
 import '../../providers/data_providers.dart';
+import '../../providers/espace_providers.dart';
 import '../../theme/app_theme.dart';
 
 class MembreFormScreen extends ConsumerStatefulWidget {
@@ -15,8 +16,10 @@ class MembreFormScreen extends ConsumerStatefulWidget {
 
 class _MembreFormScreenState extends ConsumerState<MembreFormScreen> {
   final _formKey = GlobalKey<FormState>();
-  late final _nomCtrl = TextEditingController(text: widget.membre?.nomComplet ?? '');
+  late final _nomCtrl = TextEditingController(text: widget.membre?.nom ?? '');
+  late final _prenomCtrl = TextEditingController(text: widget.membre?.prenom ?? '');
   late final _telCtrl = TextEditingController(text: widget.membre?.telephone ?? '');
+  late final _fonctionCtrl = TextEditingController(text: widget.membre?.fonction ?? '');
   bool _enCours = false;
   String? _erreur;
 
@@ -25,7 +28,9 @@ class _MembreFormScreenState extends ConsumerState<MembreFormScreen> {
   @override
   void dispose() {
     _nomCtrl.dispose();
+    _prenomCtrl.dispose();
     _telCtrl.dispose();
+    _fonctionCtrl.dispose();
     super.dispose();
   }
 
@@ -39,14 +44,21 @@ class _MembreFormScreenState extends ConsumerState<MembreFormScreen> {
       final service = ref.read(membresServiceProvider);
       if (_modification) {
         await service.modifier(widget.membre!.id, {
-          'nom_complet': _nomCtrl.text.trim(),
-          'telephone': _telCtrl.text.trim().isEmpty ? null : _telCtrl.text.trim(),
+          'nom': _nomCtrl.text.trim(),
+          'prenom': _prenomCtrl.text.trim(),
+          'telephone': _telCtrl.text.trim(),
+          'fonction': _fonctionCtrl.text.trim().isEmpty ? null : _fonctionCtrl.text.trim(),
         });
       } else {
+        final espaceId = ref.read(currentEspaceIdProvider);
+        if (espaceId == null) return;
         await service.creer(Membre(
           id: '',
-          nomComplet: _nomCtrl.text.trim(),
-          telephone: _telCtrl.text.trim().isEmpty ? null : _telCtrl.text.trim(),
+          espaceId: espaceId,
+          nom: _nomCtrl.text.trim(),
+          prenom: _prenomCtrl.text.trim(),
+          telephone: _telCtrl.text.trim(),
+          fonction: _fonctionCtrl.text.trim().isEmpty ? null : _fonctionCtrl.text.trim(),
           actif: true,
         ));
       }
@@ -71,15 +83,26 @@ class _MembreFormScreenState extends ConsumerState<MembreFormScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 TextFormField(
+                  controller: _prenomCtrl,
+                  decoration: const InputDecoration(labelText: 'Prénom'),
+                  validator: (v) => (v == null || v.trim().isEmpty) ? 'Requis' : null,
+                ),
+                const SizedBox(height: 14),
+                TextFormField(
                   controller: _nomCtrl,
-                  decoration: const InputDecoration(labelText: 'Nom complet'),
+                  decoration: const InputDecoration(labelText: 'Nom'),
                   validator: (v) => (v == null || v.trim().isEmpty) ? 'Requis' : null,
                 ),
                 const SizedBox(height: 14),
                 TextFormField(
                   controller: _telCtrl,
                   keyboardType: TextInputType.phone,
-                  decoration: const InputDecoration(labelText: 'Téléphone (optionnel)'),
+                  decoration: const InputDecoration(labelText: 'Téléphone'),
+                ),
+                const SizedBox(height: 14),
+                TextFormField(
+                  controller: _fonctionCtrl,
+                  decoration: const InputDecoration(labelText: 'Fonction (optionnel)'),
                 ),
                 if (_erreur != null) ...[
                   const SizedBox(height: 12),

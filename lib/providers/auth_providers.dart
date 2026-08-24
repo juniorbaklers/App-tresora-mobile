@@ -18,9 +18,8 @@ final currentUserProvider = Provider<User?>((ref) {
   return authState?.session?.user ?? Supabase.instance.client.auth.currentUser;
 });
 
-/// Profil (rôle, nom) de l'utilisateur connecté, synchronisé en temps réel —
-/// si le Trésorier Principal change le rôle de quelqu'un, ça se répercute
-/// immédiatement dans l'app sans reconnexion.
+/// Identité globale (nom, email) de l'utilisateur connecté. Le rôle, lui,
+/// est spécifique à chaque espace — voir currentRoleProvider.
 final monProfilProvider = StreamProvider<Profil?>((ref) {
   final user = ref.watch(currentUserProvider);
   if (user == null) return Stream.value(null);

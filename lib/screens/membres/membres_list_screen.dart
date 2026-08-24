@@ -15,7 +15,7 @@ class MembresListScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Membres')),
       floatingActionButton: RoleGate(
-        peutAcceder: (r) => r.peutSaisir,
+        peutAcceder: (r) => r.peutGererMembres,
         child: FloatingActionButton.extended(
           onPressed: () => Navigator.of(context).push(
             MaterialPageRoute(builder: (_) => const MembreFormScreen()),
@@ -55,12 +55,19 @@ class _MembreTile extends ConsumerWidget {
           child: Icon(Icons.person, color: membre.actif ? Colors.green[700] : Colors.grey),
         ),
         title: Text(membre.nomComplet, style: TextStyle(color: membre.actif ? null : Colors.grey)),
-        subtitle: Text(membre.telephone?.isNotEmpty == true ? membre.telephone! : 'Pas de téléphone'),
+        subtitle: Text(
+          [
+            if (membre.fonction?.isNotEmpty == true) membre.fonction!,
+            if (membre.telephone.isNotEmpty) membre.telephone,
+          ].join(' · ').ifEmpty('Pas de détails'),
+        ),
         trailing: RoleGate(
-          peutAcceder: (r) => r.peutSaisir,
+          peutAcceder: (r) => r.peutGererMembres,
           child: Switch(
             value: membre.actif,
-            onChanged: (v) => ref.read(membresServiceProvider).modifier(membre.id, {'actif': v}),
+            onChanged: (v) => ref
+                .read(membresServiceProvider)
+                .modifier(membre.id, {'statut': v ? 'actif' : 'inactif'}),
           ),
         ),
         onTap: () => Navigator.of(context).push(
@@ -69,4 +76,8 @@ class _MembreTile extends ConsumerWidget {
       ),
     );
   }
+}
+
+extension _StringVide on String {
+  String ifEmpty(String remplacement) => isEmpty ? remplacement : this;
 }

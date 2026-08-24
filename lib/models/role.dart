@@ -1,20 +1,30 @@
-/// Reflète l'enum Postgres `role_utilisateur` (schema.sql + schema_5_enum.sql).
-enum RoleUtilisateur {
-  tresorierPrincipal('tresorier_principal', 'Trésorier Principal'),
-  tresorierAdjoint('tresorier_adjoint', 'Trésorier Adjoint'),
-  responsableSection('responsable_section', 'Responsable de section'),
-  lectureSeule('lecture_seule', 'Lecture seule');
+/// Reflète l'enum Postgres `role_espace` (supabase/schema_1_types_tables.sql).
+/// Un rôle est toujours relatif à un espace précis — un utilisateur peut être
+/// `proprietaire` d'un espace et simple `membre` d'un autre.
+enum RoleEspace {
+  proprietaire('proprietaire', 'Propriétaire'),
+  administrateur('administrateur', 'Administrateur'),
+  tresorier('tresorier', 'Trésorier'),
+  responsable('responsable', 'Responsable'),
+  membre('membre', 'Membre');
 
   final String valeurBdd;
   final String libelle;
-  const RoleUtilisateur(this.valeurBdd, this.libelle);
+  const RoleEspace(this.valeurBdd, this.libelle);
 
-  static RoleUtilisateur fromBdd(String? v) => RoleUtilisateur.values.firstWhere(
+  static RoleEspace fromBdd(String? v) => RoleEspace.values.firstWhere(
         (r) => r.valeurBdd == v,
-        orElse: () => RoleUtilisateur.lectureSeule,
+        orElse: () => RoleEspace.membre,
       );
 
-  bool get peutSaisir => this != RoleUtilisateur.lectureSeule;
-  bool get peutSupprimer => this == RoleUtilisateur.tresorierPrincipal;
-  bool get peutGererCaisses => this == RoleUtilisateur.tresorierPrincipal;
+  /// Recettes, dépenses, cotisations, membres, événements.
+  bool get peutGerer => this == proprietaire || this == administrateur || this == tresorier;
+
+  /// Réglages de l'espace, rôles des autres membres.
+  bool get peutAdministrer => this == proprietaire || this == administrateur;
+
+  /// Membres, cotisations, événements — pas l'argent.
+  bool get peutGererMembres => peutGerer || this == responsable;
+
+  bool get estProprietaire => this == proprietaire;
 }

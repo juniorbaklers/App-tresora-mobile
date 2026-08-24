@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/auth_providers.dart';
+import '../../providers/espace_providers.dart';
 import '../../theme/app_theme.dart';
+import '../espaces/espace_selection_screen.dart';
 
 class ProfilScreen extends ConsumerWidget {
   const ProfilScreen({super.key});
@@ -10,6 +12,7 @@ class ProfilScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(currentUserProvider);
     final profilAsync = ref.watch(monProfilProvider);
+    final espaceAvecRole = ref.watch(currentEspaceProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Profil')),
@@ -35,14 +38,44 @@ class ProfilScreen extends ConsumerWidget {
                 textAlign: TextAlign.center,
               ),
             ),
-            Center(child: Text(user?.email ?? '', style: const TextStyle(color: Colors.black54))),
-            const SizedBox(height: 8),
-            Center(
-              child: Chip(
-                label: Text(profil?.role.libelle ?? '—'),
-                backgroundColor: AppColors.or.withValues(alpha: .15),
+            Center(child: Text(user?.email ?? '', style: const TextStyle(color: AppColors.texteSecondaire))),
+            const SizedBox(height: 24),
+            if (espaceAvecRole != null)
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppColors.carte,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: AppColors.bordure),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('ESPACE ACTUEL',
+                              style: TextStyle(fontSize: 11, color: AppColors.texteSecondaire)),
+                          const SizedBox(height: 4),
+                          Text(espaceAvecRole.espace.nom, style: const TextStyle(fontWeight: FontWeight.w600)),
+                          Text(espaceAvecRole.role.libelle,
+                              style: const TextStyle(fontSize: 12, color: AppColors.texteSecondaire)),
+                        ],
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        ref.read(currentEspaceIdProvider.notifier).state = null;
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(builder: (_) => const EspaceSelectionScreen()),
+                          (route) => false,
+                        );
+                      },
+                      child: const Text('Changer'),
+                    ),
+                  ],
+                ),
               ),
-            ),
             const SizedBox(height: 32),
             OutlinedButton.icon(
               onPressed: () => ref.read(authServiceProvider).deconnexion(),

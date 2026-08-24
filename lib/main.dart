@@ -6,7 +6,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'config/supabase_config.dart';
 import 'providers/auth_providers.dart';
 import 'screens/auth/login_screen.dart';
-import 'screens/home/home_shell.dart';
+import 'screens/espaces/espace_selection_screen.dart';
 import 'theme/app_theme.dart';
 
 Future<void> main() async {
@@ -35,8 +35,10 @@ class TresoraApp extends StatelessWidget {
   }
 }
 
-/// Bascule entre l'écran de connexion et l'app selon l'état de la session
-/// Supabase — se met à jour automatiquement à la connexion/déconnexion.
+/// Bascule entre l'écran de connexion et la sélection d'espace selon
+/// l'état de la session Supabase — se met à jour automatiquement à la
+/// connexion/déconnexion. Une fois connecté, l'utilisateur choisit
+/// toujours quel espace gérer (aucun n'est présélectionné).
 class AuthGate extends ConsumerWidget {
   const AuthGate({super.key});
 
@@ -44,6 +46,6 @@ class AuthGate extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     ref.watch(authStateProvider);
     final user = ref.watch(currentUserProvider);
-    return user == null ? const LoginScreen() : const HomeShell();
+    return user == null ? const LoginScreen() : const EspaceSelectionScreen();
   }
 }
