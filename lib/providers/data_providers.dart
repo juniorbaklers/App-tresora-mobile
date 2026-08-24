@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/cotisation.dart';
 import '../models/evenement.dart';
+import '../models/invitation.dart';
 import '../models/membre.dart';
 import '../models/tresorerie.dart';
 import '../services/cotisations_service.dart';
@@ -49,6 +50,12 @@ final evenementsStreamProvider = StreamProvider<List<Evenement>>((ref) {
   final espaceId = ref.watch(currentEspaceIdProvider);
   if (espaceId == null) return Stream.value(<Evenement>[]);
   return ref.watch(evenementsServiceProvider).streamEvenements(espaceId);
+});
+
+final invitationsEspaceStreamProvider = StreamProvider<List<Invitation>>((ref) {
+  final espaceId = ref.watch(currentEspaceIdProvider);
+  if (espaceId == null) return Stream.value(<Invitation>[]);
+  return ref.watch(invitationsServiceProvider).streamInvitationsEspace(espaceId);
 });
 
 /// Paiements d'une cotisation précise — provider "family" paramétré par

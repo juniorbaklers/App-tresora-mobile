@@ -98,6 +98,49 @@ create policy "invitations_creation" on invitations for insert
 create policy "invitations_maj" on invitations for update using (peut_administrer(espace_id));
 create policy "invitations_suppr" on invitations for delete using (peut_administrer(espace_id));
 
+-- L'invité (pas encore membre, donc pas "administrateur" de l'espace) doit
+-- pouvoir voir et refuser les invitations adressées à son propre email.
+create policy "invitations_lecture_invite" on invitations for select
+  using (lower(email) = lower(coalesce(auth.jwt() ->> 'email', '')));
+create policy "invitations_suppr_invite" on invitations for delete
+  using (acceptee = false and lower(email) = lower(coalesce(auth.jwt() ->> 'email', '')));
+
+-- RPC d'acceptation — security definer car l'invité n'a normalement pas le
+-- droit d'écrire dans espace_membres ni de modifier la ligne "invitations"
+-- avant d'avoir accepté (ce serait un paradoxe : il faudrait déjà être
+-- membre pour le devenir). Vérifie elle-même que l'email correspond.
+create or replace function accepter_invitation(p_invitation_id uuid)
+returns uuid
+language plpgsql
+security definer set search_path = public
+as $$
+declare
+  v_espace_id uuid;
+  v_role role_espace;
+  v_email text;
+begin
+  select espace_id, role, email into v_espace_id, v_role, v_email
+    from invitations
+    where id = p_invitation_id and acceptee = false;
+
+  if v_espace_id is null then
+    raise exception 'Invitation introuvable ou déjà traitée';
+  end if;
+
+  if lower(v_email) <> lower(coalesce(auth.jwt() ->> 'email', '')) then
+    raise exception 'Cette invitation ne correspond pas à votre compte';
+  end if;
+
+  insert into espace_membres (espace_id, user_id, role)
+  values (v_espace_id, auth.uid(), v_role)
+  on conflict (espace_id, user_id) do update set role = excluded.role;
+
+  update invitations set acceptee = true where id = p_invitation_id;
+
+  return v_espace_id;
+end;
+$$;
+
 -- ============================================================
 -- MEMBRES
 -- ============================================================

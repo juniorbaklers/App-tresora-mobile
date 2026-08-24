@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../models/espace.dart';
+import '../../models/invitation.dart';
 import '../../providers/auth_providers.dart';
 import '../../providers/espace_providers.dart';
 import '../../theme/app_theme.dart';
@@ -16,6 +17,7 @@ class EspaceSelectionScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final espacesAsync = ref.watch(mesEspacesProvider);
+    final invitations = ref.watch(mesInvitationsProvider).valueOrNull ?? [];
 
     return Scaffold(
       appBar: AppBar(
@@ -37,7 +39,7 @@ class EspaceSelectionScreen extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Erreur : $e')),
         data: (espaces) {
-          if (espaces.isEmpty) {
+          if (espaces.isEmpty && invitations.isEmpty) {
             return Center(
               child: Padding(
                 padding: const EdgeInsets.all(32),
@@ -62,22 +64,33 @@ class EspaceSelectionScreen extends ConsumerWidget {
               ),
             );
           }
-          return ListView.separated(
+          return ListView(
             padding: const EdgeInsets.all(16),
-            itemCount: espaces.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 12),
-            itemBuilder: (context, i) {
-              final e = espaces[i];
-              return _CarteEspace(
-                espaceAvecRole: e,
-                onTap: () {
-                  ref.read(currentEspaceIdProvider.notifier).state = e.espace.id;
-                  Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(builder: (_) => const HomeShell()),
-                  );
-                },
-              );
-            },
+            children: [
+              if (invitations.isNotEmpty) ...[
+                Text('INVITATIONS REÇUES',
+                    style: TextStyle(
+                        fontSize: 11, color: AppColors.texteSecondaire, fontWeight: FontWeight.w700)),
+                const SizedBox(height: 8),
+                for (final invitation in invitations) ...[
+                  _CarteInvitation(invitation: invitation),
+                  const SizedBox(height: 12),
+                ],
+                if (espaces.isNotEmpty) const SizedBox(height: 8),
+              ],
+              for (final e in espaces) ...[
+                _CarteEspace(
+                  espaceAvecRole: e,
+                  onTap: () {
+                    ref.read(currentEspaceIdProvider.notifier).state = e.espace.id;
+                    Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(builder: (_) => const HomeShell()),
+                    );
+                  },
+                ),
+                const SizedBox(height: 12),
+              ],
+            ],
           );
         },
       ),
@@ -89,6 +102,81 @@ class EspaceSelectionScreen extends ConsumerWidget {
       context: context,
       isScrollControlled: true,
       builder: (_) => const _FormulaireNouvelEspace(),
+    );
+  }
+}
+
+class _CarteInvitation extends ConsumerStatefulWidget {
+  final Invitation invitation;
+
+  const _CarteInvitation({required this.invitation});
+
+  @override
+  ConsumerState<_CarteInvitation> createState() => _CarteInvitationState();
+}
+
+class _CarteInvitationState extends ConsumerState<_CarteInvitation> {
+  bool _enCours = false;
+
+  Future<void> _accepter() async {
+    setState(() => _enCours = true);
+    try {
+      final espaceId = await ref.read(invitationsServiceProvider).accepter(widget.invitation.id);
+      if (!mounted) return;
+      ref.read(currentEspaceIdProvider.notifier).state = espaceId;
+      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const HomeShell()));
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text("Acceptation impossible : ${e.toString()}")));
+        setState(() => _enCours = false);
+      }
+    }
+  }
+
+  Future<void> _refuser() async {
+    setState(() => _enCours = true);
+    try {
+      await ref.read(invitationsServiceProvider).supprimer(widget.invitation.id);
+    } finally {
+      if (mounted) setState(() => _enCours = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.carte,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.or),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(widget.invitation.nomEspace ?? 'Espace',
+              style: AppFonts.heading(fontSize: 16, color: AppColors.texteEncre)),
+          const SizedBox(height: 2),
+          Text('Invité comme ${widget.invitation.role.libelle}',
+              style: const TextStyle(fontSize: 12, color: AppColors.texteSecondaire)),
+          const SizedBox(height: 12),
+          if (_enCours)
+            const Center(child: SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2)))
+          else
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(onPressed: _refuser, child: const Text('Refuser')),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: ElevatedButton(onPressed: _accepter, child: const Text('Accepter')),
+                ),
+              ],
+            ),
+        ],
+      ),
     );
   }
 }

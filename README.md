@@ -28,13 +28,18 @@ Ce projet est **indépendant** de `gestion-caisse-eglise` (site web mono-
 - ✅ Événements : création (objectif, montant suggéré, période), liste avec
   barre de progression, détail avec enregistrement des contributions
   (montant collecté/nombre de participants mis à jour à chaque saisie)
+- ✅ Invitations : un propriétaire/administrateur invite par email depuis
+  l'écran Membres (rôle choisi à l'envoi) ; l'invité voit ses invitations en
+  attente sur l'écran de sélection d'espace et peut accepter (rejoint
+  l'espace) ou refuser — accepter passe par la RPC `accepter_invitation`
+  (sécurité définie côté base, l'invité n'étant pas encore membre)
 
 **Pas encore fait** (modèle déjà prêt côté base, voir
 `supabase/schema_1_types_tables.sql`) : contributions inter-espaces,
 notifications, journal d'audit affiché dans l'app, clôtures, rapports/exports,
-invitations, gestion des rôles depuis l'app (à faire directement dans
-Supabase pour l'instant), identité visuelle "pile de carnets" sur l'écran de
-sélection d'espace, mode hors-ligne.
+gestion des rôles depuis l'app (à faire directement dans Supabase pour
+l'instant), identité visuelle "pile de carnets" sur l'écran de sélection
+d'espace, mode hors-ligne.
 
 ## Stack
 
@@ -70,7 +75,7 @@ build.
 lib/
 ├── config/            URL + clé Supabase
 ├── models/             Profil, Espace, Membre, Cotisation/PaiementCotisation/Tranche,
-│                        Recette/Depense, Evenement, Role — reflètent supabase/schema_1_types_tables.sql
+│                        Recette/Depense, Evenement, Invitation, Role — reflètent supabase/schema_1_types_tables.sql
 ├── services/            Appels Supabase (CRUD + flux temps réel par table)
 ├── providers/            État Riverpod : session, mes espaces, espace courant + rôle,
 │                          données scopées à l'espace sélectionné
@@ -86,7 +91,7 @@ lib/
     ├── tresorerie/               Recettes/dépenses : liste + formulaire
     ├── cotisations/               Liste, création, détail (suivi des tranches par membre)
     ├── evenements/                  Liste (progression), création, détail (contributions)
-    ├── membres/                    Liste + formulaire
+    ├── membres/                    Liste + formulaire + invitations (envoi, annulation)
     └── profil/                      Identité, espace courant + rôle, déconnexion
 ```
 

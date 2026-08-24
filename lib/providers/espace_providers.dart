@@ -1,10 +1,21 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/espace.dart';
+import '../models/invitation.dart';
 import '../models/role.dart';
 import '../services/espaces_service.dart';
+import '../services/invitations_service.dart';
 import 'auth_providers.dart';
 
 final espacesServiceProvider = Provider((ref) => EspacesService());
+final invitationsServiceProvider = Provider((ref) => InvitationsService());
+
+/// Invitations en attente adressées à l'utilisateur connecté, tous
+/// espaces confondus — affichées sur l'écran de sélection d'espace.
+final mesInvitationsProvider = StreamProvider<List<Invitation>>((ref) {
+  final user = ref.watch(currentUserProvider);
+  if (user == null || user.email == null) return Stream.value(<Invitation>[]);
+  return ref.watch(invitationsServiceProvider).streamMesInvitations(user.email!);
+});
 
 /// "Mes espaces" en temps réel — se met à jour si on est ajouté/retiré
 /// d'un espace, ou si notre rôle y change.
