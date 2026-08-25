@@ -24,11 +24,12 @@ class ContributionsEvenementService {
   final SupabaseClient _client = Supabase.instance.client;
 
   Stream<List<ContributionEvenement>> streamContributions(String evenementId) {
-    return _client
+    final flux = _client
         .from('contributions_evenement')
         .stream(primaryKey: ['id'])
         .eq('evenement_id', evenementId)
-        .order('date', ascending: false)
+        .order('date', ascending: false);
+    return avecCacheHorsLigne('contributions_evenement_$evenementId', flux)
         .map((rows) => rows.map(ContributionEvenement.fromMap).toList());
   }
 
