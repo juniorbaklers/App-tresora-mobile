@@ -21,6 +21,8 @@ class _MembreFormScreenState extends ConsumerState<MembreFormScreen> {
       TextEditingController(text: widget.membre?.prenom ?? '');
   late final _telCtrl =
       TextEditingController(text: widget.membre?.telephone ?? '');
+  late final _emailCtrl =
+      TextEditingController(text: widget.membre?.email ?? '');
   late final _fonctionCtrl =
       TextEditingController(text: widget.membre?.fonction ?? '');
   bool _enCours = false;
@@ -33,6 +35,7 @@ class _MembreFormScreenState extends ConsumerState<MembreFormScreen> {
     _nomCtrl.dispose();
     _prenomCtrl.dispose();
     _telCtrl.dispose();
+    _emailCtrl.dispose();
     _fonctionCtrl.dispose();
     super.dispose();
   }
@@ -50,6 +53,8 @@ class _MembreFormScreenState extends ConsumerState<MembreFormScreen> {
           'nom': _nomCtrl.text.trim(),
           'prenom': _prenomCtrl.text.trim(),
           'telephone': _telCtrl.text.trim(),
+          'email':
+              _emailCtrl.text.trim().isEmpty ? null : _emailCtrl.text.trim(),
           'fonction': _fonctionCtrl.text.trim().isEmpty
               ? null
               : _fonctionCtrl.text.trim(),
@@ -63,6 +68,8 @@ class _MembreFormScreenState extends ConsumerState<MembreFormScreen> {
           nom: _nomCtrl.text.trim(),
           prenom: _prenomCtrl.text.trim(),
           telephone: _telCtrl.text.trim(),
+          email:
+              _emailCtrl.text.trim().isEmpty ? null : _emailCtrl.text.trim(),
           fonction: _fonctionCtrl.text.trim().isEmpty
               ? null
               : _fonctionCtrl.text.trim(),
@@ -108,6 +115,16 @@ class _MembreFormScreenState extends ConsumerState<MembreFormScreen> {
                   controller: _telCtrl,
                   keyboardType: TextInputType.phone,
                   decoration: const InputDecoration(labelText: 'Téléphone'),
+                ),
+                const SizedBox(height: 14),
+                TextFormField(
+                  controller: _emailCtrl,
+                  keyboardType: TextInputType.emailAddress,
+                  decoration:
+                      const InputDecoration(labelText: 'Email (optionnel)'),
+                  validator: (v) => (v != null && v.trim().isNotEmpty && !v.contains('@'))
+                      ? 'Email invalide'
+                      : null,
                 ),
                 const SizedBox(height: 14),
                 TextFormField(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../models/cotisation.dart' show ModePaiement;
 import '../../models/evenement.dart';
+import '../../models/membre.dart';
 import '../../providers/auth_providers.dart';
 import '../../providers/data_providers.dart';
 import '../../theme/app_theme.dart';
@@ -242,24 +243,69 @@ class _FormulaireCollecteState extends ConsumerState<_FormulaireCollecte> {
       _erreur = null;
     });
     try {
+      final nom = _nomCtrl.text.trim();
       final responsable = ref.read(currentUserProvider)?.email ?? '';
       await ref
           .read(contributionsEvenementServiceProvider)
           .creer(ContributionEvenement(
             id: '',
             evenementId: widget.evenement.id,
-            nomContributeur: _nomCtrl.text.trim(),
+            nomContributeur: nom,
             montant: double.parse(_montantCtrl.text.replaceAll(',', '.')),
             modePaiement: _mode,
             responsable: responsable,
             date: DateTime.now(),
           ));
+      if (mounted) await _proposerAjoutMembre(nom);
       if (mounted) Navigator.of(context).pop();
     } catch (e) {
       setState(() => _erreur = "Enregistrement impossible : ${e.toString()}");
     } finally {
       if (mounted) setState(() => _enCours = false);
     }
+  }
+
+  /// Si le contributeur saisi ne correspond à aucun membre existant de
+  /// l'espace, propose de l'ajouter au registre des membres — pour qu'un
+  /// donateur régulier ne reste pas invisible du suivi des cotisations.
+  Future<void> _proposerAjoutMembre(String nom) async {
+    final espaceId = widget.evenement.espaceId;
+    final membres = ref.read(membresStreamProvider).valueOrNull ?? [];
+    final dejaMembre = membres
+        .any((m) => m.nomComplet.trim().toLowerCase() == nom.toLowerCase());
+    if (dejaMembre) return;
+
+    final ajouter = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Ajouter comme membre ?'),
+        content: Text(
+            "$nom n'est pas encore membre de cet espace. L'ajouter au registre des membres ?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Non merci'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('Ajouter'),
+          ),
+        ],
+      ),
+    );
+    if (ajouter != true || !mounted) return;
+
+    final parts = nom.split(RegExp(r'\s+'));
+    final prenom = parts.first;
+    final nomFamille = parts.length > 1 ? parts.sublist(1).join(' ') : '';
+    await ref.read(membresServiceProvider).creer(Membre(
+          id: '',
+          espaceId: espaceId,
+          nom: nomFamille,
+          prenom: prenom,
+          telephone: '',
+          actif: true,
+        ));
   }
 
   @override

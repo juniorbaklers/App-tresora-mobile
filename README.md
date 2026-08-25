@@ -25,7 +25,8 @@ Ce projet est **indépendant** de `gestion-caisse-eglise` (site web mono-
   événements actifs, contributions demandées et derniers paiements pour un
   groupe/association/perso
 - ✅ Recettes & Dépenses : liste temps réel, saisie
-- ✅ Membres : registre nominatif par espace, activation/désactivation
+- ✅ Membres : registre nominatif par espace (prénom, nom, téléphone, email
+  optionnel, fonction optionnelle), activation/désactivation
 - ✅ Cotisations payables en plusieurs tranches : création (assignée à
   tous les membres actifs), suivi des versements par membre, montant
   payé/statut recalculés automatiquement côté base à chaque tranche.
@@ -38,7 +39,9 @@ Ce projet est **indépendant** de `gestion-caisse-eglise` (site web mono-
   périmètre mobile)
 - ✅ Événements : création (objectif, montant suggéré, période), liste avec
   barre de progression, détail avec enregistrement des contributions
-  (montant collecté/nombre de participants mis à jour à chaque saisie)
+  (montant collecté/nombre de participants mis à jour à chaque saisie).
+  Si le contributeur saisi ne correspond à aucun membre existant de
+  l'espace, l'app propose de l'ajouter au registre des membres
 - ✅ Invitations : un propriétaire/administrateur invite par email depuis
   l'écran Membres (rôle choisi à l'envoi) ; l'invité voit ses invitations en
   attente sur l'écran de sélection d'espace et peut accepter (rejoint
