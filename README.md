@@ -61,8 +61,11 @@ Ce projet est **indépendant** de `gestion-caisse-eglise` (site web mono-
 - ✅ Rapports : génération d'un PDF de trésorerie (recettes/dépenses par
   catégorie) sur une période choisie, partageable directement depuis le
   téléphone — accessible depuis l'icône PDF de l'écran Recettes & Dépenses
-
-**Pas encore fait** : mode hors-ligne.
+- ✅ Mode hors-ligne (lecture seule) : les listes principales (espaces,
+  membres, cotisations, recettes/dépenses, événements, notifications,
+  journal, clôtures) restent consultables sans connexion grâce à un cache
+  local des dernières données reçues ; un bandeau discret l'indique. Pas
+  de saisie hors-ligne — les formulaires nécessitent toujours le réseau.
 
 ## Stack
 
@@ -75,6 +78,9 @@ Ce projet est **indépendant** de `gestion-caisse-eglise` (site web mono-
   Plus Jakarta Sans / IBM Plex Mono (identité "tissage" de tresora-app)
 - [`pdf`](https://pub.dev/packages/pdf) + [`printing`](https://pub.dev/packages/printing) —
   génération et partage des rapports de trésorerie
+- [`shared_preferences`](https://pub.dev/packages/shared_preferences) +
+  [`connectivity_plus`](https://pub.dev/packages/connectivity_plus) —
+  cache local et détection réseau pour le mode hors-ligne (lecture seule)
 
 ## Récupérer un APK sans installer Flutter
 
@@ -107,9 +113,9 @@ lib/
 ├── providers/            État Riverpod : session, mes espaces, espace courant + rôle,
 │                          données scopées à l'espace sélectionné
 ├── theme/                 Palette "tissage", typographie de marque
-├── utils/                  Formatage FCFA/dates
+├── utils/                  Formatage FCFA/dates, cache hors-ligne (avecCacheHorsLigne)
 ├── widgets/                 RoleGate (masque l'UI selon le rôle dans l'espace courant),
-│                             StatCard, BandeTissee (motif signature)
+│                             StatCard, BandeTissee (motif signature), BandeauHorsLigne
 └── screens/
     ├── auth/                Connexion, inscription
     ├── espaces/               Sélection / création d'espace (premier écran après connexion)

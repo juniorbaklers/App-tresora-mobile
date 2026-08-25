@@ -5,6 +5,7 @@ import '../../models/invitation.dart';
 import '../../providers/auth_providers.dart';
 import '../../providers/espace_providers.dart';
 import '../../theme/app_theme.dart';
+import '../../widgets/bandeau_hors_ligne.dart';
 import '../../widgets/motif.dart';
 import '../auth/login_screen.dart';
 import '../home/home_shell.dart';
@@ -44,65 +45,80 @@ class EspaceSelectionScreen extends ConsumerWidget {
         icon: const Icon(Icons.add),
         label: const Text('Nouvel espace'),
       ),
-      body: espacesAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Erreur : $e')),
-        data: (espaces) {
-          if (espaces.isEmpty && invitations.isEmpty) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(32),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
+      body: Column(
+        children: [
+          const BandeauHorsLigne(),
+          Expanded(
+            child: espacesAsync.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (e, _) => Center(child: Text('Erreur : $e')),
+              data: (espaces) {
+                if (espaces.isEmpty && invitations.isEmpty) {
+                  return Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(32),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const SizedBox(
+                              width: 120,
+                              child: BandeTissee(
+                                  tonalite: Tonalite.mixte, epaisseur: 4)),
+                          const SizedBox(height: 20),
+                          Text(
+                            'Aucun espace pour l\'instant',
+                            style: AppFonts.heading(
+                                fontSize: 20, color: AppColors.texteEncre),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 8),
+                          const Text(
+                            'Crée ton église, ton groupe ou ton association pour commencer.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: AppColors.texteSecondaire),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }
+                return ListView(
+                  padding: const EdgeInsets.all(16),
                   children: [
-                    const SizedBox(width: 120, child: BandeTissee(tonalite: Tonalite.mixte, epaisseur: 4)),
-                    const SizedBox(height: 20),
-                    Text(
-                      'Aucun espace pour l\'instant',
-                      style: AppFonts.heading(fontSize: 20, color: AppColors.texteEncre),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 8),
-                    const Text(
-                      'Crée ton église, ton groupe ou ton association pour commencer.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: AppColors.texteSecondaire),
-                    ),
+                    if (invitations.isNotEmpty) ...[
+                      Text('INVITATIONS REÇUES',
+                          style: TextStyle(
+                              fontSize: 11,
+                              color: AppColors.texteSecondaire,
+                              fontWeight: FontWeight.w700)),
+                      const SizedBox(height: 8),
+                      for (final invitation in invitations) ...[
+                        _CarteInvitation(invitation: invitation),
+                        const SizedBox(height: 12),
+                      ],
+                      if (espaces.isNotEmpty) const SizedBox(height: 8),
+                    ],
+                    for (final (i, e) in espaces.indexed) ...[
+                      _CarteEspace(
+                        espaceAvecRole: e,
+                        index: i,
+                        onTap: () {
+                          ref.read(currentEspaceIdProvider.notifier).state =
+                              e.espace.id;
+                          Navigator.of(context).pushReplacement(
+                            MaterialPageRoute(
+                                builder: (_) => const HomeShell()),
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                    ],
                   ],
-                ),
-              ),
-            );
-          }
-          return ListView(
-            padding: const EdgeInsets.all(16),
-            children: [
-              if (invitations.isNotEmpty) ...[
-                Text('INVITATIONS REÇUES',
-                    style: TextStyle(
-                        fontSize: 11, color: AppColors.texteSecondaire, fontWeight: FontWeight.w700)),
-                const SizedBox(height: 8),
-                for (final invitation in invitations) ...[
-                  _CarteInvitation(invitation: invitation),
-                  const SizedBox(height: 12),
-                ],
-                if (espaces.isNotEmpty) const SizedBox(height: 8),
-              ],
-              for (final (i, e) in espaces.indexed) ...[
-                _CarteEspace(
-                  espaceAvecRole: e,
-                  index: i,
-                  onTap: () {
-                    ref.read(currentEspaceIdProvider.notifier).state = e.espace.id;
-                    Navigator.of(context).pushReplacement(
-                      MaterialPageRoute(builder: (_) => const HomeShell()),
-                    );
-                  },
-                ),
-                const SizedBox(height: 12),
-              ],
-            ],
-          );
-        },
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -131,14 +147,17 @@ class _CarteInvitationState extends ConsumerState<_CarteInvitation> {
   Future<void> _accepter() async {
     setState(() => _enCours = true);
     try {
-      final espaceId = await ref.read(invitationsServiceProvider).accepter(widget.invitation.id);
+      final espaceId = await ref
+          .read(invitationsServiceProvider)
+          .accepter(widget.invitation.id);
       if (!mounted) return;
       ref.read(currentEspaceIdProvider.notifier).state = espaceId;
-      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const HomeShell()));
+      Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) => const HomeShell()));
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text("Acceptation impossible : ${e.toString()}")));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text("Acceptation impossible : ${e.toString()}")));
         setState(() => _enCours = false);
       }
     }
@@ -147,7 +166,9 @@ class _CarteInvitationState extends ConsumerState<_CarteInvitation> {
   Future<void> _refuser() async {
     setState(() => _enCours = true);
     try {
-      await ref.read(invitationsServiceProvider).supprimer(widget.invitation.id);
+      await ref
+          .read(invitationsServiceProvider)
+          .supprimer(widget.invitation.id);
     } finally {
       if (mounted) setState(() => _enCours = false);
     }
@@ -166,22 +187,30 @@ class _CarteInvitationState extends ConsumerState<_CarteInvitation> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(widget.invitation.nomEspace ?? 'Espace',
-              style: AppFonts.heading(fontSize: 16, color: AppColors.texteEncre)),
+              style:
+                  AppFonts.heading(fontSize: 16, color: AppColors.texteEncre)),
           const SizedBox(height: 2),
           Text('Invité comme ${widget.invitation.role.libelle}',
-              style: const TextStyle(fontSize: 12, color: AppColors.texteSecondaire)),
+              style: const TextStyle(
+                  fontSize: 12, color: AppColors.texteSecondaire)),
           const SizedBox(height: 12),
           if (_enCours)
-            const Center(child: SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2)))
+            const Center(
+                child: SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2)))
           else
             Row(
               children: [
                 Expanded(
-                  child: OutlinedButton(onPressed: _refuser, child: const Text('Refuser')),
+                  child: OutlinedButton(
+                      onPressed: _refuser, child: const Text('Refuser')),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: ElevatedButton(onPressed: _accepter, child: const Text('Accepter')),
+                  child: ElevatedButton(
+                      onPressed: _accepter, child: const Text('Accepter')),
                 ),
               ],
             ),
@@ -199,9 +228,16 @@ class _CarteEspace extends StatelessWidget {
   final int index;
   final VoidCallback onTap;
 
-  const _CarteEspace({required this.espaceAvecRole, required this.index, required this.onTap});
+  const _CarteEspace(
+      {required this.espaceAvecRole, required this.index, required this.onTap});
 
-  static const _tonalites = [Tonalite.or, Tonalite.palme, Tonalite.terre, Tonalite.indigo, Tonalite.mixte];
+  static const _tonalites = [
+    Tonalite.or,
+    Tonalite.palme,
+    Tonalite.terre,
+    Tonalite.indigo,
+    Tonalite.mixte
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -257,7 +293,10 @@ class _CarteEspace extends StatelessWidget {
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(color: AppColors.bordure),
                   boxShadow: [
-                    BoxShadow(color: Colors.black.withValues(alpha: .08), blurRadius: 10, offset: const Offset(0, 4)),
+                    BoxShadow(
+                        color: Colors.black.withValues(alpha: .08),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4)),
                   ],
                 ),
                 child: Row(
@@ -278,7 +317,9 @@ class _CarteEspace extends StatelessWidget {
                               ),
                               child: Text(
                                 espace.initiales,
-                                style: const TextStyle(color: AppColors.or, fontWeight: FontWeight.bold),
+                                style: const TextStyle(
+                                    color: AppColors.or,
+                                    fontWeight: FontWeight.bold),
                               ),
                             ),
                             const SizedBox(width: 14),
@@ -286,16 +327,22 @@ class _CarteEspace extends StatelessWidget {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(espace.nom, style: AppFonts.heading(fontSize: 16, color: AppColors.texteEncre)),
+                                  Text(espace.nom,
+                                      style: AppFonts.heading(
+                                          fontSize: 16,
+                                          color: AppColors.texteEncre)),
                                   const SizedBox(height: 2),
                                   Text(
                                     '${espace.type.libelle} · ${espaceAvecRole.role.libelle}',
-                                    style: const TextStyle(fontSize: 12, color: AppColors.texteSecondaire),
+                                    style: const TextStyle(
+                                        fontSize: 12,
+                                        color: AppColors.texteSecondaire),
                                   ),
                                 ],
                               ),
                             ),
-                            const Icon(Icons.chevron_right, color: AppColors.texteSecondaire),
+                            const Icon(Icons.chevron_right,
+                                color: AppColors.texteSecondaire),
                           ],
                         ),
                       ),
@@ -315,10 +362,12 @@ class _FormulaireNouvelEspace extends ConsumerStatefulWidget {
   const _FormulaireNouvelEspace();
 
   @override
-  ConsumerState<_FormulaireNouvelEspace> createState() => _FormulaireNouvelEspaceState();
+  ConsumerState<_FormulaireNouvelEspace> createState() =>
+      _FormulaireNouvelEspaceState();
 }
 
-class _FormulaireNouvelEspaceState extends ConsumerState<_FormulaireNouvelEspace> {
+class _FormulaireNouvelEspaceState
+    extends ConsumerState<_FormulaireNouvelEspace> {
   final _formKey = GlobalKey<FormState>();
   final _nomCtrl = TextEditingController();
   EspaceType _type = EspaceType.eglise;
@@ -344,7 +393,8 @@ class _FormulaireNouvelEspaceState extends ConsumerState<_FormulaireNouvelEspace
       ref.read(currentEspaceIdProvider.notifier).state = espace.id;
       if (mounted) {
         Navigator.of(context).pop();
-        Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const HomeShell()));
+        Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (_) => const HomeShell()));
       }
     } catch (e) {
       setState(() => _erreur = "Création impossible : ${e.toString()}");
@@ -368,19 +418,23 @@ class _FormulaireNouvelEspaceState extends ConsumerState<_FormulaireNouvelEspace
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text('Nouvel espace', style: AppFonts.heading(fontSize: 20, color: AppColors.texteEncre)),
+            Text('Nouvel espace',
+                style: AppFonts.heading(
+                    fontSize: 20, color: AppColors.texteEncre)),
             const SizedBox(height: 16),
             TextFormField(
               controller: _nomCtrl,
               decoration: const InputDecoration(labelText: 'Nom'),
-              validator: (v) => (v == null || v.trim().isEmpty) ? 'Requis' : null,
+              validator: (v) =>
+                  (v == null || v.trim().isEmpty) ? 'Requis' : null,
             ),
             const SizedBox(height: 14),
             DropdownButtonFormField<EspaceType>(
               initialValue: _type,
               decoration: const InputDecoration(labelText: 'Type'),
               items: EspaceType.values
-                  .map((t) => DropdownMenuItem(value: t, child: Text(t.libelle)))
+                  .map(
+                      (t) => DropdownMenuItem(value: t, child: Text(t.libelle)))
                   .toList(),
               onChanged: (v) => setState(() => _type = v!),
             ),
@@ -408,7 +462,8 @@ class _FormulaireNouvelEspaceState extends ConsumerState<_FormulaireNouvelEspace
                   ? const SizedBox(
                       height: 18,
                       width: 18,
-                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                      child: CircularProgressIndicator(
+                          strokeWidth: 2, color: Colors.white),
                     )
                   : const Text('CRÉER'),
             ),

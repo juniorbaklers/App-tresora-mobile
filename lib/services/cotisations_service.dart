@@ -1,17 +1,14 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/cotisation.dart';
+import '../utils/cache_hors_ligne.dart';
 
 /// Tables `cotisations` + `paiements_cotisation` + `tranches`.
 class CotisationsService {
   final SupabaseClient _client = Supabase.instance.client;
 
   Stream<List<Cotisation>> streamCotisations(String espaceId) {
-    return _client
-        .from('cotisations')
-        .stream(primaryKey: ['id'])
-        .eq('espace_id', espaceId)
-        .order('date_limite')
-        .map((rows) => rows.map(Cotisation.fromMap).toList());
+    final flux = _client.from('cotisations').stream(primaryKey: ['id']).eq('espace_id', espaceId).order('date_limite');
+    return avecCacheHorsLigne('cotisations_$espaceId', flux).map((rows) => rows.map(Cotisation.fromMap).toList());
   }
 
   /// Crée la cotisation puis génère une ligne `paiements_cotisation` (à

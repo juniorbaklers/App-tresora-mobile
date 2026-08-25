@@ -3,6 +3,7 @@ import '../models/espace.dart';
 import '../models/membre_compte.dart';
 import '../models/profil.dart';
 import '../models/role.dart';
+import '../utils/cache_hors_ligne.dart';
 
 /// Tables `espaces` + `espace_membres` — le concept central : chaque
 /// organisation est une trésorerie indépendante, et un utilisateur peut en
@@ -12,25 +13,30 @@ class EspacesService {
 
   /// "Mes espaces" en temps réel : écoute mes lignes espace_membres, puis
   /// recharge les espaces correspondants à chaque changement (ajout/retrait
-  /// d'un espace, changement de rôle).
+  /// d'un espace, changement de rôle). C'est le tout premier écran après
+  /// connexion, donc le flux combiné (espace + rôle) est lui-même mis en
+  /// cache hors-ligne, sous forme de lignes brutes (champs de `espaces`
+  /// plus `role`) pour rester compatible avec `avecCacheHorsLigne`.
   Stream<List<EspaceAvecRole>> streamMesEspaces(String userId) {
-    return _client
+    final flux = _client
         .from('espace_membres')
         .stream(primaryKey: ['espace_id', 'user_id'])
         .eq('user_id', userId)
         .asyncMap((lignes) async {
-      if (lignes.isEmpty) return <EspaceAvecRole>[];
+      if (lignes.isEmpty) return <Map<String, dynamic>>[];
       final ids = lignes.map((l) => l['espace_id'] as String).toList();
       final espacesData = await _client.from('espaces').select().inFilter('id', ids);
-      final espacesParId = {for (final e in espacesData) e['id'] as String: Espace.fromMap(e)};
+      final espacesParId = {for (final e in espacesData) e['id'] as String: e};
       return lignes
           .where((l) => espacesParId.containsKey(l['espace_id']))
-          .map((l) => EspaceAvecRole(
-                espace: espacesParId[l['espace_id']]!,
-                role: RoleEspace.fromBdd(l['role'] as String),
-              ))
+          .map((l) => {...espacesParId[l['espace_id']]!, 'role': l['role']})
           .toList();
     });
+    return avecCacheHorsLigne('mes_espaces_$userId', flux).map(
+      (rows) => rows
+          .map((r) => EspaceAvecRole(espace: Espace.fromMap(r), role: RoleEspace.fromBdd(r['role'] as String)))
+          .toList(),
+    );
   }
 
   /// Crée un espace ; le créateur en devient automatiquement propriétaire

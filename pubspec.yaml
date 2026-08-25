@@ -30,6 +30,10 @@ dependencies:
   pdf: ^3.11.3
   printing: ^5.13.4
 
+  # Mode hors-ligne (lecture seule) : cache local des derniers flux connus
+  shared_preferences: ^2.3.3
+  connectivity_plus: ^6.1.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

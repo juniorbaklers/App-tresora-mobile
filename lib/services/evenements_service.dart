@@ -1,5 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/evenement.dart';
+import '../utils/cache_hors_ligne.dart';
 
 /// Table `evenements`. Pas de trigger de recalcul côté base pour
 /// montant_collecte/participants (contrairement aux tranches de
@@ -8,12 +9,8 @@ class EvenementsService {
   final SupabaseClient _client = Supabase.instance.client;
 
   Stream<List<Evenement>> streamEvenements(String espaceId) {
-    return _client
-        .from('evenements')
-        .stream(primaryKey: ['id'])
-        .eq('espace_id', espaceId)
-        .order('date_debut', ascending: false)
-        .map((rows) => rows.map(Evenement.fromMap).toList());
+    final flux = _client.from('evenements').stream(primaryKey: ['id']).eq('espace_id', espaceId).order('date_debut', ascending: false);
+    return avecCacheHorsLigne('evenements_$espaceId', flux).map((rows) => rows.map(Evenement.fromMap).toList());
   }
 
   Future<void> creer(Evenement evenement) => _client.from('evenements').insert(evenement.toInsertMap());
