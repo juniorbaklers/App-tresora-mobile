@@ -53,7 +53,8 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                   ? Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.mark_email_read, size: 56, color: AppColors.palme),
+                        const Icon(Icons.mark_email_read,
+                            size: 56, color: AppColors.palme),
                         const SizedBox(height: 16),
                         const Text(
                           'Compte créé. Vérifie ta boîte mail pour confirmer ton adresse, '
@@ -75,26 +76,36 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                         children: [
                           TextFormField(
                             controller: _nomCtrl,
-                            decoration: const InputDecoration(labelText: 'Nom complet'),
-                            validator: (v) => (v == null || v.trim().isEmpty) ? 'Requis' : null,
+                            decoration:
+                                const InputDecoration(labelText: 'Nom complet'),
+                            validator: (v) => (v == null || v.trim().isEmpty)
+                                ? 'Requis'
+                                : null,
                           ),
                           const SizedBox(height: 14),
                           TextFormField(
                             controller: _emailCtrl,
                             keyboardType: TextInputType.emailAddress,
-                            decoration: const InputDecoration(labelText: 'Email'),
-                            validator: (v) => (v == null || !v.contains('@')) ? 'Email invalide' : null,
+                            decoration:
+                                const InputDecoration(labelText: 'Email'),
+                            validator: (v) => (v == null || !v.contains('@'))
+                                ? 'Email invalide'
+                                : null,
                           ),
                           const SizedBox(height: 14),
                           TextFormField(
                             controller: _motDePasseCtrl,
                             obscureText: true,
-                            decoration: const InputDecoration(labelText: 'Mot de passe'),
-                            validator: (v) => (v == null || v.length < 6) ? 'Minimum 6 caractères' : null,
+                            decoration: const InputDecoration(
+                                labelText: 'Mot de passe'),
+                            validator: (v) => (v == null || v.length < 6)
+                                ? 'Minimum 6 caractères'
+                                : null,
                           ),
                           if (_erreur != null) ...[
                             const SizedBox(height: 12),
-                            Text(_erreur!, style: const TextStyle(color: AppColors.terre)),
+                            Text(_erreur!,
+                                style: const TextStyle(color: AppColors.terre)),
                           ],
                           const SizedBox(height: 24),
                           ElevatedButton(
@@ -103,7 +114,8 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                                 ? const SizedBox(
                                     height: 18,
                                     width: 18,
-                                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                                    child: CircularProgressIndicator(
+                                        strokeWidth: 2, color: Colors.white),
                                   )
                                 : const Text('CRÉER LE COMPTE'),
                           ),

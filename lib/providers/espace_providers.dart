@@ -18,14 +18,19 @@ final notificationsServiceProvider = Provider((ref) => NotificationsService());
 final mesInvitationsProvider = StreamProvider<List<Invitation>>((ref) {
   final user = ref.watch(currentUserProvider);
   if (user == null || user.email == null) return Stream.value(<Invitation>[]);
-  return ref.watch(invitationsServiceProvider).streamMesInvitations(user.email!);
+  return ref
+      .watch(invitationsServiceProvider)
+      .streamMesInvitations(user.email!);
 });
 
 /// Notifications de l'utilisateur connecté, tous espaces confondus.
-final mesNotificationsProvider = StreamProvider<List<NotificationTresora>>((ref) {
+final mesNotificationsProvider =
+    StreamProvider<List<NotificationTresora>>((ref) {
   final user = ref.watch(currentUserProvider);
   if (user == null) return Stream.value(<NotificationTresora>[]);
-  return ref.watch(notificationsServiceProvider).streamMesNotifications(user.id);
+  return ref
+      .watch(notificationsServiceProvider)
+      .streamMesNotifications(user.id);
 });
 
 /// Comptes utilisateurs + rôles de l'espace courant — gestion des rôles

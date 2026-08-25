@@ -58,9 +58,13 @@ class MembresListScreen extends ConsumerWidget {
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 4, vertical: 4),
                   child: Text('INVITATIONS EN ATTENTE',
-                      style: TextStyle(fontSize: 11, color: AppColors.texteSecondaire, fontWeight: FontWeight.w700)),
+                      style: TextStyle(
+                          fontSize: 11,
+                          color: AppColors.texteSecondaire,
+                          fontWeight: FontWeight.w700)),
                 ),
-                for (final invitation in invitationsEnAttente) _InvitationTile(invitation: invitation),
+                for (final invitation in invitationsEnAttente)
+                  _InvitationTile(invitation: invitation),
                 const SizedBox(height: 12),
               ],
               for (final membre in membres) ...[
@@ -100,7 +104,8 @@ class _InvitationTile extends ConsumerWidget {
           child: IconButton(
             icon: const Icon(Icons.close),
             tooltip: 'Annuler l\'invitation',
-            onPressed: () => ref.read(invitationsServiceProvider).supprimer(invitation.id),
+            onPressed: () =>
+                ref.read(invitationsServiceProvider).supprimer(invitation.id),
           ),
         ),
       ),
@@ -112,7 +117,8 @@ class _FormulaireInvitation extends ConsumerStatefulWidget {
   const _FormulaireInvitation();
 
   @override
-  ConsumerState<_FormulaireInvitation> createState() => _FormulaireInvitationState();
+  ConsumerState<_FormulaireInvitation> createState() =>
+      _FormulaireInvitationState();
 }
 
 class _FormulaireInvitationState extends ConsumerState<_FormulaireInvitation> {
@@ -164,13 +170,16 @@ class _FormulaireInvitationState extends ConsumerState<_FormulaireInvitation> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text('Inviter par email', style: AppFonts.heading(fontSize: 18, color: AppColors.texteEncre)),
+            Text('Inviter par email',
+                style: AppFonts.heading(
+                    fontSize: 18, color: AppColors.texteEncre)),
             const SizedBox(height: 16),
             TextFormField(
               controller: _emailCtrl,
               keyboardType: TextInputType.emailAddress,
               decoration: const InputDecoration(labelText: 'Email'),
-              validator: (v) => (v == null || !v.contains('@')) ? 'Email invalide' : null,
+              validator: (v) =>
+                  (v == null || !v.contains('@')) ? 'Email invalide' : null,
             ),
             const SizedBox(height: 14),
             DropdownButtonFormField<RoleEspace>(
@@ -178,7 +187,8 @@ class _FormulaireInvitationState extends ConsumerState<_FormulaireInvitation> {
               decoration: const InputDecoration(labelText: 'Rôle'),
               items: RoleEspace.values
                   .where((r) => r != RoleEspace.proprietaire)
-                  .map((r) => DropdownMenuItem(value: r, child: Text(r.libelle)))
+                  .map(
+                      (r) => DropdownMenuItem(value: r, child: Text(r.libelle)))
                   .toList(),
               onChanged: (v) => setState(() => _role = v!),
             ),
@@ -193,7 +203,8 @@ class _FormulaireInvitationState extends ConsumerState<_FormulaireInvitation> {
                   ? const SizedBox(
                       height: 18,
                       width: 18,
-                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                      child: CircularProgressIndicator(
+                          strokeWidth: 2, color: Colors.white),
                     )
                   : const Text('INVITER'),
             ),
@@ -214,10 +225,14 @@ class _MembreTile extends ConsumerWidget {
     return Card(
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: membre.actif ? Colors.green.withValues(alpha: .12) : Colors.grey.withValues(alpha: .15),
-          child: Icon(Icons.person, color: membre.actif ? Colors.green[700] : Colors.grey),
+          backgroundColor: membre.actif
+              ? Colors.green.withValues(alpha: .12)
+              : Colors.grey.withValues(alpha: .15),
+          child: Icon(Icons.person,
+              color: membre.actif ? Colors.green[700] : Colors.grey),
         ),
-        title: Text(membre.nomComplet, style: TextStyle(color: membre.actif ? null : Colors.grey)),
+        title: Text(membre.nomComplet,
+            style: TextStyle(color: membre.actif ? null : Colors.grey)),
         subtitle: Text(
           [
             if (membre.fonction?.isNotEmpty == true) membre.fonction!,

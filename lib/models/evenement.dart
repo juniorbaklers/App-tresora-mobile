@@ -10,7 +10,8 @@ enum StatutEvenement {
   const StatutEvenement(this.valeurBdd, this.libelle);
 
   static StatutEvenement fromBdd(String v) =>
-      StatutEvenement.values.firstWhere((s) => s.valeurBdd == v, orElse: () => StatutEvenement.planifie);
+      StatutEvenement.values.firstWhere((s) => s.valeurBdd == v,
+          orElse: () => StatutEvenement.planifie);
 }
 
 /// Table `evenements` — collecte ponctuelle (fête, projet, urgence...) avec
@@ -43,7 +44,9 @@ class Evenement {
     required this.statut,
   });
 
-  double? get progression => (montantCible == null || montantCible == 0) ? null : montantCollecte / montantCible!;
+  double? get progression => (montantCible == null || montantCible == 0)
+      ? null
+      : montantCollecte / montantCible!;
 
   factory Evenement.fromMap(Map<String, dynamic> map) => Evenement(
         id: map['id'] as String,
@@ -94,7 +97,8 @@ class ContributionEvenement {
     required this.date,
   });
 
-  factory ContributionEvenement.fromMap(Map<String, dynamic> map) => ContributionEvenement(
+  factory ContributionEvenement.fromMap(Map<String, dynamic> map) =>
+      ContributionEvenement(
         id: map['id'] as String,
         evenementId: map['evenement_id'] as String,
         nomContributeur: map['nom_contributeur'] as String,

@@ -7,20 +7,34 @@ class CotisationsService {
   final SupabaseClient _client = Supabase.instance.client;
 
   Stream<List<Cotisation>> streamCotisations(String espaceId) {
-    final flux = _client.from('cotisations').stream(primaryKey: ['id']).eq('espace_id', espaceId).order('date_limite');
-    return avecCacheHorsLigne('cotisations_$espaceId', flux).map((rows) => rows.map(Cotisation.fromMap).toList());
+    final flux = _client
+        .from('cotisations')
+        .stream(primaryKey: ['id'])
+        .eq('espace_id', espaceId)
+        .order('date_limite');
+    return avecCacheHorsLigne('cotisations_$espaceId', flux)
+        .map((rows) => rows.map(Cotisation.fromMap).toList());
   }
 
   /// Crée la cotisation puis génère une ligne `paiements_cotisation` (à
   /// zéro, statut impayé) pour chaque membre actif de l'espace — c'est ce
   /// qui rend la cotisation "assignée" à tout le monde dès sa création.
-  Future<void> creer(Cotisation cotisation, {required List<String> membreIdsActifs}) async {
-    final row = await _client.from('cotisations').insert(cotisation.toInsertMap()).select().single();
+  Future<void> creer(Cotisation cotisation,
+      {required List<String> membreIdsActifs}) async {
+    final row = await _client
+        .from('cotisations')
+        .insert(cotisation.toInsertMap())
+        .select()
+        .single();
     final cotisationId = row['id'] as String;
     if (membreIdsActifs.isEmpty) return;
     await _client.from('paiements_cotisation').insert([
       for (final membreId in membreIdsActifs)
-        {'cotisation_id': cotisationId, 'membre_id': membreId, 'montant_du': cotisation.montant},
+        {
+          'cotisation_id': cotisationId,
+          'membre_id': membreId,
+          'montant_du': cotisation.montant
+        },
     ]);
   }
 }
@@ -54,5 +68,6 @@ class TranchesService {
         .map((rows) => rows.map(Tranche.fromMap).toList());
   }
 
-  Future<void> creer(Tranche tranche) => _client.from('tranches').insert(tranche.toInsertMap());
+  Future<void> creer(Tranche tranche) =>
+      _client.from('tranches').insert(tranche.toInsertMap());
 }

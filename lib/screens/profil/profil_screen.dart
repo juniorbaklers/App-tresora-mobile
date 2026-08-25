@@ -29,8 +29,14 @@ class ProfilScreen extends ConsumerWidget {
               radius: 36,
               backgroundColor: AppColors.indigoProfond,
               child: Text(
-                (profil?.nomComplet.isNotEmpty == true ? profil!.nomComplet[0] : '?').toUpperCase(),
-                style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),
+                (profil?.nomComplet.isNotEmpty == true
+                        ? profil!.nomComplet[0]
+                        : '?')
+                    .toUpperCase(),
+                style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold),
               ),
             ),
             const SizedBox(height: 16),
@@ -41,7 +47,9 @@ class ProfilScreen extends ConsumerWidget {
                 textAlign: TextAlign.center,
               ),
             ),
-            Center(child: Text(user?.email ?? '', style: const TextStyle(color: AppColors.texteSecondaire))),
+            Center(
+                child: Text(user?.email ?? '',
+                    style: const TextStyle(color: AppColors.texteSecondaire))),
             const SizedBox(height: 24),
             if (espaceAvecRole != null)
               Container(
@@ -58,11 +66,17 @@ class ProfilScreen extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Text('ESPACE ACTUEL',
-                              style: TextStyle(fontSize: 11, color: AppColors.texteSecondaire)),
+                              style: TextStyle(
+                                  fontSize: 11,
+                                  color: AppColors.texteSecondaire)),
                           const SizedBox(height: 4),
-                          Text(espaceAvecRole.espace.nom, style: const TextStyle(fontWeight: FontWeight.w600)),
+                          Text(espaceAvecRole.espace.nom,
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.w600)),
                           Text(espaceAvecRole.role.libelle,
-                              style: const TextStyle(fontSize: 12, color: AppColors.texteSecondaire)),
+                              style: const TextStyle(
+                                  fontSize: 12,
+                                  color: AppColors.texteSecondaire)),
                         ],
                       ),
                     ),
@@ -70,7 +84,8 @@ class ProfilScreen extends ConsumerWidget {
                       onPressed: () {
                         ref.read(currentEspaceIdProvider.notifier).state = null;
                         Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(builder: (_) => const EspaceSelectionScreen()),
+                          MaterialPageRoute(
+                              builder: (_) => const EspaceSelectionScreen()),
                           (route) => false,
                         );
                       },
@@ -90,7 +105,8 @@ class ProfilScreen extends ConsumerWidget {
                       title: const Text('Réglages de l\'espace'),
                       trailing: const Icon(Icons.chevron_right),
                       onTap: () => Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => const ReglagesEspaceScreen()),
+                        MaterialPageRoute(
+                            builder: (_) => const ReglagesEspaceScreen()),
                       ),
                     ),
                   ),

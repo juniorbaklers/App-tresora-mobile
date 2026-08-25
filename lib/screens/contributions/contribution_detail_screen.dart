@@ -10,12 +10,16 @@ class ContributionDetailScreen extends ConsumerWidget {
   final Contribution contribution;
   final bool estCible;
 
-  const ContributionDetailScreen({super.key, required this.contribution, required this.estCible});
+  const ContributionDetailScreen(
+      {super.key, required this.contribution, required this.estCible});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final versementsAsync = ref.watch(versementsContributionProvider(contribution.id));
-    final autreEspace = estCible ? contribution.nomEspaceDemandeur : contribution.nomEspaceCible;
+    final versementsAsync =
+        ref.watch(versementsContributionProvider(contribution.id));
+    final autreEspace = estCible
+        ? contribution.nomEspaceDemandeur
+        : contribution.nomEspaceCible;
 
     return Scaffold(
       appBar: AppBar(title: Text(contribution.projet)),
@@ -33,14 +37,21 @@ class ContributionDetailScreen extends ConsumerWidget {
         padding: const EdgeInsets.all(16),
         children: [
           if (contribution.description.isNotEmpty) ...[
-            Text(contribution.description, style: const TextStyle(color: AppColors.texteSecondaire)),
+            Text(contribution.description,
+                style: const TextStyle(color: AppColors.texteSecondaire)),
             const SizedBox(height: 16),
           ],
           Row(
             children: [
-              Expanded(child: _Resume(titre: 'Reçu', montant: contribution.montantRecu, couleur: AppColors.palme)),
+              Expanded(
+                  child: _Resume(
+                      titre: 'Reçu',
+                      montant: contribution.montantRecu,
+                      couleur: AppColors.palme)),
               const SizedBox(width: 12),
-              Expanded(child: _Resume(titre: 'Demandé', montant: contribution.montantDemande)),
+              Expanded(
+                  child: _Resume(
+                      titre: 'Demandé', montant: contribution.montantDemande)),
             ],
           ),
           const SizedBox(height: 16),
@@ -67,19 +78,27 @@ class ContributionDetailScreen extends ConsumerWidget {
             subtitle: Text(formatDate(contribution.dateLimite)),
           ),
           const SizedBox(height: 8),
-          Text('VERSEMENTS', style: TextStyle(fontSize: 11, color: AppColors.texteSecondaire, fontWeight: FontWeight.w700)),
+          Text('VERSEMENTS',
+              style: TextStyle(
+                  fontSize: 11,
+                  color: AppColors.texteSecondaire,
+                  fontWeight: FontWeight.w700)),
           const SizedBox(height: 8),
           versementsAsync.when(
             loading: () => const Center(child: CircularProgressIndicator()),
             error: (e, _) => Text('Erreur : $e'),
             data: (versements) {
-              if (versements.isEmpty) return const Text('Aucun versement enregistré', style: TextStyle(color: AppColors.texteSecondaire));
+              if (versements.isEmpty) {
+                return const Text('Aucun versement enregistré',
+                    style: TextStyle(color: AppColors.texteSecondaire));
+              }
               return Column(
                 children: [
                   for (final v in versements)
                     Card(
                       child: ListTile(
-                        leading: const Icon(Icons.arrow_downward, color: AppColors.palme),
+                        leading: const Icon(Icons.arrow_downward,
+                            color: AppColors.palme),
                         title: Text(formatMontant(v.montant)),
                         subtitle: Text(formatDate(v.date)),
                       ),
@@ -107,7 +126,10 @@ class _Resume extends StatelessWidget {
   final double montant;
   final Color couleur;
 
-  const _Resume({required this.titre, required this.montant, this.couleur = AppColors.indigoProfond});
+  const _Resume(
+      {required this.titre,
+      required this.montant,
+      this.couleur = AppColors.indigoProfond});
 
   @override
   Widget build(BuildContext context) {
@@ -121,9 +143,12 @@ class _Resume extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(titre.toUpperCase(), style: const TextStyle(fontSize: 11, color: AppColors.texteSecondaire)),
+          Text(titre.toUpperCase(),
+              style: const TextStyle(
+                  fontSize: 11, color: AppColors.texteSecondaire)),
           const SizedBox(height: 4),
-          Text(formatMontant(montant), style: AppFonts.montant(fontSize: 16, color: couleur)),
+          Text(formatMontant(montant),
+              style: AppFonts.montant(fontSize: 16, color: couleur)),
         ],
       ),
     );
@@ -136,7 +161,8 @@ class _FormulaireVersement extends ConsumerStatefulWidget {
   const _FormulaireVersement({required this.contribution});
 
   @override
-  ConsumerState<_FormulaireVersement> createState() => _FormulaireVersementState();
+  ConsumerState<_FormulaireVersement> createState() =>
+      _FormulaireVersementState();
 }
 
 class _FormulaireVersementState extends ConsumerState<_FormulaireVersement> {
@@ -166,7 +192,8 @@ class _FormulaireVersementState extends ConsumerState<_FormulaireVersement> {
 
   @override
   Widget build(BuildContext context) {
-    final restant = widget.contribution.montantDemande - widget.contribution.montantRecu;
+    final restant =
+        widget.contribution.montantDemande - widget.contribution.montantRecu;
     return Padding(
       padding: EdgeInsets.only(
         left: 20,
@@ -180,14 +207,19 @@ class _FormulaireVersementState extends ConsumerState<_FormulaireVersement> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text('Enregistrer un versement', style: AppFonts.heading(fontSize: 18, color: AppColors.texteEncre)),
+            Text('Enregistrer un versement',
+                style: AppFonts.heading(
+                    fontSize: 18, color: AppColors.texteEncre)),
             const SizedBox(height: 4),
-            Text('Reste dû : ${formatMontant(restant)}', style: const TextStyle(color: AppColors.texteSecondaire)),
+            Text('Reste dû : ${formatMontant(restant)}',
+                style: const TextStyle(color: AppColors.texteSecondaire)),
             const SizedBox(height: 16),
             TextFormField(
               controller: _montantCtrl,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              decoration: const InputDecoration(labelText: 'Montant versé (FCFA)'),
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
+              decoration:
+                  const InputDecoration(labelText: 'Montant versé (FCFA)'),
               validator: (v) {
                 final n = double.tryParse((v ?? '').replaceAll(',', '.'));
                 return (n == null || n <= 0) ? 'Montant invalide' : null;
@@ -204,7 +236,8 @@ class _FormulaireVersementState extends ConsumerState<_FormulaireVersement> {
                   ? const SizedBox(
                       height: 18,
                       width: 18,
-                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                      child: CircularProgressIndicator(
+                          strokeWidth: 2, color: Colors.white),
                     )
                   : const Text('ENREGISTRER'),
             ),

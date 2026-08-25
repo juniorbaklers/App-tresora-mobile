@@ -28,7 +28,8 @@ class Cloture {
     this.justification,
   });
 
-  double get totalDeclare => offrandeOrdinaire + offrandeSpeciale + dimes + autresRecettes;
+  double get totalDeclare =>
+      offrandeOrdinaire + offrandeSpeciale + dimes + autresRecettes;
 
   double get ecart => totalCompte - totalDeclare;
 

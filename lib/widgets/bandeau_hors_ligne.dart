@@ -24,7 +24,9 @@ class BandeauHorsLigne extends ConsumerWidget {
           const SizedBox(width: 6),
           Text(
             'Hors-ligne — dernières données synchronisées',
-            style: TextStyle(fontSize: 11, color: AppColors.texteEncre.withValues(alpha: .8)),
+            style: TextStyle(
+                fontSize: 11,
+                color: AppColors.texteEncre.withValues(alpha: .8)),
           ),
         ],
       ),

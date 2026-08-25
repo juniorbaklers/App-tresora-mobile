@@ -14,7 +14,8 @@ class CotisationDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final paiementsAsync = ref.watch(paiementsCotisationProvider(cotisation.id));
+    final paiementsAsync =
+        ref.watch(paiementsCotisationProvider(cotisation.id));
     final membres = ref.watch(membresStreamProvider).valueOrNull ?? [];
     final membresParId = {for (final m in membres) m.id: m};
 
@@ -25,7 +26,8 @@ class CotisationDetailScreen extends ConsumerWidget {
         error: (e, _) => Center(child: Text('Erreur : $e')),
         data: (paiements) {
           if (paiements.isEmpty) {
-            return const Center(child: Text('Aucun membre assigné à cette cotisation'));
+            return const Center(
+                child: Text('Aucun membre assigné à cette cotisation'));
           }
           final totalDu = paiements.fold(0.0, (a, p) => a + p.montantDu);
           final totalPaye = paiements.fold(0.0, (a, p) => a + p.montantPaye);
@@ -40,7 +42,10 @@ class CotisationDetailScreen extends ConsumerWidget {
                     ),
                     const SizedBox(width: 12),
                     Expanded(
-                      child: _Resume(titre: 'Collecté', montant: totalPaye, couleur: AppColors.palme),
+                      child: _Resume(
+                          titre: 'Collecté',
+                          montant: totalPaye,
+                          couleur: AppColors.palme),
                     ),
                   ],
                 ),
@@ -73,7 +78,10 @@ class _Resume extends StatelessWidget {
   final double montant;
   final Color couleur;
 
-  const _Resume({required this.titre, required this.montant, this.couleur = AppColors.indigoProfond});
+  const _Resume(
+      {required this.titre,
+      required this.montant,
+      this.couleur = AppColors.indigoProfond});
 
   @override
   Widget build(BuildContext context) {
@@ -87,9 +95,12 @@ class _Resume extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(titre.toUpperCase(), style: const TextStyle(fontSize: 11, color: AppColors.texteSecondaire)),
+          Text(titre.toUpperCase(),
+              style: const TextStyle(
+                  fontSize: 11, color: AppColors.texteSecondaire)),
           const SizedBox(height: 4),
-          Text(formatMontant(montant), style: AppFonts.montant(fontSize: 16, color: couleur)),
+          Text(formatMontant(montant),
+              style: AppFonts.montant(fontSize: 16, color: couleur)),
         ],
       ),
     );
@@ -115,7 +126,8 @@ class _LignePaiement extends ConsumerWidget {
     return Card(
       child: ListTile(
         title: Text(nomMembre),
-        subtitle: Text('${formatMontant(paiement.montantPaye)} / ${formatMontant(paiement.montantDu)}'),
+        subtitle: Text(
+            '${formatMontant(paiement.montantPaye)} / ${formatMontant(paiement.montantDu)}'),
         trailing: RoleGate(
           peutAcceder: (r) => r.peutGererMembres,
           remplacement: Chip(
@@ -139,7 +151,8 @@ class _LignePaiement extends ConsumerWidget {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      builder: (_) => _FormulaireTranche(nomMembre: nomMembre, paiement: paiement),
+      builder: (_) =>
+          _FormulaireTranche(nomMembre: nomMembre, paiement: paiement),
     );
   }
 }
@@ -201,16 +214,22 @@ class _FormulaireTrancheState extends ConsumerState<_FormulaireTranche> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text('Enregistrer un versement', style: AppFonts.heading(fontSize: 18, color: AppColors.texteEncre)),
+            Text('Enregistrer un versement',
+                style: AppFonts.heading(
+                    fontSize: 18, color: AppColors.texteEncre)),
             const SizedBox(height: 4),
-            Text(widget.nomMembre, style: const TextStyle(fontWeight: FontWeight.w600)),
+            Text(widget.nomMembre,
+                style: const TextStyle(fontWeight: FontWeight.w600)),
             const SizedBox(height: 2),
-            Text('Reste dû : ${formatMontant(restant)}', style: const TextStyle(color: AppColors.texteSecondaire)),
+            Text('Reste dû : ${formatMontant(restant)}',
+                style: const TextStyle(color: AppColors.texteSecondaire)),
             const SizedBox(height: 16),
             TextFormField(
               controller: _montantCtrl,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              decoration: const InputDecoration(labelText: 'Montant versé (FCFA)'),
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
+              decoration:
+                  const InputDecoration(labelText: 'Montant versé (FCFA)'),
               validator: (v) {
                 final n = double.tryParse((v ?? '').replaceAll(',', '.'));
                 return (n == null || n <= 0) ? 'Montant invalide' : null;
@@ -221,7 +240,8 @@ class _FormulaireTrancheState extends ConsumerState<_FormulaireTranche> {
               initialValue: _mode,
               decoration: const InputDecoration(labelText: 'Mode de paiement'),
               items: ModePaiement.values
-                  .map((m) => DropdownMenuItem(value: m, child: Text(m.libelle)))
+                  .map(
+                      (m) => DropdownMenuItem(value: m, child: Text(m.libelle)))
                   .toList(),
               onChanged: (v) => setState(() => _mode = v!),
             ),
@@ -236,7 +256,8 @@ class _FormulaireTrancheState extends ConsumerState<_FormulaireTranche> {
                   ? const SizedBox(
                       height: 18,
                       width: 18,
-                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                      child: CircularProgressIndicator(
+                          strokeWidth: 2, color: Colors.white),
                     )
                   : const Text('ENREGISTRER'),
             ),

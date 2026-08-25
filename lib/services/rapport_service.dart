@@ -25,7 +25,8 @@ class RapportService {
 
     final recettesParCategorie = <CategorieRecette, double>{};
     for (final r in recettes) {
-      recettesParCategorie[r.categorie] = (recettesParCategorie[r.categorie] ?? 0) + r.montant;
+      recettesParCategorie[r.categorie] =
+          (recettesParCategorie[r.categorie] ?? 0) + r.montant;
     }
     final depensesParCategorie = <String, double>{};
     for (final d in depenses) {
@@ -40,8 +41,12 @@ class RapportService {
         header: (context) => pw.Column(
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
-            pw.Text(espace.nom, style: pw.TextStyle(fontSize: 20, fontWeight: pw.FontWeight.bold)),
-            pw.Text('Rapport de trésorerie', style: const pw.TextStyle(fontSize: 13, color: PdfColors.grey700)),
+            pw.Text(espace.nom,
+                style:
+                    pw.TextStyle(fontSize: 20, fontWeight: pw.FontWeight.bold)),
+            pw.Text('Rapport de trésorerie',
+                style:
+                    const pw.TextStyle(fontSize: 13, color: PdfColors.grey700)),
             pw.Text(
               'Période du ${formatDate(debut)} au ${formatDate(fin)} — généré le ${formatDate(DateTime.now())}',
               style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey600),
@@ -56,22 +61,30 @@ class RapportService {
             children: [
               _bloc('Total recettes', totalRecettes, PdfColors.green800),
               _bloc('Total dépenses', totalDepenses, PdfColors.red800),
-              _bloc('Solde net', soldeNet, soldeNet >= 0 ? PdfColors.green800 : PdfColors.red800),
+              _bloc('Solde net', soldeNet,
+                  soldeNet >= 0 ? PdfColors.green800 : PdfColors.red800),
             ],
           ),
           pw.SizedBox(height: 24),
-          pw.Text('Recettes par catégorie', style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold)),
+          pw.Text('Recettes par catégorie',
+              style:
+                  pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold)),
           pw.SizedBox(height: 8),
           _tableau(
-            recettesParCategorie.entries.map((e) => MapEntry(e.key.libelle, e.value)).toList()
+            recettesParCategorie.entries
+                .map((e) => MapEntry(e.key.libelle, e.value))
+                .toList()
               ..sort((a, b) => b.value.compareTo(a.value)),
             totalRecettes,
           ),
           pw.SizedBox(height: 24),
-          pw.Text('Dépenses par catégorie', style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold)),
+          pw.Text('Dépenses par catégorie',
+              style:
+                  pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold)),
           pw.SizedBox(height: 8),
           _tableau(
-            depensesParCategorie.entries.toList()..sort((a, b) => b.value.compareTo(a.value)),
+            depensesParCategorie.entries.toList()
+              ..sort((a, b) => b.value.compareTo(a.value)),
             totalDepenses,
           ),
         ],
@@ -85,16 +98,20 @@ class RapportService {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
-        pw.Text(titre.toUpperCase(), style: const pw.TextStyle(fontSize: 9, color: PdfColors.grey600)),
+        pw.Text(titre.toUpperCase(),
+            style: const pw.TextStyle(fontSize: 9, color: PdfColors.grey600)),
         pw.SizedBox(height: 2),
-        pw.Text(formatMontant(montant), style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold, color: couleur)),
+        pw.Text(formatMontant(montant),
+            style: pw.TextStyle(
+                fontSize: 14, fontWeight: pw.FontWeight.bold, color: couleur)),
       ],
     );
   }
 
   pw.Widget _tableau(List<MapEntry<String, double>> lignes, double total) {
     if (lignes.isEmpty) {
-      return pw.Text('Aucune écriture sur cette période', style: const pw.TextStyle(color: PdfColors.grey600));
+      return pw.Text('Aucune écriture sur cette période',
+          style: const pw.TextStyle(color: PdfColors.grey600));
     }
     return pw.TableHelper.fromTextArray(
       headers: const ['Catégorie', 'Montant'],

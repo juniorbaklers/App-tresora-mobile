@@ -19,12 +19,14 @@ import 'espace_providers.dart';
 
 final membresServiceProvider = Provider((ref) => MembresService());
 final cotisationsServiceProvider = Provider((ref) => CotisationsService());
-final paiementsCotisationServiceProvider = Provider((ref) => PaiementsCotisationService());
+final paiementsCotisationServiceProvider =
+    Provider((ref) => PaiementsCotisationService());
 final tranchesServiceProvider = Provider((ref) => TranchesService());
 final recettesServiceProvider = Provider((ref) => RecettesService());
 final depensesServiceProvider = Provider((ref) => DepensesService());
 final evenementsServiceProvider = Provider((ref) => EvenementsService());
-final contributionsEvenementServiceProvider = Provider((ref) => ContributionsEvenementService());
+final contributionsEvenementServiceProvider =
+    Provider((ref) => ContributionsEvenementService());
 final contributionsServiceProvider = Provider((ref) => ContributionsService());
 final journalServiceProvider = Provider((ref) => JournalService());
 final cloturesServiceProvider = Provider((ref) => CloturesService());
@@ -67,23 +69,30 @@ final evenementsStreamProvider = StreamProvider<List<Evenement>>((ref) {
 final invitationsEspaceStreamProvider = StreamProvider<List<Invitation>>((ref) {
   final espaceId = ref.watch(currentEspaceIdProvider);
   if (espaceId == null) return Stream.value(<Invitation>[]);
-  return ref.watch(invitationsServiceProvider).streamInvitationsEspace(espaceId);
+  return ref
+      .watch(invitationsServiceProvider)
+      .streamInvitationsEspace(espaceId);
 });
 
-final contributionsEnvoyeesStreamProvider = StreamProvider<List<Contribution>>((ref) {
+final contributionsEnvoyeesStreamProvider =
+    StreamProvider<List<Contribution>>((ref) {
   final espaceId = ref.watch(currentEspaceIdProvider);
   if (espaceId == null) return Stream.value(<Contribution>[]);
   return ref.watch(contributionsServiceProvider).streamEnvoyees(espaceId);
 });
 
-final contributionsRecuesStreamProvider = StreamProvider<List<Contribution>>((ref) {
+final contributionsRecuesStreamProvider =
+    StreamProvider<List<Contribution>>((ref) {
   final espaceId = ref.watch(currentEspaceIdProvider);
   if (espaceId == null) return Stream.value(<Contribution>[]);
   return ref.watch(contributionsServiceProvider).streamRecues(espaceId);
 });
 
-final versementsContributionProvider = StreamProvider.family((ref, String contributionId) {
-  return ref.watch(contributionsServiceProvider).streamVersements(contributionId);
+final versementsContributionProvider =
+    StreamProvider.family((ref, String contributionId) {
+  return ref
+      .watch(contributionsServiceProvider)
+      .streamVersements(contributionId);
 });
 
 final journalStreamProvider = StreamProvider<List<EntreeJournal>>((ref) {
@@ -102,15 +111,23 @@ final cloturesStreamProvider = StreamProvider<List<Cloture>>((ref) {
 /// l'id de la cotisation (utilisé sur l'écran de détail).
 final paiementsCotisationProvider =
     StreamProvider.family((ref, String cotisationId) {
-  return ref.watch(paiementsCotisationServiceProvider).streamPaiements(cotisationId);
+  return ref
+      .watch(paiementsCotisationServiceProvider)
+      .streamPaiements(cotisationId);
 });
 
-final tranchesProvider = StreamProvider.family((ref, String paiementCotisationId) {
-  return ref.watch(tranchesServiceProvider).streamTranches(paiementCotisationId);
+final tranchesProvider =
+    StreamProvider.family((ref, String paiementCotisationId) {
+  return ref
+      .watch(tranchesServiceProvider)
+      .streamTranches(paiementCotisationId);
 });
 
 /// Fiches de contribution d'un événement précis — provider "family" utilisé
 /// sur l'écran de détail (analogue à tranchesProvider pour les cotisations).
-final contributionsEvenementProvider = StreamProvider.family((ref, String evenementId) {
-  return ref.watch(contributionsEvenementServiceProvider).streamContributions(evenementId);
+final contributionsEvenementProvider =
+    StreamProvider.family((ref, String evenementId) {
+  return ref
+      .watch(contributionsEvenementServiceProvider)
+      .streamContributions(evenementId);
 });

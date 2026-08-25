@@ -17,9 +17,12 @@ class MembreFormScreen extends ConsumerStatefulWidget {
 class _MembreFormScreenState extends ConsumerState<MembreFormScreen> {
   final _formKey = GlobalKey<FormState>();
   late final _nomCtrl = TextEditingController(text: widget.membre?.nom ?? '');
-  late final _prenomCtrl = TextEditingController(text: widget.membre?.prenom ?? '');
-  late final _telCtrl = TextEditingController(text: widget.membre?.telephone ?? '');
-  late final _fonctionCtrl = TextEditingController(text: widget.membre?.fonction ?? '');
+  late final _prenomCtrl =
+      TextEditingController(text: widget.membre?.prenom ?? '');
+  late final _telCtrl =
+      TextEditingController(text: widget.membre?.telephone ?? '');
+  late final _fonctionCtrl =
+      TextEditingController(text: widget.membre?.fonction ?? '');
   bool _enCours = false;
   String? _erreur;
 
@@ -47,7 +50,9 @@ class _MembreFormScreenState extends ConsumerState<MembreFormScreen> {
           'nom': _nomCtrl.text.trim(),
           'prenom': _prenomCtrl.text.trim(),
           'telephone': _telCtrl.text.trim(),
-          'fonction': _fonctionCtrl.text.trim().isEmpty ? null : _fonctionCtrl.text.trim(),
+          'fonction': _fonctionCtrl.text.trim().isEmpty
+              ? null
+              : _fonctionCtrl.text.trim(),
         });
       } else {
         final espaceId = ref.read(currentEspaceIdProvider);
@@ -58,7 +63,9 @@ class _MembreFormScreenState extends ConsumerState<MembreFormScreen> {
           nom: _nomCtrl.text.trim(),
           prenom: _prenomCtrl.text.trim(),
           telephone: _telCtrl.text.trim(),
-          fonction: _fonctionCtrl.text.trim().isEmpty ? null : _fonctionCtrl.text.trim(),
+          fonction: _fonctionCtrl.text.trim().isEmpty
+              ? null
+              : _fonctionCtrl.text.trim(),
           actif: true,
         ));
       }
@@ -73,7 +80,8 @@ class _MembreFormScreenState extends ConsumerState<MembreFormScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(_modification ? 'Modifier le membre' : 'Nouveau membre')),
+      appBar: AppBar(
+          title: Text(_modification ? 'Modifier le membre' : 'Nouveau membre')),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
@@ -85,13 +93,15 @@ class _MembreFormScreenState extends ConsumerState<MembreFormScreen> {
                 TextFormField(
                   controller: _prenomCtrl,
                   decoration: const InputDecoration(labelText: 'Prénom'),
-                  validator: (v) => (v == null || v.trim().isEmpty) ? 'Requis' : null,
+                  validator: (v) =>
+                      (v == null || v.trim().isEmpty) ? 'Requis' : null,
                 ),
                 const SizedBox(height: 14),
                 TextFormField(
                   controller: _nomCtrl,
                   decoration: const InputDecoration(labelText: 'Nom'),
-                  validator: (v) => (v == null || v.trim().isEmpty) ? 'Requis' : null,
+                  validator: (v) =>
+                      (v == null || v.trim().isEmpty) ? 'Requis' : null,
                 ),
                 const SizedBox(height: 14),
                 TextFormField(
@@ -102,11 +112,13 @@ class _MembreFormScreenState extends ConsumerState<MembreFormScreen> {
                 const SizedBox(height: 14),
                 TextFormField(
                   controller: _fonctionCtrl,
-                  decoration: const InputDecoration(labelText: 'Fonction (optionnel)'),
+                  decoration:
+                      const InputDecoration(labelText: 'Fonction (optionnel)'),
                 ),
                 if (_erreur != null) ...[
                   const SizedBox(height: 12),
-                  Text(_erreur!, style: const TextStyle(color: AppColors.terre)),
+                  Text(_erreur!,
+                      style: const TextStyle(color: AppColors.terre)),
                 ],
                 const SizedBox(height: 24),
                 ElevatedButton(
@@ -115,9 +127,12 @@ class _MembreFormScreenState extends ConsumerState<MembreFormScreen> {
                       ? const SizedBox(
                           height: 18,
                           width: 18,
-                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                          child: CircularProgressIndicator(
+                              strokeWidth: 2, color: Colors.white),
                         )
-                      : Text(_modification ? 'ENREGISTRER LES MODIFICATIONS' : 'AJOUTER'),
+                      : Text(_modification
+                          ? 'ENREGISTRER LES MODIFICATIONS'
+                          : 'AJOUTER'),
                 ),
               ],
             ),

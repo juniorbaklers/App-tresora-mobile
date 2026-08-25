@@ -10,7 +10,8 @@ class EvenementFormScreen extends ConsumerStatefulWidget {
   const EvenementFormScreen({super.key});
 
   @override
-  ConsumerState<EvenementFormScreen> createState() => _EvenementFormScreenState();
+  ConsumerState<EvenementFormScreen> createState() =>
+      _EvenementFormScreenState();
 }
 
 class _EvenementFormScreenState extends ConsumerState<EvenementFormScreen> {
@@ -40,8 +41,10 @@ class _EvenementFormScreenState extends ConsumerState<EvenementFormScreen> {
         description: _descriptionCtrl.text.trim(),
         dateDebut: _dateDebut,
         dateFin: _dateFin,
-        montantCible: double.tryParse(_montantCibleCtrl.text.replaceAll(',', '.')),
-        montantSuggere: double.tryParse(_montantSuggereCtrl.text.replaceAll(',', '.')),
+        montantCible:
+            double.tryParse(_montantCibleCtrl.text.replaceAll(',', '.')),
+        montantSuggere:
+            double.tryParse(_montantSuggereCtrl.text.replaceAll(',', '.')),
         montantCollecte: 0,
         participants: 0,
         statut: StatutEvenement.planifie,
@@ -70,12 +73,14 @@ class _EvenementFormScreenState extends ConsumerState<EvenementFormScreen> {
                 TextFormField(
                   controller: _nomCtrl,
                   decoration: const InputDecoration(labelText: 'Nom'),
-                  validator: (v) => (v == null || v.trim().isEmpty) ? 'Requis' : null,
+                  validator: (v) =>
+                      (v == null || v.trim().isEmpty) ? 'Requis' : null,
                 ),
                 const SizedBox(height: 14),
                 TextFormField(
                   controller: _descriptionCtrl,
-                  decoration: const InputDecoration(labelText: 'Description (optionnel)'),
+                  decoration: const InputDecoration(
+                      labelText: 'Description (optionnel)'),
                   maxLines: 2,
                 ),
                 const SizedBox(height: 14),
@@ -88,13 +93,17 @@ class _EvenementFormScreenState extends ConsumerState<EvenementFormScreen> {
                     final choisie = await showDatePicker(
                       context: context,
                       initialDate: _dateDebut,
-                      firstDate: DateTime.now().subtract(const Duration(days: 365)),
-                      lastDate: DateTime.now().add(const Duration(days: 365 * 2)),
+                      firstDate:
+                          DateTime.now().subtract(const Duration(days: 365)),
+                      lastDate:
+                          DateTime.now().add(const Duration(days: 365 * 2)),
                     );
                     if (choisie != null) {
                       setState(() {
                         _dateDebut = choisie;
-                        if (_dateFin.isBefore(_dateDebut)) _dateFin = _dateDebut;
+                        if (_dateFin.isBefore(_dateDebut)) {
+                          _dateFin = _dateDebut;
+                        }
                       });
                     }
                   },
@@ -109,7 +118,8 @@ class _EvenementFormScreenState extends ConsumerState<EvenementFormScreen> {
                       context: context,
                       initialDate: _dateFin,
                       firstDate: _dateDebut,
-                      lastDate: DateTime.now().add(const Duration(days: 365 * 2)),
+                      lastDate:
+                          DateTime.now().add(const Duration(days: 365 * 2)),
                     );
                     if (choisie != null) setState(() => _dateFin = choisie);
                   },
@@ -117,8 +127,10 @@ class _EvenementFormScreenState extends ConsumerState<EvenementFormScreen> {
                 const SizedBox(height: 14),
                 TextFormField(
                   controller: _montantCibleCtrl,
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  decoration: const InputDecoration(labelText: 'Objectif (FCFA, optionnel)'),
+                  keyboardType:
+                      const TextInputType.numberWithOptions(decimal: true),
+                  decoration: const InputDecoration(
+                      labelText: 'Objectif (FCFA, optionnel)'),
                   validator: (v) {
                     if (v == null || v.trim().isEmpty) return null;
                     final n = double.tryParse(v.replaceAll(',', '.'));
@@ -128,8 +140,10 @@ class _EvenementFormScreenState extends ConsumerState<EvenementFormScreen> {
                 const SizedBox(height: 14),
                 TextFormField(
                   controller: _montantSuggereCtrl,
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  decoration: const InputDecoration(labelText: 'Montant suggéré par personne (optionnel)'),
+                  keyboardType:
+                      const TextInputType.numberWithOptions(decimal: true),
+                  decoration: const InputDecoration(
+                      labelText: 'Montant suggéré par personne (optionnel)'),
                   validator: (v) {
                     if (v == null || v.trim().isEmpty) return null;
                     final n = double.tryParse(v.replaceAll(',', '.'));
@@ -138,7 +152,8 @@ class _EvenementFormScreenState extends ConsumerState<EvenementFormScreen> {
                 ),
                 if (_erreur != null) ...[
                   const SizedBox(height: 12),
-                  Text(_erreur!, style: const TextStyle(color: AppColors.terre)),
+                  Text(_erreur!,
+                      style: const TextStyle(color: AppColors.terre)),
                 ],
                 const SizedBox(height: 24),
                 ElevatedButton(
@@ -147,7 +162,8 @@ class _EvenementFormScreenState extends ConsumerState<EvenementFormScreen> {
                       ? const SizedBox(
                           height: 18,
                           width: 18,
-                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                          child: CircularProgressIndicator(
+                              strokeWidth: 2, color: Colors.white),
                         )
                       : const Text('CRÉER'),
                 ),

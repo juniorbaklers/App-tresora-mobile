@@ -18,7 +18,8 @@ enum RoleEspace {
       );
 
   /// Recettes, dépenses, cotisations, membres, événements.
-  bool get peutGerer => this == proprietaire || this == administrateur || this == tresorier;
+  bool get peutGerer =>
+      this == proprietaire || this == administrateur || this == tresorier;
 
   /// Réglages de l'espace, rôles des autres membres.
   bool get peutAdministrer => this == proprietaire || this == administrateur;

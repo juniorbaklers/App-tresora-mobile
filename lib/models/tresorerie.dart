@@ -13,7 +13,8 @@ enum CategorieRecette {
   const CategorieRecette(this.valeurBdd, this.libelle);
 
   static CategorieRecette fromBdd(String v) =>
-      CategorieRecette.values.firstWhere((c) => c.valeurBdd == v, orElse: () => CategorieRecette.autre);
+      CategorieRecette.values.firstWhere((c) => c.valeurBdd == v,
+          orElse: () => CategorieRecette.autre);
 }
 
 /// Table `recettes`.

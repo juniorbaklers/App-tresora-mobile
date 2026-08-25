@@ -47,21 +47,27 @@ class _RapportScreenState extends ConsumerState<RapportScreen> {
       _erreur = null;
     });
     try {
-      final finInclusive = DateTime(_fin.year, _fin.month, _fin.day, 23, 59, 59);
+      final finInclusive =
+          DateTime(_fin.year, _fin.month, _fin.day, 23, 59, 59);
       final recettes = (ref.read(recettesStreamProvider).valueOrNull ?? [])
-          .where((r) => !r.date.isBefore(_debut) && !r.date.isAfter(finInclusive))
+          .where(
+              (r) => !r.date.isBefore(_debut) && !r.date.isAfter(finInclusive))
           .toList();
       final depenses = (ref.read(depensesStreamProvider).valueOrNull ?? [])
-          .where((d) => !d.date.isBefore(_debut) && !d.date.isAfter(finInclusive))
+          .where(
+              (d) => !d.date.isBefore(_debut) && !d.date.isAfter(finInclusive))
           .toList();
-      final pdfBytes = await ref.read(rapportServiceProvider).genererRapportTresorerie(
-            espace: espace,
-            debut: _debut,
-            fin: _fin,
-            recettes: recettes,
-            depenses: depenses,
-          );
-      await Printing.sharePdf(bytes: pdfBytes, filename: 'rapport-${espace.nom}-${formatDate(_fin)}.pdf');
+      final pdfBytes =
+          await ref.read(rapportServiceProvider).genererRapportTresorerie(
+                espace: espace,
+                debut: _debut,
+                fin: _fin,
+                recettes: recettes,
+                depenses: depenses,
+              );
+      await Printing.sharePdf(
+          bytes: pdfBytes,
+          filename: 'rapport-${espace.nom}-${formatDate(_fin)}.pdf');
     } catch (e) {
       setState(() => _erreur = "Génération impossible : ${e.toString()}");
     } finally {
@@ -115,16 +121,23 @@ class _RapportScreenState extends ConsumerState<RapportScreen> {
               Row(
                 children: [
                   Expanded(
-                    child: _Resume(titre: 'Recettes', montant: totalRecettes, couleur: AppColors.palme),
+                    child: _Resume(
+                        titre: 'Recettes',
+                        montant: totalRecettes,
+                        couleur: AppColors.palme),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: _Resume(titre: 'Dépenses', montant: totalDepenses, couleur: AppColors.terre),
+                    child: _Resume(
+                        titre: 'Dépenses',
+                        montant: totalDepenses,
+                        couleur: AppColors.terre),
                   ),
                 ],
               ),
               const SizedBox(height: 12),
-              _Resume(titre: 'Solde net', montant: totalRecettes - totalDepenses),
+              _Resume(
+                  titre: 'Solde net', montant: totalRecettes - totalDepenses),
               const Spacer(),
               if (_erreur != null) ...[
                 Text(_erreur!, style: const TextStyle(color: AppColors.terre)),
@@ -136,11 +149,13 @@ class _RapportScreenState extends ConsumerState<RapportScreen> {
                     ? const SizedBox(
                         height: 18,
                         width: 18,
-                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2, color: Colors.white),
                       )
                     : const Icon(Icons.picture_as_pdf_outlined),
                 label: const Text('GÉNÉRER ET PARTAGER LE PDF'),
-                style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 14)),
+                style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 14)),
               ),
             ],
           ),
@@ -155,7 +170,10 @@ class _Resume extends StatelessWidget {
   final double montant;
   final Color couleur;
 
-  const _Resume({required this.titre, required this.montant, this.couleur = AppColors.indigoProfond});
+  const _Resume(
+      {required this.titre,
+      required this.montant,
+      this.couleur = AppColors.indigoProfond});
 
   @override
   Widget build(BuildContext context) {
@@ -169,9 +187,12 @@ class _Resume extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(titre.toUpperCase(), style: const TextStyle(fontSize: 11, color: AppColors.texteSecondaire)),
+          Text(titre.toUpperCase(),
+              style: const TextStyle(
+                  fontSize: 11, color: AppColors.texteSecondaire)),
           const SizedBox(height: 4),
-          Text(formatMontant(montant), style: AppFonts.montant(fontSize: 16, color: couleur)),
+          Text(formatMontant(montant),
+              style: AppFonts.montant(fontSize: 16, color: couleur)),
         ],
       ),
     );

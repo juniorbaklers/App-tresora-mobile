@@ -1,6 +1,8 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../models/module_espace.dart';
+import '../../models/tresorerie.dart';
 import '../../providers/data_providers.dart';
 import '../../providers/espace_providers.dart';
 import '../../theme/app_theme.dart';
@@ -19,19 +21,23 @@ class DashboardScreen extends ConsumerWidget {
     final recettesAsync = ref.watch(recettesStreamProvider);
     final depensesAsync = ref.watch(depensesStreamProvider);
     final notificationsNonLues =
-        (ref.watch(mesNotificationsProvider).valueOrNull ?? []).where((n) => !n.lue).length;
+        (ref.watch(mesNotificationsProvider).valueOrNull ?? [])
+            .where((n) => !n.lue)
+            .length;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(espace?.nom ?? 'Tableau de bord'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.compare_arrows),
-            tooltip: 'Contributions inter-espaces',
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const ContributionsListScreen()),
+          if (espace == null || espace.aModule(ModuleEspace.contributions))
+            IconButton(
+              icon: const Icon(Icons.compare_arrows),
+              tooltip: 'Contributions inter-espaces',
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                    builder: (_) => const ContributionsListScreen()),
+              ),
             ),
-          ),
           IconButton(
             icon: Badge(
               label: Text('$notificationsNonLues'),
@@ -40,7 +46,8 @@ class DashboardScreen extends ConsumerWidget {
             ),
             tooltip: 'Notifications',
             onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const NotificationsListScreen()),
+              MaterialPageRoute(
+                  builder: (_) => const NotificationsListScreen()),
             ),
           ),
         ],
@@ -55,15 +62,32 @@ class DashboardScreen extends ConsumerWidget {
             final annee = DateTime.now().year;
             final totalRecettes = recettes.fold(0.0, (a, r) => a + r.montant);
             final totalDepenses = depenses.fold(0.0, (a, d) => a + d.montant);
-            final solde = (espace?.soldeInitial ?? 0) + totalRecettes - totalDepenses;
+            final solde =
+                (espace?.soldeInitial ?? 0) + totalRecettes - totalDepenses;
+            final totalDimes = recettes
+                .where((r) => r.categorie == CategorieRecette.dime)
+                .fold(0.0, (a, r) => a + r.montant);
+            final totalOffrandes = recettes
+                .where((r) =>
+                    r.categorie == CategorieRecette.offrandeOrdinaire ||
+                    r.categorie == CategorieRecette.offrandeSpeciale ||
+                    r.categorie == CategorieRecette.offrandeCulteSoir)
+                .fold(0.0, (a, r) => a + r.montant);
+            final afficherDimes = espace?.aModule(ModuleEspace.dimes) ?? false;
+            final afficherOffrandes =
+                espace?.aModule(ModuleEspace.offrandes) ?? false;
 
             final entreesParMois = List<double>.filled(12, 0);
             final depensesParMois = List<double>.filled(12, 0);
             for (final r in recettes) {
-              if (r.date.year == annee) entreesParMois[r.date.month - 1] += r.montant;
+              if (r.date.year == annee) {
+                entreesParMois[r.date.month - 1] += r.montant;
+              }
             }
             for (final d in depenses) {
-              if (d.date.year == annee) depensesParMois[d.date.month - 1] += d.montant;
+              if (d.date.year == annee) {
+                depensesParMois[d.date.month - 1] += d.montant;
+              }
             }
 
             return RefreshIndicator(
@@ -104,14 +128,30 @@ class DashboardScreen extends ConsumerWidget {
                         sousTitre: espace?.nom ?? '',
                         tonalite: Tonalite.indigo,
                       ),
+                      if (afficherDimes)
+                        StatCard(
+                          titre: 'DÎMES',
+                          montant: totalDimes,
+                          sousTitre: 'Cette année',
+                          tonalite: Tonalite.or,
+                        ),
+                      if (afficherOffrandes)
+                        StatCard(
+                          titre: 'OFFRANDES',
+                          montant: totalOffrandes,
+                          sousTitre: 'Cette année',
+                          tonalite: Tonalite.mixte,
+                        ),
                     ],
                   ),
                   const SizedBox(height: 24),
-                  Text('Recettes / Dépenses $annee', style: Theme.of(context).textTheme.titleMedium),
+                  Text('Recettes / Dépenses $annee',
+                      style: Theme.of(context).textTheme.titleMedium),
                   const SizedBox(height: 12),
                   SizedBox(
                     height: 260,
-                    child: _GraphiqueMensuel(entrees: entreesParMois, depenses: depensesParMois),
+                    child: _GraphiqueMensuel(
+                        entrees: entreesParMois, depenses: depensesParMois),
                   ),
                 ],
               ),
@@ -137,15 +177,19 @@ class _GraphiqueMensuel extends StatelessWidget {
         maxY: maxY == 0 ? 10 : maxY * 1.2,
         barTouchData: BarTouchData(enabled: true),
         titlesData: FlTitlesData(
-          topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          topTitles:
+              const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          rightTitles:
+              const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          leftTitles:
+              const AxisTitles(sideTitles: SideTitles(showTitles: false)),
           bottomTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
               getTitlesWidget: (value, meta) => Padding(
                 padding: const EdgeInsets.only(top: 6),
-                child: Text(formatMoisCourt(value.toInt()), style: const TextStyle(fontSize: 10)),
+                child: Text(formatMoisCourt(value.toInt()),
+                    style: const TextStyle(fontSize: 10)),
               ),
             ),
           ),
@@ -156,8 +200,10 @@ class _GraphiqueMensuel extends StatelessWidget {
           return BarChartGroupData(
             x: i,
             barRods: [
-              BarChartRodData(toY: entrees[i], color: AppColors.palme, width: 6),
-              BarChartRodData(toY: depenses[i], color: AppColors.terre, width: 6),
+              BarChartRodData(
+                  toY: entrees[i], color: AppColors.palme, width: 6),
+              BarChartRodData(
+                  toY: depenses[i], color: AppColors.terre, width: 6),
             ],
           );
         }),

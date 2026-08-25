@@ -27,7 +27,8 @@ class _ClotureFormScreenState extends ConsumerState<ClotureFormScreen> {
   bool _enCours = false;
   String? _erreur;
 
-  double _n(TextEditingController c) => double.tryParse(c.text.replaceAll(',', '.')) ?? 0;
+  double _n(TextEditingController c) =>
+      double.tryParse(c.text.replaceAll(',', '.')) ?? 0;
 
   Future<void> _enregistrer() async {
     if (!_formKey.currentState!.validate()) return;
@@ -50,7 +51,9 @@ class _ClotureFormScreenState extends ConsumerState<ClotureFormScreen> {
             autresRecettes: _n(_autresRecettesCtrl),
             totalCompte: _n(_totalCompteCtrl),
             responsable: user?.email ?? '',
-            justification: _justificationCtrl.text.trim().isEmpty ? null : _justificationCtrl.text.trim(),
+            justification: _justificationCtrl.text.trim().isEmpty
+                ? null
+                : _justificationCtrl.text.trim(),
           ));
       if (mounted) Navigator.of(context).pop();
     } catch (e) {
@@ -62,7 +65,10 @@ class _ClotureFormScreenState extends ConsumerState<ClotureFormScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final totalDeclare = _n(_offrandeOrdinaireCtrl) + _n(_offrandeSpecialeCtrl) + _n(_dimesCtrl) + _n(_autresRecettesCtrl);
+    final totalDeclare = _n(_offrandeOrdinaireCtrl) +
+        _n(_offrandeSpecialeCtrl) +
+        _n(_dimesCtrl) +
+        _n(_autresRecettesCtrl);
     final ecart = _n(_totalCompteCtrl) - totalDeclare;
 
     return Scaffold(
@@ -93,11 +99,15 @@ class _ClotureFormScreenState extends ConsumerState<ClotureFormScreen> {
                 const SizedBox(height: 14),
                 TextFormField(
                   controller: _culteCtrl,
-                  decoration: const InputDecoration(labelText: 'Culte (ex: Matin, Soir — optionnel)'),
+                  decoration: const InputDecoration(
+                      labelText: 'Culte (ex: Matin, Soir — optionnel)'),
                 ),
                 const SizedBox(height: 20),
                 Text('DÉCLARÉ (issu des écritures de recette)',
-                    style: const TextStyle(fontSize: 11, color: AppColors.texteSecondaire, fontWeight: FontWeight.w700)),
+                    style: const TextStyle(
+                        fontSize: 11,
+                        color: AppColors.texteSecondaire,
+                        fontWeight: FontWeight.w700)),
                 const SizedBox(height: 10),
                 _champMontant(_offrandeOrdinaireCtrl, 'Offrande ordinaire'),
                 const SizedBox(height: 14),
@@ -108,7 +118,10 @@ class _ClotureFormScreenState extends ConsumerState<ClotureFormScreen> {
                 _champMontant(_autresRecettesCtrl, 'Autres recettes'),
                 const SizedBox(height: 20),
                 Text('COMPTÉ EN CAISSE',
-                    style: const TextStyle(fontSize: 11, color: AppColors.texteSecondaire, fontWeight: FontWeight.w700)),
+                    style: const TextStyle(
+                        fontSize: 11,
+                        color: AppColors.texteSecondaire,
+                        fontWeight: FontWeight.w700)),
                 const SizedBox(height: 10),
                 _champMontant(_totalCompteCtrl, 'Total compté', requis: true),
                 const SizedBox(height: 14),
@@ -122,11 +135,16 @@ class _ClotureFormScreenState extends ConsumerState<ClotureFormScreen> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text('Écart', style: TextStyle(color: AppColors.texteSecondaire)),
+                      const Text('Écart',
+                          style: TextStyle(color: AppColors.texteSecondaire)),
                       Text(
-                        ecart == 0 ? 'Aucun' : '${ecart > 0 ? '+' : ''}${formatMontant(ecart)}',
+                        ecart == 0
+                            ? 'Aucun'
+                            : '${ecart > 0 ? '+' : ''}${formatMontant(ecart)}',
                         style: AppFonts.montant(
-                            fontSize: 15, color: ecart == 0 ? AppColors.palme : AppColors.terre),
+                            fontSize: 15,
+                            color:
+                                ecart == 0 ? AppColors.palme : AppColors.terre),
                       ),
                     ],
                   ),
@@ -134,12 +152,14 @@ class _ClotureFormScreenState extends ConsumerState<ClotureFormScreen> {
                 const SizedBox(height: 14),
                 TextFormField(
                   controller: _justificationCtrl,
-                  decoration: const InputDecoration(labelText: 'Justification de l\'écart (optionnel)'),
+                  decoration: const InputDecoration(
+                      labelText: 'Justification de l\'écart (optionnel)'),
                   maxLines: 2,
                 ),
                 if (_erreur != null) ...[
                   const SizedBox(height: 12),
-                  Text(_erreur!, style: const TextStyle(color: AppColors.terre)),
+                  Text(_erreur!,
+                      style: const TextStyle(color: AppColors.terre)),
                 ],
                 const SizedBox(height: 24),
                 ElevatedButton(
@@ -148,7 +168,8 @@ class _ClotureFormScreenState extends ConsumerState<ClotureFormScreen> {
                       ? const SizedBox(
                           height: 18,
                           width: 18,
-                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                          child: CircularProgressIndicator(
+                              strokeWidth: 2, color: Colors.white),
                         )
                       : const Text('ENREGISTRER'),
                 ),
@@ -160,7 +181,8 @@ class _ClotureFormScreenState extends ConsumerState<ClotureFormScreen> {
     );
   }
 
-  Widget _champMontant(TextEditingController controller, String label, {bool requis = false}) {
+  Widget _champMontant(TextEditingController controller, String label,
+      {bool requis = false}) {
     return TextFormField(
       controller: controller,
       keyboardType: const TextInputType.numberWithOptions(decimal: true),

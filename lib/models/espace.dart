@@ -1,3 +1,4 @@
+import 'module_espace.dart';
 import 'role.dart';
 
 enum EspaceType {
@@ -10,8 +11,8 @@ enum EspaceType {
   final String libelle;
   const EspaceType(this.valeurBdd, this.libelle);
 
-  static EspaceType fromBdd(String v) =>
-      EspaceType.values.firstWhere((t) => t.valeurBdd == v, orElse: () => EspaceType.autre);
+  static EspaceType fromBdd(String v) => EspaceType.values
+      .firstWhere((t) => t.valeurBdd == v, orElse: () => EspaceType.autre);
 }
 
 /// Table `espaces` — le concept central : chaque organisation (église,
@@ -23,6 +24,7 @@ class Espace {
   final String initiales;
   final String devise;
   final double soldeInitial;
+  final List<ModuleEspace> modules;
 
   Espace({
     required this.id,
@@ -31,7 +33,10 @@ class Espace {
     required this.initiales,
     required this.devise,
     required this.soldeInitial,
+    this.modules = const [],
   });
+
+  bool aModule(ModuleEspace module) => modules.contains(module);
 
   factory Espace.fromMap(Map<String, dynamic> map) => Espace(
         id: map['id'] as String,
@@ -40,6 +45,7 @@ class Espace {
         initiales: map['initiales'] as String? ?? '',
         devise: map['devise'] as String? ?? 'XOF',
         soldeInitial: (map['solde_initial'] as num?)?.toDouble() ?? 0,
+        modules: ModuleEspace.listeDepuisBdd(map['modules'] as List<dynamic>?),
       );
 }
 

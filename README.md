@@ -69,6 +69,14 @@ Ce projet est **indépendant** de `gestion-caisse-eglise` (site web mono-
 - ✅ Écran de démarrage animé (pastille, nom, motif de tissage qui se
   dessine progressivement, ~2,8s) avant de rejoindre l'écran de connexion
   ou de sélection d'espace.
+- ✅ Modules par espace : chaque espace n'active que les fonctionnalités
+  dont il a besoin (Membres, Cotisations, Événements, Dîmes, Offrandes,
+  Dons, Contributions... Rapports toujours actif) — les onglets de
+  navigation et les cartes du tableau de bord s'adaptent en conséquence.
+  Dîmes/Offrandes sont activées par défaut uniquement pour les espaces de
+  type église, mais restent activables pour n'importe quel type ; tout se
+  règle depuis Réglages → Modules. Reprend le système `ModuleKey` de
+  tresora-app (src/lib/types.ts, src/lib/nav.ts).
 
 ## Stack
 
@@ -108,7 +116,7 @@ build.
 ```
 lib/
 ├── config/            URL + clé Supabase
-├── models/             Profil, Espace, Membre, Cotisation/PaiementCotisation/Tranche,
+├── models/             Profil, Espace (+ModuleEspace), Membre, Cotisation/PaiementCotisation/Tranche,
 │                        Recette/Depense, Evenement, Invitation, Contribution,
 │                        NotificationTresora, EntreeJournal, Cloture, MembreCompte, Role —
 │                        reflètent supabase/schema_1_types_tables.sql

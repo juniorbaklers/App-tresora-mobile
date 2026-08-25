@@ -31,12 +31,15 @@ class CotisationsListScreen extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Erreur : $e')),
         data: (cotisations) {
-          if (cotisations.isEmpty) return const Center(child: Text('Aucune cotisation'));
+          if (cotisations.isEmpty) {
+            return const Center(child: Text('Aucune cotisation'));
+          }
           return ListView.separated(
             padding: const EdgeInsets.all(12),
             itemCount: cotisations.length,
             separatorBuilder: (_, __) => const SizedBox(height: 8),
-            itemBuilder: (context, i) => _CotisationTile(cotisation: cotisations[i]),
+            itemBuilder: (context, i) =>
+                _CotisationTile(cotisation: cotisations[i]),
           );
         },
       ),
@@ -66,7 +69,8 @@ class _CotisationTile extends StatelessWidget {
           'Échéance ${formatDate(cotisation.dateLimite)}',
         ),
         trailing: !cotisation.active
-            ? const Chip(label: Text('Clôturée'), visualDensity: VisualDensity.compact)
+            ? const Chip(
+                label: Text('Clôturée'), visualDensity: VisualDensity.compact)
             : enRetard
                 ? const Chip(
                     label: Text('En retard'),
@@ -75,7 +79,8 @@ class _CotisationTile extends StatelessWidget {
                   )
                 : null,
         onTap: () => Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => CotisationDetailScreen(cotisation: cotisation)),
+          MaterialPageRoute(
+              builder: (_) => CotisationDetailScreen(cotisation: cotisation)),
         ),
       ),
     );

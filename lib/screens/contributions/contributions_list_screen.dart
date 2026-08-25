@@ -36,19 +36,23 @@ class ContributionsListScreen extends ConsumerWidget {
           error: (e, _) => Center(child: Text('Erreur : $e')),
           data: (recues) {
             if (envoyees.isEmpty && recues.isEmpty) {
-              return const Center(child: Text('Aucune contribution inter-espaces'));
+              return const Center(
+                  child: Text('Aucune contribution inter-espaces'));
             }
             return ListView(
               padding: const EdgeInsets.all(12),
               children: [
                 if (recues.isNotEmpty) ...[
-                  const _EnTeteSection(titre: 'DEMANDÉES PAR D\'AUTRES ESPACES'),
-                  for (final c in recues) _ContributionTile(contribution: c, estCible: true),
+                  const _EnTeteSection(
+                      titre: 'DEMANDÉES PAR D\'AUTRES ESPACES'),
+                  for (final c in recues)
+                    _ContributionTile(contribution: c, estCible: true),
                   const SizedBox(height: 16),
                 ],
                 if (envoyees.isNotEmpty) ...[
                   const _EnTeteSection(titre: 'MES DEMANDES'),
-                  for (final c in envoyees) _ContributionTile(contribution: c, estCible: false),
+                  for (final c in envoyees)
+                    _ContributionTile(contribution: c, estCible: false),
                 ],
               ],
             );
@@ -68,7 +72,11 @@ class _EnTeteSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
-      child: Text(titre, style: const TextStyle(fontSize: 11, color: AppColors.texteSecondaire, fontWeight: FontWeight.w700)),
+      child: Text(titre,
+          style: const TextStyle(
+              fontSize: 11,
+              color: AppColors.texteSecondaire,
+              fontWeight: FontWeight.w700)),
     );
   }
 }
@@ -87,11 +95,15 @@ class _ContributionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final autreEspace = estCible ? contribution.nomEspaceDemandeur : contribution.nomEspaceCible;
+    final autreEspace = estCible
+        ? contribution.nomEspaceDemandeur
+        : contribution.nomEspaceCible;
     return Card(
       child: ListTile(
         onTap: () => Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => ContributionDetailScreen(contribution: contribution, estCible: estCible)),
+          MaterialPageRoute(
+              builder: (_) => ContributionDetailScreen(
+                  contribution: contribution, estCible: estCible)),
         ),
         title: Text(contribution.projet),
         subtitle: Text(
@@ -101,8 +113,10 @@ class _ContributionTile extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Text('${formatMontant(contribution.montantRecu)} / ${formatMontant(contribution.montantDemande)}',
-                style: AppFonts.montant(fontSize: 13, color: AppColors.texteEncre)),
+            Text(
+                '${formatMontant(contribution.montantRecu)} / ${formatMontant(contribution.montantDemande)}',
+                style: AppFonts.montant(
+                    fontSize: 13, color: AppColors.texteEncre)),
             const SizedBox(height: 4),
             Chip(
               label: Text(contribution.statut.libelle),

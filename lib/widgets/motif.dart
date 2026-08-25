@@ -61,7 +61,8 @@ class BandeTissee extends StatelessWidget {
   final Tonalite tonalite;
   final double epaisseur;
 
-  const BandeTissee({super.key, this.tonalite = Tonalite.or, this.epaisseur = 3});
+  const BandeTissee(
+      {super.key, this.tonalite = Tonalite.or, this.epaisseur = 3});
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +72,8 @@ class BandeTissee extends StatelessWidget {
         height: epaisseur,
         child: Row(
           children: _segments()[tonalite]!
-              .map((s) => Expanded(flex: s.flex, child: ColoredBox(color: s.couleur())))
+              .map((s) =>
+                  Expanded(flex: s.flex, child: ColoredBox(color: s.couleur())))
               .toList(),
         ),
       ),
@@ -84,7 +86,8 @@ class LisiereVerticale extends StatelessWidget {
   final Tonalite tonalite;
   final double epaisseur;
 
-  const LisiereVerticale({super.key, this.tonalite = Tonalite.or, this.epaisseur = 3});
+  const LisiereVerticale(
+      {super.key, this.tonalite = Tonalite.or, this.epaisseur = 3});
 
   @override
   Widget build(BuildContext context) {
@@ -92,7 +95,8 @@ class LisiereVerticale extends StatelessWidget {
       width: epaisseur,
       child: Column(
         children: _segments()[tonalite]!
-            .map((s) => Expanded(flex: s.flex, child: ColoredBox(color: s.couleur())))
+            .map((s) =>
+                Expanded(flex: s.flex, child: ColoredBox(color: s.couleur())))
             .toList(),
       ),
     );

@@ -25,10 +25,12 @@ class ContributionsService {
         .asyncMap(_avecNomsEspaceDemandeur);
   }
 
-  Future<List<Contribution>> _avecNomsEspaceCible(List<Map<String, dynamic>> rows) =>
+  Future<List<Contribution>> _avecNomsEspaceCible(
+          List<Map<String, dynamic>> rows) =>
       _avecNoms(rows, colonneAResoudre: 'espace_cible_id', cible: true);
 
-  Future<List<Contribution>> _avecNomsEspaceDemandeur(List<Map<String, dynamic>> rows) =>
+  Future<List<Contribution>> _avecNomsEspaceDemandeur(
+          List<Map<String, dynamic>> rows) =>
       _avecNoms(rows, colonneAResoudre: 'espace_demandeur_id', cible: false);
 
   Future<List<Contribution>> _avecNoms(
@@ -38,16 +40,22 @@ class ContributionsService {
   }) async {
     if (rows.isEmpty) return <Contribution>[];
     final ids = rows.map((r) => r[colonneAResoudre] as String).toSet().toList();
-    final espaces = await _client.from('espaces').select('id, nom').inFilter('id', ids);
-    final nomsParId = {for (final e in espaces) e['id'] as String: e['nom'] as String};
+    final espaces =
+        await _client.from('espaces').select('id, nom').inFilter('id', ids);
+    final nomsParId = {
+      for (final e in espaces) e['id'] as String: e['nom'] as String
+    };
     return rows.map((r) {
       final contribution = Contribution.fromMap(r);
       final nom = nomsParId[r[colonneAResoudre] as String];
-      return cible ? contribution.avecNoms(cible: nom) : contribution.avecNoms(demandeur: nom);
+      return cible
+          ? contribution.avecNoms(cible: nom)
+          : contribution.avecNoms(demandeur: nom);
     }).toList();
   }
 
-  Future<void> creer(Contribution contribution) => _client.from('contributions').insert(contribution.toInsertMap());
+  Future<void> creer(Contribution contribution) =>
+      _client.from('contributions').insert(contribution.toInsertMap());
 
   Stream<List<ContributionVersement>> streamVersements(String contributionId) {
     return _client
@@ -59,8 +67,11 @@ class ContributionsService {
   }
 
   /// Seul l'espace cible peut enregistrer qu'il a versé (RLS).
-  Future<void> enregistrerVersement(String contributionId, double montant) => _client
-      .from('contribution_versements')
-      .insert(ContributionVersement(id: '', contributionId: contributionId, date: DateTime.now(), montant: montant)
+  Future<void> enregistrerVersement(String contributionId, double montant) =>
+      _client.from('contribution_versements').insert(ContributionVersement(
+              id: '',
+              contributionId: contributionId,
+              date: DateTime.now(),
+              montant: montant)
           .toInsertMap());
 }

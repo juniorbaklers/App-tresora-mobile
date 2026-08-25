@@ -34,14 +34,19 @@ class AppColorsDark {
 /// par défaut sur un montant, c'est ce qui donne au tableau de bord son
 /// sérieux de registre comptable plutôt qu'un look d'appli générique.
 class AppFonts {
-  static TextStyle heading({double? fontSize, FontWeight? fontWeight, Color? color}) =>
+  static TextStyle heading(
+          {double? fontSize, FontWeight? fontWeight, Color? color}) =>
       GoogleFonts.fraunces(
         fontSize: fontSize,
         fontWeight: fontWeight ?? FontWeight.w600,
         color: color,
-      ).copyWith(fontVariations: const [FontVariation('SOFT', 0), FontVariation('WONK', 1)]);
+      ).copyWith(fontVariations: const [
+        FontVariation('SOFT', 0),
+        FontVariation('WONK', 1)
+      ]);
 
-  static TextStyle montant({double? fontSize, FontWeight? fontWeight, Color? color}) =>
+  static TextStyle montant(
+          {double? fontSize, FontWeight? fontWeight, Color? color}) =>
       GoogleFonts.ibmPlexMono(
         fontSize: fontSize,
         fontWeight: fontWeight ?? FontWeight.w600,
@@ -97,14 +102,17 @@ class AppTheme {
     required Brightness brightness,
   }) {
     final baseTextTheme = GoogleFonts.plusJakartaSansTextTheme(
-      brightness == Brightness.dark ? ThemeData.dark().textTheme : ThemeData.light().textTheme,
+      brightness == Brightness.dark
+          ? ThemeData.dark().textTheme
+          : ThemeData.light().textTheme,
     ).apply(bodyColor: colors.texteEncre, displayColor: colors.texteEncre);
 
     final textTheme = baseTextTheme.copyWith(
       headlineLarge: AppFonts.heading(fontSize: 30, color: colors.texteEncre),
       headlineMedium: AppFonts.heading(fontSize: 24, color: colors.texteEncre),
       headlineSmall: AppFonts.heading(fontSize: 20, color: colors.texteEncre),
-      titleLarge: AppFonts.heading(fontSize: 18, fontWeight: FontWeight.w600, color: colors.texteEncre),
+      titleLarge: AppFonts.heading(
+          fontSize: 18, fontWeight: FontWeight.w600, color: colors.texteEncre),
     );
 
     final base = ThemeData(
@@ -156,15 +164,18 @@ class AppTheme {
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: colors.or, width: 2),
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: colors.indigoProfond,
           foregroundColor: colors.fond,
           padding: const EdgeInsets.symmetric(vertical: 14),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          textStyle: const TextStyle(fontWeight: FontWeight.w600, letterSpacing: .3),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          textStyle:
+              const TextStyle(fontWeight: FontWeight.w600, letterSpacing: .3),
         ),
       ),
       bottomNavigationBarTheme: BottomNavigationBarThemeData(

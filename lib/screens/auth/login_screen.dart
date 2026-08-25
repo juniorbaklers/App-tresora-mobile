@@ -65,13 +65,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         color: AppColors.indigoProfond,
                         borderRadius: BorderRadius.circular(18),
                       ),
-                      child: const Icon(Icons.church, size: 32, color: AppColors.or),
+                      child: const Icon(Icons.church,
+                          size: 32, color: AppColors.or),
                     ),
                     const SizedBox(height: 16),
                     Text(
                       'Trésora',
                       textAlign: TextAlign.center,
-                      style: AppFonts.heading(fontSize: 30, color: AppColors.indigoProfond),
+                      style: AppFonts.heading(
+                          fontSize: 30, color: AppColors.indigoProfond),
                     ),
                     const SizedBox(height: 4),
                     const Text(
@@ -81,25 +83,34 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                     const SizedBox(height: 20),
                     const Center(
-                      child: SizedBox(width: 120, child: BandeTissee(tonalite: Tonalite.mixte, epaisseur: 4)),
+                      child: SizedBox(
+                          width: 120,
+                          child: BandeTissee(
+                              tonalite: Tonalite.mixte, epaisseur: 4)),
                     ),
                     const SizedBox(height: 28),
                     TextFormField(
                       controller: _emailCtrl,
                       keyboardType: TextInputType.emailAddress,
                       decoration: const InputDecoration(labelText: 'Email'),
-                      validator: (v) => (v == null || !v.contains('@')) ? 'Email invalide' : null,
+                      validator: (v) => (v == null || !v.contains('@'))
+                          ? 'Email invalide'
+                          : null,
                     ),
                     const SizedBox(height: 14),
                     TextFormField(
                       controller: _motDePasseCtrl,
                       obscureText: true,
-                      decoration: const InputDecoration(labelText: 'Mot de passe'),
-                      validator: (v) => (v == null || v.length < 6) ? 'Minimum 6 caractères' : null,
+                      decoration:
+                          const InputDecoration(labelText: 'Mot de passe'),
+                      validator: (v) => (v == null || v.length < 6)
+                          ? 'Minimum 6 caractères'
+                          : null,
                     ),
                     if (_erreur != null) ...[
                       const SizedBox(height: 12),
-                      Text(_erreur!, style: const TextStyle(color: AppColors.terre)),
+                      Text(_erreur!,
+                          style: const TextStyle(color: AppColors.terre)),
                     ],
                     const SizedBox(height: 24),
                     ElevatedButton(
@@ -108,7 +119,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           ? const SizedBox(
                               height: 18,
                               width: 18,
-                              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                              child: CircularProgressIndicator(
+                                  strokeWidth: 2, color: Colors.white),
                             )
                           : const Text('SE CONNECTER'),
                     ),
@@ -117,7 +129,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       onPressed: _enCours
                           ? null
                           : () => Navigator.of(context).push(
-                                MaterialPageRoute(builder: (_) => const SignupScreen()),
+                                MaterialPageRoute(
+                                    builder: (_) => const SignupScreen()),
                               ),
                       child: const Text('Créer un compte'),
                     ),

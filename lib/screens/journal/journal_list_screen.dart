@@ -18,7 +18,9 @@ class JournalListScreen extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Erreur : $e')),
         data: (entrees) {
-          if (entrees.isEmpty) return const Center(child: Text('Aucune entrée pour l\'instant'));
+          if (entrees.isEmpty) {
+            return const Center(child: Text('Aucune entrée pour l\'instant'));
+          }
           return ListView.separated(
             padding: const EdgeInsets.all(12),
             itemCount: entrees.length,

@@ -28,7 +28,8 @@ class StatCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: couleurFond ?? Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(14),
-        border: couleurFond == null ? Border.all(color: AppColors.bordure) : null,
+        border:
+            couleurFond == null ? Border.all(color: AppColors.bordure) : null,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -45,9 +46,12 @@ class StatCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          Text(formatMontant(montant), style: AppFonts.montant(fontSize: 20, color: couleurTexte)),
+          Text(formatMontant(montant),
+              style: AppFonts.montant(fontSize: 20, color: couleurTexte)),
           const SizedBox(height: 4),
-          Text(sousTitre, style: TextStyle(fontSize: 12, color: couleurTexte.withValues(alpha: .7))),
+          Text(sousTitre,
+              style: TextStyle(
+                  fontSize: 12, color: couleurTexte.withValues(alpha: .7))),
         ],
       ),
     );

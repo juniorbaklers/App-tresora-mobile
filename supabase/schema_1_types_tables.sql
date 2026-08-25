@@ -53,7 +53,7 @@ create table espaces (
   initiales text not null,
   couleur text not null default 'bg-primary',
   devise devise_code not null default 'XOF',
-  modules text[] not null default array['membres','cotisations','recettes','depenses','rapports'],
+  modules text[] not null default array['membres','cotisations','evenements','recettes','depenses','rapports','dons','contributions'],
   solde_initial numeric(14,2) not null default 0,
   created_by uuid not null references auth.users(id),
   created_at timestamptz not null default now()

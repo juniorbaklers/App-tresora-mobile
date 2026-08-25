@@ -8,7 +8,8 @@ enum StatutContribution {
   const StatutContribution(this.valeurBdd, this.libelle);
 
   static StatutContribution fromBdd(String v) =>
-      StatutContribution.values.firstWhere((s) => s.valeurBdd == v, orElse: () => StatutContribution.enAttente);
+      StatutContribution.values.firstWhere((s) => s.valeurBdd == v,
+          orElse: () => StatutContribution.enAttente);
 }
 
 /// Table `contributions` — seul canal financier entre deux espaces :
@@ -42,7 +43,8 @@ class Contribution {
     this.nomEspaceCible,
   });
 
-  double get progression => montantDemande == 0 ? 0 : (montantRecu / montantDemande).clamp(0, 1);
+  double get progression =>
+      montantDemande == 0 ? 0 : (montantRecu / montantDemande).clamp(0, 1);
 
   factory Contribution.fromMap(Map<String, dynamic> map) => Contribution(
         id: map['id'] as String,
@@ -96,7 +98,8 @@ class ContributionVersement {
     required this.montant,
   });
 
-  factory ContributionVersement.fromMap(Map<String, dynamic> map) => ContributionVersement(
+  factory ContributionVersement.fromMap(Map<String, dynamic> map) =>
+      ContributionVersement(
         id: map['id'] as String,
         contributionId: map['contribution_id'] as String,
         date: DateTime.parse(map['date'] as String),

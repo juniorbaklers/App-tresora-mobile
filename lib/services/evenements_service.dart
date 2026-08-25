@@ -9,14 +9,22 @@ class EvenementsService {
   final SupabaseClient _client = Supabase.instance.client;
 
   Stream<List<Evenement>> streamEvenements(String espaceId) {
-    final flux = _client.from('evenements').stream(primaryKey: ['id']).eq('espace_id', espaceId).order('date_debut', ascending: false);
-    return avecCacheHorsLigne('evenements_$espaceId', flux).map((rows) => rows.map(Evenement.fromMap).toList());
+    final flux = _client
+        .from('evenements')
+        .stream(primaryKey: ['id'])
+        .eq('espace_id', espaceId)
+        .order('date_debut', ascending: false);
+    return avecCacheHorsLigne('evenements_$espaceId', flux)
+        .map((rows) => rows.map(Evenement.fromMap).toList());
   }
 
-  Future<void> creer(Evenement evenement) => _client.from('evenements').insert(evenement.toInsertMap());
+  Future<void> creer(Evenement evenement) =>
+      _client.from('evenements').insert(evenement.toInsertMap());
 
   Future<void> changerStatut(String evenementId, StatutEvenement statut) =>
-      _client.from('evenements').update({'statut': statut.valeurBdd}).eq('id', evenementId);
+      _client
+          .from('evenements')
+          .update({'statut': statut.valeurBdd}).eq('id', evenementId);
 }
 
 /// Table `contributions_evenement` — une fiche par contribution individuelle.
@@ -33,6 +41,7 @@ class ContributionsEvenementService {
         .map((rows) => rows.map(ContributionEvenement.fromMap).toList());
   }
 
-  Future<void> creer(ContributionEvenement contribution) =>
-      _client.from('contributions_evenement').insert(contribution.toInsertMap());
+  Future<void> creer(ContributionEvenement contribution) => _client
+      .from('contributions_evenement')
+      .insert(contribution.toInsertMap());
 }

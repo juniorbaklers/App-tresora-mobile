@@ -30,7 +30,9 @@ class CloturesListScreen extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Erreur : $e')),
         data: (clotures) {
-          if (clotures.isEmpty) return const Center(child: Text('Aucune clôture enregistrée'));
+          if (clotures.isEmpty) {
+            return const Center(child: Text('Aucune clôture enregistrée'));
+          }
           return ListView.separated(
             padding: const EdgeInsets.all(12),
             itemCount: clotures.length,
@@ -55,8 +57,11 @@ class _ClotureTile extends StatelessWidget {
     return Card(
       child: ListTile(
         leading: const Icon(Icons.fact_check_outlined),
-        title: Text(cloture.culte.isEmpty ? formatDate(cloture.date) : '${cloture.culte} · ${formatDate(cloture.date)}'),
-        subtitle: Text('Compté ${formatMontant(cloture.totalCompte)} · Déclaré ${formatMontant(cloture.totalDeclare)}'),
+        title: Text(cloture.culte.isEmpty
+            ? formatDate(cloture.date)
+            : '${cloture.culte} · ${formatDate(cloture.date)}'),
+        subtitle: Text(
+            'Compté ${formatMontant(cloture.totalCompte)} · Déclaré ${formatMontant(cloture.totalDeclare)}'),
         trailing: Text(
           ecart == 0 ? 'OK' : '${ecart > 0 ? '+' : ''}${formatMontant(ecart)}',
           style: TextStyle(color: couleurEcart, fontWeight: FontWeight.w700),

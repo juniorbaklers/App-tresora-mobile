@@ -32,12 +32,15 @@ class EvenementsListScreen extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Erreur : $e')),
         data: (evenements) {
-          if (evenements.isEmpty) return const Center(child: Text('Aucun événement'));
+          if (evenements.isEmpty) {
+            return const Center(child: Text('Aucun événement'));
+          }
           return ListView.separated(
             padding: const EdgeInsets.all(12),
             itemCount: evenements.length,
             separatorBuilder: (_, __) => const SizedBox(height: 8),
-            itemBuilder: (context, i) => _EvenementTile(evenement: evenements[i]),
+            itemBuilder: (context, i) =>
+                _EvenementTile(evenement: evenements[i]),
           );
         },
       ),
@@ -63,7 +66,8 @@ class _EvenementTile extends StatelessWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
         onTap: () => Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => EvenementDetailScreen(evenement: evenement)),
+          MaterialPageRoute(
+              builder: (_) => EvenementDetailScreen(evenement: evenement)),
         ),
         child: Padding(
           padding: const EdgeInsets.all(14),
@@ -75,7 +79,9 @@ class _EvenementTile extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: Text(evenement.nom, style: AppFonts.heading(fontSize: 16, color: AppColors.texteEncre)),
+                    child: Text(evenement.nom,
+                        style: AppFonts.heading(
+                            fontSize: 16, color: AppColors.texteEncre)),
                   ),
                   Chip(
                     label: Text(evenement.statut.libelle),
@@ -86,14 +92,16 @@ class _EvenementTile extends StatelessWidget {
               const SizedBox(height: 4),
               Text(
                 '${formatDate(evenement.dateDebut)} → ${formatDate(evenement.dateFin)}',
-                style: const TextStyle(fontSize: 12, color: AppColors.texteSecondaire),
+                style: const TextStyle(
+                    fontSize: 12, color: AppColors.texteSecondaire),
               ),
               const SizedBox(height: 10),
               Text(
                 evenement.montantCible != null
                     ? '${formatMontant(evenement.montantCollecte)} / ${formatMontant(evenement.montantCible!)}'
                     : formatMontant(evenement.montantCollecte),
-                style: AppFonts.montant(fontSize: 16, color: AppColors.texteEncre),
+                style:
+                    AppFonts.montant(fontSize: 16, color: AppColors.texteEncre),
               ),
               if (progression != null) ...[
                 const SizedBox(height: 6),
@@ -110,7 +118,8 @@ class _EvenementTile extends StatelessWidget {
               const SizedBox(height: 6),
               Text(
                 '${evenement.participants} participant${evenement.participants > 1 ? 's' : ''}',
-                style: const TextStyle(fontSize: 12, color: AppColors.texteSecondaire),
+                style: const TextStyle(
+                    fontSize: 12, color: AppColors.texteSecondaire),
               ),
             ],
           ),

@@ -69,7 +69,9 @@ class TresorerieListScreen extends ConsumerWidget {
               ...depenses.map(_LigneDepense.new),
             ]..sort((a, b) => b.date.compareTo(a.date));
 
-            if (lignes.isEmpty) return const Center(child: Text('Aucune écriture'));
+            if (lignes.isEmpty) {
+              return const Center(child: Text('Aucune écriture'));
+            }
 
             return ListView.separated(
               padding: const EdgeInsets.all(12),
@@ -98,19 +100,23 @@ class _LigneTile extends StatelessWidget {
       _LigneDepense(:final depense) => depense.montant,
     };
     final titre = switch (ligne) {
-      _LigneRecette(:final recette) => recette.libelle.isEmpty ? recette.categorie.libelle : recette.libelle,
-      _LigneDepense(:final depense) => depense.description.isEmpty ? depense.categorie : depense.description,
+      _LigneRecette(:final recette) =>
+        recette.libelle.isEmpty ? recette.categorie.libelle : recette.libelle,
+      _LigneDepense(:final depense) =>
+        depense.description.isEmpty ? depense.categorie : depense.description,
     };
     final sousTitre = switch (ligne) {
       _LigneRecette(:final recette) => recette.categorie.libelle,
-      _LigneDepense(:final depense) => depense.beneficiaire.isEmpty ? depense.categorie : depense.beneficiaire,
+      _LigneDepense(:final depense) =>
+        depense.beneficiaire.isEmpty ? depense.categorie : depense.beneficiaire,
     };
 
     return Card(
       child: ListTile(
         leading: CircleAvatar(
           backgroundColor: couleur.withValues(alpha: .12),
-          child: Icon(estRecette ? Icons.arrow_downward : Icons.arrow_upward, color: couleur, size: 20),
+          child: Icon(estRecette ? Icons.arrow_downward : Icons.arrow_upward,
+              color: couleur, size: 20),
         ),
         title: Text(titre),
         subtitle: Text('$sousTitre • ${formatDate(ligne.date)}'),

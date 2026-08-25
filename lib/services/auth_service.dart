@@ -10,7 +10,8 @@ class AuthService {
 
   User? get currentUser => _client.auth.currentUser;
 
-  Future<void> connexion({required String email, required String motDePasse}) async {
+  Future<void> connexion(
+      {required String email, required String motDePasse}) async {
     await _client.auth.signInWithPassword(email: email, password: motDePasse);
   }
 

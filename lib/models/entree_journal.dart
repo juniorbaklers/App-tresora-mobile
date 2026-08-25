@@ -24,7 +24,10 @@ class EntreeJournal {
     this.nouvelleValeur,
   });
 
-  static String _heureCourte(String? heure) => (heure == null || heure.length < 5) ? (heure ?? '') : heure.substring(0, 5);
+  static String _heureCourte(String? heure) =>
+      (heure == null || heure.length < 5)
+          ? (heure ?? '')
+          : heure.substring(0, 5);
 
   factory EntreeJournal.fromMap(Map<String, dynamic> map) => EntreeJournal(
         id: map['id'] as String,

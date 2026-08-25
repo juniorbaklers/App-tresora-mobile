@@ -14,7 +14,8 @@ class EvenementDetailScreen extends ConsumerStatefulWidget {
   const EvenementDetailScreen({super.key, required this.evenement});
 
   @override
-  ConsumerState<EvenementDetailScreen> createState() => _EvenementDetailScreenState();
+  ConsumerState<EvenementDetailScreen> createState() =>
+      _EvenementDetailScreenState();
 }
 
 class _EvenementDetailScreenState extends ConsumerState<EvenementDetailScreen> {
@@ -26,7 +27,8 @@ class _EvenementDetailScreenState extends ConsumerState<EvenementDetailScreen> {
       orElse: () => widget.evenement,
     );
     final progression = evenement.progression;
-    final contributionsAsync = ref.watch(contributionsEvenementProvider(evenement.id));
+    final contributionsAsync =
+        ref.watch(contributionsEvenementProvider(evenement.id));
 
     return Scaffold(
       appBar: AppBar(title: Text(evenement.nom)),
@@ -42,18 +44,23 @@ class _EvenementDetailScreenState extends ConsumerState<EvenementDetailScreen> {
         padding: const EdgeInsets.all(16),
         children: [
           if (evenement.description.isNotEmpty) ...[
-            Text(evenement.description, style: const TextStyle(color: AppColors.texteSecondaire)),
+            Text(evenement.description,
+                style: const TextStyle(color: AppColors.texteSecondaire)),
             const SizedBox(height: 16),
           ],
           Row(
             children: [
               Expanded(
-                child: _Resume(titre: 'Collecté', montant: evenement.montantCollecte, couleur: AppColors.palme),
+                child: _Resume(
+                    titre: 'Collecté',
+                    montant: evenement.montantCollecte,
+                    couleur: AppColors.palme),
               ),
               if (evenement.montantCible != null) ...[
                 const SizedBox(width: 12),
                 Expanded(
-                  child: _Resume(titre: 'Objectif', montant: evenement.montantCible!),
+                  child: _Resume(
+                      titre: 'Objectif', montant: evenement.montantCible!),
                 ),
               ],
             ],
@@ -70,15 +77,18 @@ class _EvenementDetailScreenState extends ConsumerState<EvenementDetailScreen> {
               ),
             ),
             const SizedBox(height: 4),
-            Text('${(progression * 100).clamp(0, 999).toStringAsFixed(0)} % de l\'objectif',
-                style: const TextStyle(fontSize: 12, color: AppColors.texteSecondaire)),
+            Text(
+                '${(progression * 100).clamp(0, 999).toStringAsFixed(0)} % de l\'objectif',
+                style: const TextStyle(
+                    fontSize: 12, color: AppColors.texteSecondaire)),
           ],
           const SizedBox(height: 16),
           ListTile(
             contentPadding: EdgeInsets.zero,
             leading: const Icon(Icons.calendar_today_outlined),
             title: const Text('Période'),
-            subtitle: Text('${formatDate(evenement.dateDebut)} → ${formatDate(evenement.dateFin)}'),
+            subtitle: Text(
+                '${formatDate(evenement.dateDebut)} → ${formatDate(evenement.dateFin)}'),
           ),
           ListTile(
             contentPadding: EdgeInsets.zero,
@@ -101,8 +111,9 @@ class _EvenementDetailScreenState extends ConsumerState<EvenementDetailScreen> {
             trailing: RoleGate(
               peutAcceder: (r) => r.peutGererMembres,
               child: PopupMenuButton<StatutEvenement>(
-                onSelected: (statut) =>
-                    ref.read(evenementsServiceProvider).changerStatut(evenement.id, statut),
+                onSelected: (statut) => ref
+                    .read(evenementsServiceProvider)
+                    .changerStatut(evenement.id, statut),
                 itemBuilder: (_) => StatutEvenement.values
                     .map((s) => PopupMenuItem(value: s, child: Text(s.libelle)))
                     .toList(),
@@ -110,22 +121,27 @@ class _EvenementDetailScreenState extends ConsumerState<EvenementDetailScreen> {
             ),
           ),
           const SizedBox(height: 24),
-          Text('Contributions', style: AppFonts.heading(fontSize: 16, color: AppColors.texteEncre)),
+          Text('Contributions',
+              style:
+                  AppFonts.heading(fontSize: 16, color: AppColors.texteEncre)),
           const SizedBox(height: 8),
           contributionsAsync.when(
             loading: () => const Padding(
               padding: EdgeInsets.symmetric(vertical: 16),
               child: Center(child: CircularProgressIndicator()),
             ),
-            error: (e, _) => Text('Erreur : $e', style: const TextStyle(color: AppColors.terre)),
+            error: (e, _) => Text('Erreur : $e',
+                style: const TextStyle(color: AppColors.terre)),
             data: (contributions) {
               if (contributions.isEmpty) {
-                return const Text('Aucune contribution enregistrée pour le moment',
+                return const Text(
+                    'Aucune contribution enregistrée pour le moment',
                     style: TextStyle(color: AppColors.texteSecondaire));
               }
               return Column(
                 children: [
-                  for (final contribution in contributions) _LigneContribution(contribution: contribution),
+                  for (final contribution in contributions)
+                    _LigneContribution(contribution: contribution),
                 ],
               );
             },
@@ -149,7 +165,10 @@ class _Resume extends StatelessWidget {
   final double montant;
   final Color couleur;
 
-  const _Resume({required this.titre, required this.montant, this.couleur = AppColors.indigoProfond});
+  const _Resume(
+      {required this.titre,
+      required this.montant,
+      this.couleur = AppColors.indigoProfond});
 
   @override
   Widget build(BuildContext context) {
@@ -163,9 +182,12 @@ class _Resume extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(titre.toUpperCase(), style: const TextStyle(fontSize: 11, color: AppColors.texteSecondaire)),
+          Text(titre.toUpperCase(),
+              style: const TextStyle(
+                  fontSize: 11, color: AppColors.texteSecondaire)),
           const SizedBox(height: 4),
-          Text(formatMontant(montant), style: AppFonts.montant(fontSize: 16, color: couleur)),
+          Text(formatMontant(montant),
+              style: AppFonts.montant(fontSize: 16, color: couleur)),
         ],
       ),
     );
@@ -184,8 +206,10 @@ class _LigneContribution extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 6),
       child: ListTile(
         title: Text(contribution.nomContributeur),
-        subtitle: Text('${contribution.modePaiement.libelle} · ${formatDate(contribution.date)}'),
-        trailing: Text(formatMontant(contribution.montant), style: AppFonts.montant(fontSize: 14)),
+        subtitle: Text(
+            '${contribution.modePaiement.libelle} · ${formatDate(contribution.date)}'),
+        trailing: Text(formatMontant(contribution.montant),
+            style: AppFonts.montant(fontSize: 14)),
       ),
     );
   }
@@ -197,7 +221,8 @@ class _FormulaireCollecte extends ConsumerStatefulWidget {
   const _FormulaireCollecte({required this.evenement});
 
   @override
-  ConsumerState<_FormulaireCollecte> createState() => _FormulaireCollecteState();
+  ConsumerState<_FormulaireCollecte> createState() =>
+      _FormulaireCollecteState();
 }
 
 class _FormulaireCollecteState extends ConsumerState<_FormulaireCollecte> {
@@ -218,7 +243,9 @@ class _FormulaireCollecteState extends ConsumerState<_FormulaireCollecte> {
     });
     try {
       final responsable = ref.read(currentUserProvider)?.email ?? '';
-      await ref.read(contributionsEvenementServiceProvider).creer(ContributionEvenement(
+      await ref
+          .read(contributionsEvenementServiceProvider)
+          .creer(ContributionEvenement(
             id: '',
             evenementId: widget.evenement.id,
             nomContributeur: _nomCtrl.text.trim(),
@@ -250,19 +277,25 @@ class _FormulaireCollecteState extends ConsumerState<_FormulaireCollecte> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text('Enregistrer une contribution', style: AppFonts.heading(fontSize: 18, color: AppColors.texteEncre)),
+            Text('Enregistrer une contribution',
+                style: AppFonts.heading(
+                    fontSize: 18, color: AppColors.texteEncre)),
             const SizedBox(height: 16),
             TextFormField(
               controller: _nomCtrl,
               textCapitalization: TextCapitalization.words,
-              decoration: const InputDecoration(labelText: 'Nom du contributeur'),
-              validator: (v) => (v == null || v.trim().isEmpty) ? 'Nom requis' : null,
+              decoration:
+                  const InputDecoration(labelText: 'Nom du contributeur'),
+              validator: (v) =>
+                  (v == null || v.trim().isEmpty) ? 'Nom requis' : null,
             ),
             const SizedBox(height: 14),
             TextFormField(
               controller: _montantCtrl,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              decoration: const InputDecoration(labelText: 'Montant reçu (FCFA)'),
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
+              decoration:
+                  const InputDecoration(labelText: 'Montant reçu (FCFA)'),
               validator: (v) {
                 final n = double.tryParse((v ?? '').replaceAll(',', '.'));
                 return (n == null || n <= 0) ? 'Montant invalide' : null;
@@ -273,7 +306,8 @@ class _FormulaireCollecteState extends ConsumerState<_FormulaireCollecte> {
               initialValue: _mode,
               decoration: const InputDecoration(labelText: 'Mode de paiement'),
               items: ModePaiement.values
-                  .map((m) => DropdownMenuItem(value: m, child: Text(m.libelle)))
+                  .map(
+                      (m) => DropdownMenuItem(value: m, child: Text(m.libelle)))
                   .toList(),
               onChanged: (v) => setState(() => _mode = v!),
             ),
@@ -288,7 +322,8 @@ class _FormulaireCollecteState extends ConsumerState<_FormulaireCollecte> {
                   ? const SizedBox(
                       height: 18,
                       width: 18,
-                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                      child: CircularProgressIndicator(
+                          strokeWidth: 2, color: Colors.white),
                     )
                   : const Text('ENREGISTRER'),
             ),

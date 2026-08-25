@@ -11,7 +11,8 @@ enum TypeNotification {
   const TypeNotification(this.valeurBdd, this.libelle);
 
   static TypeNotification fromBdd(String v) =>
-      TypeNotification.values.firstWhere((t) => t.valeurBdd == v, orElse: () => TypeNotification.rapportDisponible);
+      TypeNotification.values.firstWhere((t) => t.valeurBdd == v,
+          orElse: () => TypeNotification.rapportDisponible);
 }
 
 /// Table `notifications` — boîte personnelle de l'utilisateur, alimentée
@@ -36,7 +37,8 @@ class NotificationTresora {
     required this.lue,
   });
 
-  factory NotificationTresora.fromMap(Map<String, dynamic> map) => NotificationTresora(
+  factory NotificationTresora.fromMap(Map<String, dynamic> map) =>
+      NotificationTresora(
         id: map['id'] as String,
         espaceId: map['espace_id'] as String,
         type: TypeNotification.fromBdd(map['type'] as String),

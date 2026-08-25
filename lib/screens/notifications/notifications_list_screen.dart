@@ -20,7 +20,11 @@ class NotificationsListScreen extends ConsumerWidget {
           TextButton(
             onPressed: () {
               final user = ref.read(currentUserProvider);
-              if (user != null) ref.read(notificationsServiceProvider).marquerToutesLues(user.id);
+              if (user != null) {
+                ref
+                    .read(notificationsServiceProvider)
+                    .marquerToutesLues(user.id);
+              }
             },
             child: const Text('Tout marquer lu'),
           ),
@@ -30,12 +34,15 @@ class NotificationsListScreen extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Erreur : $e')),
         data: (notifications) {
-          if (notifications.isEmpty) return const Center(child: Text('Aucune notification'));
+          if (notifications.isEmpty) {
+            return const Center(child: Text('Aucune notification'));
+          }
           return ListView.separated(
             padding: const EdgeInsets.all(12),
             itemCount: notifications.length,
             separatorBuilder: (_, __) => const SizedBox(height: 6),
-            itemBuilder: (context, i) => _NotificationTile(notification: notifications[i]),
+            itemBuilder: (context, i) =>
+                _NotificationTile(notification: notifications[i]),
           );
         },
       ),
@@ -62,11 +69,20 @@ class _NotificationTile extends ConsumerWidget {
     return Card(
       color: notification.lue ? null : AppColors.or.withValues(alpha: .08),
       child: ListTile(
-        leading: Icon(_icone, color: notification.lue ? AppColors.texteSecondaire : AppColors.or),
-        title: Text(notification.titre, style: TextStyle(fontWeight: notification.lue ? FontWeight.normal : FontWeight.w700)),
-        subtitle: Text('${notification.description}\n${formatDate(notification.date)}'),
+        leading: Icon(_icone,
+            color: notification.lue ? AppColors.texteSecondaire : AppColors.or),
+        title: Text(notification.titre,
+            style: TextStyle(
+                fontWeight:
+                    notification.lue ? FontWeight.normal : FontWeight.w700)),
+        subtitle: Text(
+            '${notification.description}\n${formatDate(notification.date)}'),
         isThreeLine: true,
-        onTap: notification.lue ? null : () => ref.read(notificationsServiceProvider).marquerLue(notification.id),
+        onTap: notification.lue
+            ? null
+            : () => ref
+                .read(notificationsServiceProvider)
+                .marquerLue(notification.id),
       ),
     );
   }

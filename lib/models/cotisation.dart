@@ -10,8 +10,8 @@ enum Periodicite {
   final String libelle;
   const Periodicite(this.valeurBdd, this.libelle);
 
-  static Periodicite fromBdd(String v) =>
-      Periodicite.values.firstWhere((p) => p.valeurBdd == v, orElse: () => Periodicite.unique);
+  static Periodicite fromBdd(String v) => Periodicite.values
+      .firstWhere((p) => p.valeurBdd == v, orElse: () => Periodicite.unique);
 }
 
 /// Table `cotisations` — payable en une ou plusieurs tranches (voir Tranche).
@@ -68,8 +68,8 @@ enum StatutPaiement {
   final String libelle;
   const StatutPaiement(this.valeurBdd, this.libelle);
 
-  static StatutPaiement fromBdd(String v) =>
-      StatutPaiement.values.firstWhere((s) => s.valeurBdd == v, orElse: () => StatutPaiement.impaye);
+  static StatutPaiement fromBdd(String v) => StatutPaiement.values
+      .firstWhere((s) => s.valeurBdd == v, orElse: () => StatutPaiement.impaye);
 }
 
 /// Table `paiements_cotisation` — une ligne par (cotisation, membre).
@@ -92,7 +92,8 @@ class PaiementCotisation {
     required this.statut,
   });
 
-  factory PaiementCotisation.fromMap(Map<String, dynamic> map) => PaiementCotisation(
+  factory PaiementCotisation.fromMap(Map<String, dynamic> map) =>
+      PaiementCotisation(
         id: map['id'] as String,
         cotisationId: map['cotisation_id'] as String,
         membreId: map['membre_id'] as String,
@@ -112,8 +113,8 @@ enum ModePaiement {
   final String libelle;
   const ModePaiement(this.valeurBdd, this.libelle);
 
-  static ModePaiement fromBdd(String? v) =>
-      ModePaiement.values.firstWhere((m) => m.valeurBdd == v, orElse: () => ModePaiement.especes);
+  static ModePaiement fromBdd(String? v) => ModePaiement.values
+      .firstWhere((m) => m.valeurBdd == v, orElse: () => ModePaiement.especes);
 }
 
 /// Table `tranches` — un versement isolé pour une cotisation d'un membre.
@@ -140,7 +141,9 @@ class Tranche {
         date: DateTime.parse(map['date'] as String),
         montant: (map['montant'] as num).toDouble(),
         responsable: map['responsable'] as String? ?? '',
-        modePaiement: map['mode_paiement'] == null ? null : ModePaiement.fromBdd(map['mode_paiement'] as String),
+        modePaiement: map['mode_paiement'] == null
+            ? null
+            : ModePaiement.fromBdd(map['mode_paiement'] as String),
       );
 
   Map<String, dynamic> toInsertMap() => {

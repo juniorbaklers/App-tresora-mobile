@@ -10,10 +10,12 @@ class ContributionFormScreen extends ConsumerStatefulWidget {
   const ContributionFormScreen({super.key});
 
   @override
-  ConsumerState<ContributionFormScreen> createState() => _ContributionFormScreenState();
+  ConsumerState<ContributionFormScreen> createState() =>
+      _ContributionFormScreenState();
 }
 
-class _ContributionFormScreenState extends ConsumerState<ContributionFormScreen> {
+class _ContributionFormScreenState
+    extends ConsumerState<ContributionFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final _projetCtrl = TextEditingController();
   final _descriptionCtrl = TextEditingController();
@@ -38,7 +40,8 @@ class _ContributionFormScreenState extends ConsumerState<ContributionFormScreen>
             description: _descriptionCtrl.text.trim(),
             espaceDemandeurId: espaceId,
             espaceCibleId: _espaceCibleId!,
-            montantDemande: double.parse(_montantCtrl.text.replaceAll(',', '.')),
+            montantDemande:
+                double.parse(_montantCtrl.text.replaceAll(',', '.')),
             montantRecu: 0,
             dateLimite: _dateLimite,
             statut: StatutContribution.enAttente,
@@ -82,9 +85,11 @@ class _ContributionFormScreenState extends ConsumerState<ContributionFormScreen>
                   DropdownButtonFormField<String>(
                     initialValue: _espaceCibleId,
                     isExpanded: true,
-                    decoration: const InputDecoration(labelText: 'Espace sollicité'),
+                    decoration:
+                        const InputDecoration(labelText: 'Espace sollicité'),
                     items: [
-                      for (final e in autresEspaces) DropdownMenuItem(value: e.id, child: Text(e.nom)),
+                      for (final e in autresEspaces)
+                        DropdownMenuItem(value: e.id, child: Text(e.nom)),
                     ],
                     onChanged: (v) => setState(() => _espaceCibleId = v),
                     validator: (v) => v == null ? 'Choisis un espace' : null,
@@ -93,19 +98,23 @@ class _ContributionFormScreenState extends ConsumerState<ContributionFormScreen>
                 TextFormField(
                   controller: _projetCtrl,
                   decoration: const InputDecoration(labelText: 'Projet'),
-                  validator: (v) => (v == null || v.trim().isEmpty) ? 'Requis' : null,
+                  validator: (v) =>
+                      (v == null || v.trim().isEmpty) ? 'Requis' : null,
                 ),
                 const SizedBox(height: 14),
                 TextFormField(
                   controller: _descriptionCtrl,
-                  decoration: const InputDecoration(labelText: 'Description (optionnel)'),
+                  decoration: const InputDecoration(
+                      labelText: 'Description (optionnel)'),
                   maxLines: 2,
                 ),
                 const SizedBox(height: 14),
                 TextFormField(
                   controller: _montantCtrl,
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  decoration: const InputDecoration(labelText: 'Montant demandé (FCFA)'),
+                  keyboardType:
+                      const TextInputType.numberWithOptions(decimal: true),
+                  decoration: const InputDecoration(
+                      labelText: 'Montant demandé (FCFA)'),
                   validator: (v) {
                     final n = double.tryParse((v ?? '').replaceAll(',', '.'));
                     return (n == null || n <= 0) ? 'Montant invalide' : null;
@@ -122,23 +131,27 @@ class _ContributionFormScreenState extends ConsumerState<ContributionFormScreen>
                       context: context,
                       initialDate: _dateLimite,
                       firstDate: DateTime.now(),
-                      lastDate: DateTime.now().add(const Duration(days: 365 * 2)),
+                      lastDate:
+                          DateTime.now().add(const Duration(days: 365 * 2)),
                     );
                     if (choisie != null) setState(() => _dateLimite = choisie);
                   },
                 ),
                 if (_erreur != null) ...[
                   const SizedBox(height: 12),
-                  Text(_erreur!, style: const TextStyle(color: AppColors.terre)),
+                  Text(_erreur!,
+                      style: const TextStyle(color: AppColors.terre)),
                 ],
                 const SizedBox(height: 20),
                 ElevatedButton(
-                  onPressed: (_enCours || autresEspaces.isEmpty) ? null : _envoyer,
+                  onPressed:
+                      (_enCours || autresEspaces.isEmpty) ? null : _envoyer,
                   child: _enCours
                       ? const SizedBox(
                           height: 18,
                           width: 18,
-                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                          child: CircularProgressIndicator(
+                              strokeWidth: 2, color: Colors.white),
                         )
                       : const Text('ENVOYER LA DEMANDE'),
                 ),

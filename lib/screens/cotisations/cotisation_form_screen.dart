@@ -10,7 +10,8 @@ class CotisationFormScreen extends ConsumerStatefulWidget {
   const CotisationFormScreen({super.key});
 
   @override
-  ConsumerState<CotisationFormScreen> createState() => _CotisationFormScreenState();
+  ConsumerState<CotisationFormScreen> createState() =>
+      _CotisationFormScreenState();
 }
 
 class _CotisationFormScreenState extends ConsumerState<CotisationFormScreen> {
@@ -33,7 +34,8 @@ class _CotisationFormScreenState extends ConsumerState<CotisationFormScreen> {
     });
     try {
       final membres = ref.read(membresStreamProvider).valueOrNull ?? [];
-      final membreIdsActifs = membres.where((m) => m.actif).map((m) => m.id).toList();
+      final membreIdsActifs =
+          membres.where((m) => m.actif).map((m) => m.id).toList();
       final cotisation = Cotisation(
         id: '',
         espaceId: espaceId,
@@ -44,7 +46,9 @@ class _CotisationFormScreenState extends ConsumerState<CotisationFormScreen> {
         dateLimite: _dateLimite,
         active: true,
       );
-      await ref.read(cotisationsServiceProvider).creer(cotisation, membreIdsActifs: membreIdsActifs);
+      await ref
+          .read(cotisationsServiceProvider)
+          .creer(cotisation, membreIdsActifs: membreIdsActifs);
       if (mounted) Navigator.of(context).pop();
     } catch (e) {
       setState(() => _erreur = "Création impossible : ${e.toString()}");
@@ -72,19 +76,23 @@ class _CotisationFormScreenState extends ConsumerState<CotisationFormScreen> {
                 TextFormField(
                   controller: _nomCtrl,
                   decoration: const InputDecoration(labelText: 'Nom'),
-                  validator: (v) => (v == null || v.trim().isEmpty) ? 'Requis' : null,
+                  validator: (v) =>
+                      (v == null || v.trim().isEmpty) ? 'Requis' : null,
                 ),
                 const SizedBox(height: 14),
                 TextFormField(
                   controller: _descriptionCtrl,
-                  decoration: const InputDecoration(labelText: 'Description (optionnel)'),
+                  decoration: const InputDecoration(
+                      labelText: 'Description (optionnel)'),
                   maxLines: 2,
                 ),
                 const SizedBox(height: 14),
                 TextFormField(
                   controller: _montantCtrl,
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  decoration: const InputDecoration(labelText: 'Montant par membre (FCFA)'),
+                  keyboardType:
+                      const TextInputType.numberWithOptions(decimal: true),
+                  decoration: const InputDecoration(
+                      labelText: 'Montant par membre (FCFA)'),
                   validator: (v) {
                     final n = double.tryParse((v ?? '').replaceAll(',', '.'));
                     return (n == null || n <= 0) ? 'Montant invalide' : null;
@@ -95,7 +103,8 @@ class _CotisationFormScreenState extends ConsumerState<CotisationFormScreen> {
                   initialValue: _periodicite,
                   decoration: const InputDecoration(labelText: 'Périodicité'),
                   items: Periodicite.values
-                      .map((p) => DropdownMenuItem(value: p, child: Text(p.libelle)))
+                      .map((p) =>
+                          DropdownMenuItem(value: p, child: Text(p.libelle)))
                       .toList(),
                   onChanged: (v) => setState(() => _periodicite = v!),
                 ),
@@ -110,7 +119,8 @@ class _CotisationFormScreenState extends ConsumerState<CotisationFormScreen> {
                       context: context,
                       initialDate: _dateLimite,
                       firstDate: DateTime.now(),
-                      lastDate: DateTime.now().add(const Duration(days: 365 * 2)),
+                      lastDate:
+                          DateTime.now().add(const Duration(days: 365 * 2)),
                     );
                     if (choisie != null) setState(() => _dateLimite = choisie);
                   },
@@ -120,11 +130,13 @@ class _CotisationFormScreenState extends ConsumerState<CotisationFormScreen> {
                   nbMembresActifs == 0
                       ? 'Aucun membre actif : la cotisation sera créée sans échéance assignée.'
                       : 'Sera assignée aux $nbMembresActifs membre${nbMembresActifs > 1 ? 's' : ''} actif${nbMembresActifs > 1 ? 's' : ''}.',
-                  style: const TextStyle(fontSize: 12, color: AppColors.texteSecondaire),
+                  style: const TextStyle(
+                      fontSize: 12, color: AppColors.texteSecondaire),
                 ),
                 if (_erreur != null) ...[
                   const SizedBox(height: 12),
-                  Text(_erreur!, style: const TextStyle(color: AppColors.terre)),
+                  Text(_erreur!,
+                      style: const TextStyle(color: AppColors.terre)),
                 ],
                 const SizedBox(height: 24),
                 ElevatedButton(
@@ -133,7 +145,8 @@ class _CotisationFormScreenState extends ConsumerState<CotisationFormScreen> {
                       ? const SizedBox(
                           height: 18,
                           width: 18,
-                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                          child: CircularProgressIndicator(
+                              strokeWidth: 2, color: Colors.white),
                         )
                       : const Text('CRÉER'),
                 ),
