@@ -10,6 +10,7 @@ import '../../theme/app_theme.dart';
 import '../../utils/format.dart';
 import '../clotures/clotures_list_screen.dart';
 import '../journal/journal_list_screen.dart';
+import 'roles_permissions_screen.dart';
 
 class ReglagesEspaceScreen extends ConsumerWidget {
   const ReglagesEspaceScreen({super.key});
@@ -105,6 +106,16 @@ class ReglagesEspaceScreen extends ConsumerWidget {
                     ),
                   ),
                 ],
+                const Divider(height: 1),
+                ListTile(
+                  leading: const Icon(Icons.shield_outlined),
+                  title: const Text('Rôles et permissions'),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                        builder: (_) => const RolesPermissionsScreen()),
+                  ),
+                ),
               ],
             ),
           ),

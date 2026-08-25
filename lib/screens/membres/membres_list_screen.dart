@@ -8,6 +8,7 @@ import '../../providers/data_providers.dart';
 import '../../providers/espace_providers.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/role_gate.dart';
+import 'membre_detail_screen.dart';
 import 'membre_form_screen.dart';
 
 class MembresListScreen extends ConsumerWidget {
@@ -249,7 +250,7 @@ class _MembreTile extends ConsumerWidget {
           ),
         ),
         onTap: () => Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => MembreFormScreen(membre: membre)),
+          MaterialPageRoute(builder: (_) => MembreDetailScreen(membre: membre)),
         ),
       ),
     );

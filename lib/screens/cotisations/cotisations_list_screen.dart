@@ -5,6 +5,7 @@ import '../../providers/data_providers.dart';
 import '../../theme/app_theme.dart';
 import '../../utils/format.dart';
 import '../../widgets/role_gate.dart';
+import '../paiement/paiement_screen.dart';
 import 'cotisation_detail_screen.dart';
 import 'cotisation_form_screen.dart';
 
@@ -16,7 +17,21 @@ class CotisationsListScreen extends ConsumerWidget {
     final cotisationsAsync = ref.watch(cotisationsStreamProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Cotisations')),
+      appBar: AppBar(
+        title: const Text('Cotisations'),
+        actions: [
+          RoleGate(
+            peutAcceder: (r) => r.peutGererMembres,
+            child: IconButton(
+              icon: const Icon(Icons.point_of_sale_outlined),
+              tooltip: 'Paiement',
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const PaiementScreen()),
+              ),
+            ),
+          ),
+        ],
+      ),
       floatingActionButton: RoleGate(
         peutAcceder: (r) => r.peutGererMembres,
         child: FloatingActionButton.extended(

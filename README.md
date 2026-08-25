@@ -19,12 +19,23 @@ Ce projet est **indépendant** de `gestion-caisse-eglise` (site web mono-
   responsable / membre) — la barrière réelle est la Row Level Security
   côté base, l'app adapte juste l'interface
 - ✅ Tableau de bord : recettes/dépenses de l'espace courant, solde,
-  graphique mensuel
+  graphique mensuel. Deux variantes selon le type d'espace, comme
+  tresora-app (`DashboardEglise` / `DashboardGroupe`) : dîmes/offrandes pour
+  une église, cotisation en cours (progression, payé/partiel/impayé),
+  événements actifs, contributions demandées et derniers paiements pour un
+  groupe/association/perso
 - ✅ Recettes & Dépenses : liste temps réel, saisie
 - ✅ Membres : registre nominatif par espace, activation/désactivation
 - ✅ Cotisations payables en plusieurs tranches : création (assignée à
   tous les membres actifs), suivi des versements par membre, montant
-  payé/statut recalculés automatiquement côté base à chaque tranche
+  payé/statut recalculés automatiquement côté base à chaque tranche.
+  Écran "Paiement" (icône dans l'AppBar de Cotisations) pour encaisser
+  directement la cotisation due d'un membre recherché par nom, sans passer
+  par une cotisation précise — reprend `PaiementView` de tresora-app
+- ✅ Fiche membre (au clic sur un membre) : coordonnées et historique
+  financier (chaque cotisation qui le concerne avec son statut) — reprend
+  `MembreDetail` de tresora-app (sans la carte membre/QR code, hors
+  périmètre mobile)
 - ✅ Événements : création (objectif, montant suggéré, période), liste avec
   barre de progression, détail avec enregistrement des contributions
   (montant collecté/nombre de participants mis à jour à chaque saisie)
@@ -54,6 +65,10 @@ Ce projet est **indépendant** de `gestion-caisse-eglise` (site web mono-
 - ✅ Réglages de l'espace : modifier nom/devise/solde initial (propriétaire/
   administrateur), gérer le rôle de chaque membre ou le retirer de
   l'espace — plus besoin de passer par Supabase pour ça
+- ✅ Rôles et permissions : page de référence en lecture seule listant ce
+  que chaque rôle peut faire (matrice des permissions), accessible depuis
+  Réglages — reprend `/espace/[espaceId]/roles` de tresora-app ; la
+  barrière réelle reste la RLS côté base
 - ✅ Identité visuelle "pile de carnets" sur l'écran de sélection d'espace :
   chaque carte d'espace est présentée comme un carnet de comptes, avec
   deux feuillets décalés en arrière-plan et une tranche colorée (motif de
