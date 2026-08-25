@@ -75,13 +75,16 @@ begin
     montant_paye = v_total,
     dernier_paiement = v_dernier,
     -- Une exonération est une décision manuelle : on ne l'écrase pas
-    -- juste parce qu'un versement arrive ou disparaît.
-    statut = case
+    -- juste parce qu'un versement arrive ou disparaît. Cast explicite
+    -- nécessaire : un CASE dont toutes les branches sont des littéraux
+    -- texte est typé "text" par Postgres, pas assignable tel quel à une
+    -- colonne enum.
+    statut = (case
       when v_statut_actuel = 'exonere' then 'exonere'
       when v_total >= v_du then 'paye'
       when v_total > 0 then 'partiel'
       else 'impaye'
-    end
+    end)::statut_paiement_cotisation
   where id = v_paiement_id;
 
   return coalesce(new, old);
@@ -202,6 +205,14 @@ declare
   v_libelle_table text;
   v_action text;
 begin
+  -- Une suppression d'espace entraîne la suppression en cascade de ses
+  -- recettes/dépenses/membres, ce qui déclenche ce trigger alors que
+  -- l'espace référencé disparaît dans la même transaction : inutile (et
+  -- impossible, contrainte de clé étrangère) de journaliser dans ce cas.
+  if not exists (select 1 from espaces where id = v_espace_id) then
+    return coalesce(new, old);
+  end if;
+
   select nom_complet into v_utilisateur from profils where id = auth.uid();
   v_role := coalesce((role_dans_espace(v_espace_id))::text, '');
   v_libelle_table := case TG_TABLE_NAME
