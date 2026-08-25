@@ -1,9 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../models/contribution.dart';
 import '../models/cotisation.dart';
 import '../models/evenement.dart';
 import '../models/invitation.dart';
 import '../models/membre.dart';
 import '../models/tresorerie.dart';
+import '../services/contributions_service.dart';
 import '../services/cotisations_service.dart';
 import '../services/evenements_service.dart';
 import '../services/membres_service.dart';
@@ -17,6 +19,7 @@ final tranchesServiceProvider = Provider((ref) => TranchesService());
 final recettesServiceProvider = Provider((ref) => RecettesService());
 final depensesServiceProvider = Provider((ref) => DepensesService());
 final evenementsServiceProvider = Provider((ref) => EvenementsService());
+final contributionsServiceProvider = Provider((ref) => ContributionsService());
 
 /// Tous les providers de données ci-dessous sont scopés à l'espace
 /// sélectionné (currentEspaceIdProvider) : flux vide tant qu'aucun espace
@@ -56,6 +59,22 @@ final invitationsEspaceStreamProvider = StreamProvider<List<Invitation>>((ref) {
   final espaceId = ref.watch(currentEspaceIdProvider);
   if (espaceId == null) return Stream.value(<Invitation>[]);
   return ref.watch(invitationsServiceProvider).streamInvitationsEspace(espaceId);
+});
+
+final contributionsEnvoyeesStreamProvider = StreamProvider<List<Contribution>>((ref) {
+  final espaceId = ref.watch(currentEspaceIdProvider);
+  if (espaceId == null) return Stream.value(<Contribution>[]);
+  return ref.watch(contributionsServiceProvider).streamEnvoyees(espaceId);
+});
+
+final contributionsRecuesStreamProvider = StreamProvider<List<Contribution>>((ref) {
+  final espaceId = ref.watch(currentEspaceIdProvider);
+  if (espaceId == null) return Stream.value(<Contribution>[]);
+  return ref.watch(contributionsServiceProvider).streamRecues(espaceId);
+});
+
+final versementsContributionProvider = StreamProvider.family((ref, String contributionId) {
+  return ref.watch(contributionsServiceProvider).streamVersements(contributionId);
 });
 
 /// Paiements d'une cotisation précise — provider "family" paramétré par

@@ -7,6 +7,7 @@ import '../../theme/app_theme.dart';
 import '../../utils/format.dart';
 import '../../widgets/motif.dart';
 import '../../widgets/stat_card.dart';
+import '../contributions/contributions_list_screen.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -18,7 +19,18 @@ class DashboardScreen extends ConsumerWidget {
     final depensesAsync = ref.watch(depensesStreamProvider);
 
     return Scaffold(
-      appBar: AppBar(title: Text(espace?.nom ?? 'Tableau de bord')),
+      appBar: AppBar(
+        title: Text(espace?.nom ?? 'Tableau de bord'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.compare_arrows),
+            tooltip: 'Contributions inter-espaces',
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const ContributionsListScreen()),
+            ),
+          ),
+        ],
+      ),
       body: recettesAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Erreur : $e')),

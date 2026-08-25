@@ -33,13 +33,17 @@ Ce projet est **indépendant** de `gestion-caisse-eglise` (site web mono-
   attente sur l'écran de sélection d'espace et peut accepter (rejoint
   l'espace) ou refuser — accepter passe par la RPC `accepter_invitation`
   (sécurité définie côté base, l'invité n'étant pas encore membre)
+- ✅ Contributions inter-espaces : un espace demande une somme à un autre
+  (parmi les espaces que l'utilisateur gère aussi), accessible depuis
+  l'icône dans l'AppBar du tableau de bord ; l'espace sollicité enregistre
+  ses versements sans que le demandeur ne voie comment la somme a été
+  réunie — montant reçu/statut recalculés côté base à chaque versement
 
 **Pas encore fait** (modèle déjà prêt côté base, voir
-`supabase/schema_1_types_tables.sql`) : contributions inter-espaces,
-notifications, journal d'audit affiché dans l'app, clôtures, rapports/exports,
-gestion des rôles depuis l'app (à faire directement dans Supabase pour
-l'instant), identité visuelle "pile de carnets" sur l'écran de sélection
-d'espace, mode hors-ligne.
+`supabase/schema_1_types_tables.sql`) : notifications, journal d'audit
+affiché dans l'app, clôtures, rapports/exports, gestion des rôles depuis
+l'app (à faire directement dans Supabase pour l'instant), identité visuelle
+"pile de carnets" sur l'écran de sélection d'espace, mode hors-ligne.
 
 ## Stack
 
@@ -75,7 +79,8 @@ build.
 lib/
 ├── config/            URL + clé Supabase
 ├── models/             Profil, Espace, Membre, Cotisation/PaiementCotisation/Tranche,
-│                        Recette/Depense, Evenement, Invitation, Role — reflètent supabase/schema_1_types_tables.sql
+│                        Recette/Depense, Evenement, Invitation, Contribution, Role —
+│                        reflètent supabase/schema_1_types_tables.sql
 ├── services/            Appels Supabase (CRUD + flux temps réel par table)
 ├── providers/            État Riverpod : session, mes espaces, espace courant + rôle,
 │                          données scopées à l'espace sélectionné
@@ -91,6 +96,7 @@ lib/
     ├── tresorerie/               Recettes/dépenses : liste + formulaire
     ├── cotisations/               Liste, création, détail (suivi des tranches par membre)
     ├── evenements/                  Liste (progression), création, détail (contributions)
+    ├── contributions/                Envoyées/reçues, création, détail (versements), accessible depuis le tableau de bord
     ├── membres/                    Liste + formulaire + invitations (envoi, annulation)
     └── profil/                      Identité, espace courant + rôle, déconnexion
 ```
