@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 /// Palette « tissage » — indigo de teinture, safran, terre de Korhogo, palme,
 /// coton écru. Reprise à l'identique de globals.css dans le dépôt tresora-app
@@ -36,7 +35,8 @@ class AppColorsDark {
 class AppFonts {
   static TextStyle heading(
           {double? fontSize, FontWeight? fontWeight, Color? color}) =>
-      GoogleFonts.fraunces(
+      TextStyle(
+        fontFamily: 'Fraunces',
         fontSize: fontSize,
         fontWeight: fontWeight ?? FontWeight.w600,
         color: color,
@@ -47,7 +47,8 @@ class AppFonts {
 
   static TextStyle montant(
           {double? fontSize, FontWeight? fontWeight, Color? color}) =>
-      GoogleFonts.ibmPlexMono(
+      TextStyle(
+        fontFamily: 'IBMPlexMono',
         fontSize: fontSize,
         fontWeight: fontWeight ?? FontWeight.w600,
         color: color,
@@ -101,11 +102,14 @@ class AppTheme {
     }) colors,
     required Brightness brightness,
   }) {
-    final baseTextTheme = GoogleFonts.plusJakartaSansTextTheme(
-      brightness == Brightness.dark
-          ? ThemeData.dark().textTheme
-          : ThemeData.light().textTheme,
-    ).apply(bodyColor: colors.texteEncre, displayColor: colors.texteEncre);
+    final baseTextTheme = (brightness == Brightness.dark
+            ? ThemeData.dark().textTheme
+            : ThemeData.light().textTheme)
+        .apply(
+      fontFamily: 'PlusJakartaSans',
+      bodyColor: colors.texteEncre,
+      displayColor: colors.texteEncre,
+    );
 
     final textTheme = baseTextTheme.copyWith(
       headlineLarge: AppFonts.heading(fontSize: 30, color: colors.texteEncre),
@@ -128,7 +132,7 @@ class AppTheme {
       ),
       scaffoldBackgroundColor: colors.fond,
       textTheme: textTheme,
-      fontFamily: GoogleFonts.plusJakartaSans().fontFamily,
+      fontFamily: 'PlusJakartaSans',
     );
 
     return base.copyWith(

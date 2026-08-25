@@ -119,14 +119,15 @@ maintenant `paiementsEspaceProvider`/`tranchesCotisationProvider`
 le détail d'une cotisation ou d'un versement précis gardent leur flux temps
 réel individuel (peu nombreux, mise à jour instantanée utile).
 
-Les polices de marque (Fraunces, Plus Jakarta Sans, IBM Plex Mono) ne sont
-pas encore embarquées comme assets locaux ; `google_fonts` tenterait sinon
-de les télécharger au premier affichage de chaque écran à chaque lancement
-(cache froid), bloquant le rendu sur une requête réseau. `main.dart` désactive
-ce téléchargement à l'exécution (`GoogleFonts.config.allowRuntimeFetching =
-false`) — l'app retombe sur la police système en attendant un vrai
-embarquement des `.ttf`, mais ne bloque plus jamais sur un appel réseau pour
-afficher du texte.
+Les polices de marque (Fraunces, Plus Jakarta Sans, IBM Plex Mono) sont
+embarquées en assets locaux (`assets/fonts/`, licence SIL Open Font License —
+voir `assets/fonts/LICENSES/`) au lieu de passer par le paquet `google_fonts`,
+qui les télécharge sinon au premier affichage de chaque écran à chaque
+lancement à froid, bloquant le rendu sur une requête réseau. Fraunces et
+Plus Jakarta Sans sont des polices variables : un seul fichier par famille
+suffit, `TextStyle.fontWeight`/`fontVariations` sélectionne la bonne
+instance (voir `lib/theme/app_theme.dart`). Plus aucun appel réseau pour
+afficher du texte, identité visuelle de marque conservée.
 
 ## Stack
 
@@ -135,8 +136,9 @@ afficher du texte.
   Postgres, RLS, synchronisation temps réel
 - [`flutter_riverpod`](https://pub.dev/packages/flutter_riverpod) — état
 - [`fl_chart`](https://pub.dev/packages/fl_chart) — graphiques
-- [`google_fonts`](https://pub.dev/packages/google_fonts) — Fraunces /
-  Plus Jakarta Sans / IBM Plex Mono (identité "tissage" de tresora-app)
+- Fraunces / Plus Jakarta Sans / IBM Plex Mono (identité "tissage" de
+  tresora-app) — polices embarquées en assets locaux (`assets/fonts/`),
+  pas de paquet `google_fonts` (voir section Performance ci-dessus)
 - [`pdf`](https://pub.dev/packages/pdf) + [`printing`](https://pub.dev/packages/printing) —
   génération et partage des rapports de trésorerie
 - [`shared_preferences`](https://pub.dev/packages/shared_preferences) +

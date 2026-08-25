@@ -23,9 +23,6 @@ dependencies:
   # Formatage dates / montants (FCFA)
   intl: ^0.19.0
 
-  # Typographie de marque (Fraunces, Plus Jakarta Sans, IBM Plex Mono)
-  google_fonts: ^6.2.1
-
   # Génération et partage des rapports PDF (recettes/dépenses par période)
   pdf: ^3.11.3
   printing: ^5.13.4
@@ -41,3 +38,21 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  # Typographie de marque embarquée en assets locaux (téléchargées depuis
+  # google/fonts, licence OFL) : plus aucun appel réseau au premier
+  # affichage, contrairement au paquet google_fonts en mode "runtime fetch".
+  # Fraunces et Plus Jakarta Sans sont des polices variables : un seul
+  # fichier par famille suffit, Flutter choisit la bonne instance selon le
+  # FontWeight/FontVariation demandé.
+  fonts:
+    - family: Fraunces
+      fonts:
+        - asset: assets/fonts/Fraunces-Variable.ttf
+    - family: PlusJakartaSans
+      fonts:
+        - asset: assets/fonts/PlusJakartaSans-Variable.ttf
+    - family: IBMPlexMono
+      fonts:
+        - asset: assets/fonts/IBMPlexMono-SemiBold.ttf
+          weight: 600
