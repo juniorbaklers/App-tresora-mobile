@@ -24,6 +24,9 @@ class ReglagesEspaceScreen extends ConsumerWidget {
 
     if (espace == null) return const Scaffold(body: SizedBox.shrink());
 
+    final afficherClotures = espace.aModule(ModuleEspace.dimes) ||
+        espace.aModule(ModuleEspace.offrandes);
+
     return Scaffold(
       appBar: AppBar(title: const Text('Réglages de l\'espace')),
       body: ListView(
@@ -90,16 +93,18 @@ class ReglagesEspaceScreen extends ConsumerWidget {
                         builder: (_) => const JournalListScreen()),
                   ),
                 ),
-                const Divider(height: 1),
-                ListTile(
-                  leading: const Icon(Icons.fact_check_outlined),
-                  title: const Text('Clôtures'),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(
-                        builder: (_) => const CloturesListScreen()),
+                if (afficherClotures) ...[
+                  const Divider(height: 1),
+                  ListTile(
+                    leading: const Icon(Icons.fact_check_outlined),
+                    title: const Text('Clôtures'),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                          builder: (_) => const CloturesListScreen()),
+                    ),
                   ),
-                ),
+                ],
               ],
             ),
           ),

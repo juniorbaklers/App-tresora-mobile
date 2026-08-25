@@ -76,7 +76,10 @@ Ce projet est **indépendant** de `gestion-caisse-eglise` (site web mono-
   Dîmes/Offrandes sont activées par défaut uniquement pour les espaces de
   type église, mais restent activables pour n'importe quel type ; tout se
   règle depuis Réglages → Modules. Reprend le système `ModuleKey` de
-  tresora-app (src/lib/types.ts, src/lib/nav.ts).
+  tresora-app (src/lib/types.ts, src/lib/nav.ts) : les catégories proposées
+  à la saisie d'une recette (Dîme/Offrande vs Cotisation/Activité) et
+  l'accès aux Clôtures depuis Réglages suivent aussi les modules Dîmes/
+  Offrandes actifs sur l'espace, comme sur l'app web.
 
 ## Stack
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../models/module_espace.dart';
 import '../../models/tresorerie.dart';
 import '../../providers/data_providers.dart';
 import '../../providers/espace_providers.dart';
@@ -7,6 +8,22 @@ import '../../theme/app_theme.dart';
 import '../../utils/format.dart';
 
 enum _TypeEcriture { recette, depense }
+
+List<CategorieRecette> _categoriesDisponibles(bool eglise) => eglise
+    ? const [
+        CategorieRecette.dime,
+        CategorieRecette.offrandeOrdinaire,
+        CategorieRecette.offrandeSpeciale,
+        CategorieRecette.offrandeCulteSoir,
+        CategorieRecette.don,
+        CategorieRecette.autre,
+      ]
+    : const [
+        CategorieRecette.cotisation,
+        CategorieRecette.don,
+        CategorieRecette.activite,
+        CategorieRecette.autre,
+      ];
 
 class TresorerieFormScreen extends ConsumerStatefulWidget {
   const TresorerieFormScreen({super.key});
@@ -19,7 +36,7 @@ class TresorerieFormScreen extends ConsumerStatefulWidget {
 class _TresorerieFormScreenState extends ConsumerState<TresorerieFormScreen> {
   final _formKey = GlobalKey<FormState>();
   _TypeEcriture _type = _TypeEcriture.recette;
-  CategorieRecette _categorieRecette = CategorieRecette.offrandeOrdinaire;
+  CategorieRecette? _categorieRecette;
   final _libelleCtrl = TextEditingController();
   final _beneficiaireCtrl = TextEditingController();
   final _montantCtrl = TextEditingController();
@@ -43,7 +60,7 @@ class _TresorerieFormScreenState extends ConsumerState<TresorerieFormScreen> {
               espaceId: espaceId,
               date: _date,
               montant: montant,
-              categorie: _categorieRecette,
+              categorie: _categorieRecette!,
               libelle: _libelleCtrl.text.trim(),
               responsable: '',
             ));
@@ -69,6 +86,14 @@ class _TresorerieFormScreenState extends ConsumerState<TresorerieFormScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final espace = ref.watch(currentEspaceProvider)?.espace;
+    final eglise = espace == null ||
+        espace.aModule(ModuleEspace.dimes) ||
+        espace.aModule(ModuleEspace.offrandes);
+    final categories = _categoriesDisponibles(eglise);
+    if (_categorieRecette == null || !categories.contains(_categorieRecette)) {
+      _categorieRecette = categories.first;
+    }
     return Scaffold(
       appBar: AppBar(title: const Text('Nouvelle écriture')),
       body: SafeArea(
@@ -99,7 +124,7 @@ class _TresorerieFormScreenState extends ConsumerState<TresorerieFormScreen> {
                     initialValue: _categorieRecette,
                     isExpanded: true,
                     decoration: const InputDecoration(labelText: 'Catégorie'),
-                    items: CategorieRecette.values
+                    items: categories
                         .map((c) =>
                             DropdownMenuItem(value: c, child: Text(c.libelle)))
                         .toList(),
