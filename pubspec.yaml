@@ -26,6 +26,10 @@ dependencies:
   # Typographie de marque (Fraunces, Plus Jakarta Sans, IBM Plex Mono)
   google_fonts: ^6.2.1
 
+  # Génération et partage des rapports PDF (recettes/dépenses par période)
+  pdf: ^3.11.3
+  printing: ^5.13.4
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

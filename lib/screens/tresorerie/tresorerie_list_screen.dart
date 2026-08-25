@@ -5,6 +5,7 @@ import '../../providers/data_providers.dart';
 import '../../theme/app_theme.dart';
 import '../../utils/format.dart';
 import '../../widgets/role_gate.dart';
+import '../rapports/rapport_screen.dart';
 import 'tresorerie_form_screen.dart';
 
 sealed class _Ligne {
@@ -34,7 +35,18 @@ class TresorerieListScreen extends ConsumerWidget {
     final depensesAsync = ref.watch(depensesStreamProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Recettes & Dépenses')),
+      appBar: AppBar(
+        title: const Text('Recettes & Dépenses'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.picture_as_pdf_outlined),
+            tooltip: 'Rapport',
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const RapportScreen()),
+            ),
+          ),
+        ],
+      ),
       floatingActionButton: RoleGate(
         peutAcceder: (r) => r.peutGerer,
         child: FloatingActionButton.extended(

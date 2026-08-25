@@ -55,11 +55,13 @@ Ce projet est **indépendant** de `gestion-caisse-eglise` (site web mono-
   chaque carte d'espace est présentée comme un carnet de comptes, avec
   deux feuillets décalés en arrière-plan et une tranche colorée (motif de
   tissage) qui varie d'un espace à l'autre
+- ✅ Rapports : génération d'un PDF de trésorerie (recettes/dépenses par
+  catégorie) sur une période choisie, partageable directement depuis le
+  téléphone — accessible depuis l'icône PDF de l'écran Recettes & Dépenses
 
-**Pas encore fait** (modèle déjà prêt côté base, voir
-`supabase/schema_1_types_tables.sql`) : rapports/exports, notifications
-programmées (cotisation en retard, événement bientôt — nécessiteraient un
-job planifié type pg_cron, pas encore mis en place), mode hors-ligne.
+**Pas encore fait** : notifications programmées (cotisation en retard,
+événement bientôt — nécessiteraient un job planifié type pg_cron, pas
+encore mis en place), mode hors-ligne.
 
 ## Stack
 
@@ -70,6 +72,8 @@ job planifié type pg_cron, pas encore mis en place), mode hors-ligne.
 - [`fl_chart`](https://pub.dev/packages/fl_chart) — graphiques
 - [`google_fonts`](https://pub.dev/packages/google_fonts) — Fraunces /
   Plus Jakarta Sans / IBM Plex Mono (identité "tissage" de tresora-app)
+- [`pdf`](https://pub.dev/packages/pdf) + [`printing`](https://pub.dev/packages/printing) —
+  génération et partage des rapports de trésorerie
 
 ## Récupérer un APK sans installer Flutter
 
@@ -115,6 +119,7 @@ lib/
     ├── evenements/                  Liste (progression), création, détail (contributions)
     ├── contributions/                Envoyées/reçues, création, détail (versements), accessible depuis le tableau de bord
     ├── notifications/                 Boîte personnelle, accessible depuis la cloche du tableau de bord
+    ├── rapports/                      Génération/partage PDF, accessible depuis Recettes & Dépenses
     ├── membres/                    Liste + formulaire + invitations (envoi, annulation)
     ├── reglages/                    Réglages de l'espace + rôles des membres, accessible depuis Profil
     ├── journal/                      Journal d'audit (lecture seule), accessible depuis Réglages
