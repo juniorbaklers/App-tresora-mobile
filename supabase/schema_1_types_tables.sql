@@ -226,6 +226,20 @@ create table evenements (
 alter table depenses
   add constraint depenses_evenement_fk foreign key (evenement_id) references evenements(id) on delete set null;
 
+-- Une fiche par contribution individuelle à une collecte : qui a donné,
+-- combien, comment, et qui a fait la saisie. montant_collecte/participants
+-- sur "evenements" sont recalculés automatiquement par un trigger à chaque
+-- fiche insérée/modifiée/supprimée ici — ne jamais les écrire directement.
+create table contributions_evenement (
+  id uuid primary key default gen_random_uuid(),
+  evenement_id uuid not null references evenements(id) on delete cascade,
+  nom_contributeur text not null,
+  montant numeric(14,2) not null check (montant > 0),
+  mode_paiement mode_paiement,
+  responsable text not null default '',
+  date timestamptz not null default now()
+);
+
 -- ============================================================
 -- 8. CONTRIBUTIONS INTER-ESPACES — seul canal financier entre deux
 --    espaces : l'un demande une somme à l'autre, voit ce qui est versé,
@@ -318,6 +332,7 @@ create index idx_tranches_paiement on tranches(paiement_cotisation_id);
 create index idx_recettes_espace_date on recettes(espace_id, date);
 create index idx_depenses_espace_date on depenses(espace_id, date);
 create index idx_evenements_espace on evenements(espace_id);
+create index idx_contributions_evenement on contributions_evenement(evenement_id);
 create index idx_contributions_demandeur on contributions(espace_demandeur_id);
 create index idx_contributions_cible on contributions(espace_cible_id);
 create index idx_notifications_user on notifications(user_id, lue);

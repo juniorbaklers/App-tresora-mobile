@@ -136,6 +136,42 @@ create trigger on_versement_contribution_change
   for each row execute function recalculer_contribution();
 
 -- ============================================================
+-- 4bis. Chaque fiche de contributions_evenement recalcule le total
+--    collecté et le nombre de participants sur l'événement parent.
+--    L'app ne doit jamais écrire montant_collecte/participants
+--    directement sur evenements — uniquement insérer/modifier des
+--    lignes dans "contributions_evenement".
+-- ============================================================
+
+create or replace function recalculer_evenement()
+returns trigger
+language plpgsql
+security definer set search_path = public
+as $$
+declare
+  v_evenement_id uuid := coalesce(new.evenement_id, old.evenement_id);
+  v_total numeric(14,2);
+  v_participants int;
+begin
+  select coalesce(sum(montant), 0), count(*)
+    into v_total, v_participants
+    from contributions_evenement
+    where evenement_id = v_evenement_id;
+
+  update evenements
+  set montant_collecte = v_total,
+      participants = v_participants
+  where id = v_evenement_id;
+
+  return coalesce(new, old);
+end;
+$$;
+
+create trigger on_contribution_evenement_changee
+  after insert or update or delete on contributions_evenement
+  for each row execute function recalculer_evenement();
+
+-- ============================================================
 -- 5. Notifications automatiques — l'app ne crée jamais de notification
 --    elle-même, seule la base sait avec certitude quand un événement
 --    notifiable s'est produit. Envoyées aux gérants (propriétaire,

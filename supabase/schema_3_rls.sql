@@ -55,6 +55,7 @@ alter table corrections enable row level security;
 alter table recettes enable row level security;
 alter table depenses enable row level security;
 alter table evenements enable row level security;
+alter table contributions_evenement enable row level security;
 alter table contributions enable row level security;
 alter table contribution_versements enable row level security;
 alter table notifications enable row level security;
@@ -254,6 +255,23 @@ create policy "evenements_lecture" on evenements for select using (est_membre_es
 create policy "evenements_ecriture" on evenements for insert with check (peut_gerer_membres(espace_id));
 create policy "evenements_maj" on evenements for update using (peut_gerer_membres(espace_id));
 create policy "evenements_suppr" on evenements for delete using (peut_gerer(espace_id));
+
+-- ============================================================
+-- CONTRIBUTIONS_EVENEMENT (scoping via evenements.espace_id)
+-- ============================================================
+
+create policy "contributions_evenement_lecture" on contributions_evenement for select using (
+  exists (select 1 from evenements e where e.id = evenement_id and est_membre_espace(e.espace_id))
+);
+create policy "contributions_evenement_ecriture" on contributions_evenement for insert with check (
+  exists (select 1 from evenements e where e.id = evenement_id and peut_gerer_membres(e.espace_id))
+);
+create policy "contributions_evenement_maj" on contributions_evenement for update using (
+  exists (select 1 from evenements e where e.id = evenement_id and peut_gerer_membres(e.espace_id))
+);
+create policy "contributions_evenement_suppr" on contributions_evenement for delete using (
+  exists (select 1 from evenements e where e.id = evenement_id and peut_gerer_membres(e.espace_id))
+);
 
 -- ============================================================
 -- CONTRIBUTIONS INTER-ESPACES — visibles des deux côtés, modifiables

@@ -24,6 +24,7 @@ final tranchesServiceProvider = Provider((ref) => TranchesService());
 final recettesServiceProvider = Provider((ref) => RecettesService());
 final depensesServiceProvider = Provider((ref) => DepensesService());
 final evenementsServiceProvider = Provider((ref) => EvenementsService());
+final contributionsEvenementServiceProvider = Provider((ref) => ContributionsEvenementService());
 final contributionsServiceProvider = Provider((ref) => ContributionsService());
 final journalServiceProvider = Provider((ref) => JournalService());
 final cloturesServiceProvider = Provider((ref) => CloturesService());
@@ -106,4 +107,10 @@ final paiementsCotisationProvider =
 
 final tranchesProvider = StreamProvider.family((ref, String paiementCotisationId) {
   return ref.watch(tranchesServiceProvider).streamTranches(paiementCotisationId);
+});
+
+/// Fiches de contribution d'un événement précis — provider "family" utilisé
+/// sur l'écran de détail (analogue à tranchesProvider pour les cotisations).
+final contributionsEvenementProvider = StreamProvider.family((ref, String evenementId) {
+  return ref.watch(contributionsEvenementServiceProvider).streamContributions(evenementId);
 });

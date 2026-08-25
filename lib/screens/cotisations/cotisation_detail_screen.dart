@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../models/cotisation.dart';
+import '../../providers/auth_providers.dart';
 import '../../providers/data_providers.dart';
 import '../../theme/app_theme.dart';
 import '../../utils/format.dart';
@@ -138,15 +139,16 @@ class _LignePaiement extends ConsumerWidget {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      builder: (_) => _FormulaireTranche(paiement: paiement),
+      builder: (_) => _FormulaireTranche(nomMembre: nomMembre, paiement: paiement),
     );
   }
 }
 
 class _FormulaireTranche extends ConsumerStatefulWidget {
+  final String nomMembre;
   final PaiementCotisation paiement;
 
-  const _FormulaireTranche({required this.paiement});
+  const _FormulaireTranche({required this.nomMembre, required this.paiement});
 
   @override
   ConsumerState<_FormulaireTranche> createState() => _FormulaireTrancheState();
@@ -166,12 +168,13 @@ class _FormulaireTrancheState extends ConsumerState<_FormulaireTranche> {
       _erreur = null;
     });
     try {
+      final responsable = ref.read(currentUserProvider)?.email ?? '';
       await ref.read(tranchesServiceProvider).creer(Tranche(
             id: '',
             paiementCotisationId: widget.paiement.id,
             date: DateTime.now(),
             montant: double.parse(_montantCtrl.text.replaceAll(',', '.')),
-            responsable: '',
+            responsable: responsable,
             modePaiement: _mode,
           ));
       if (mounted) Navigator.of(context).pop();
@@ -200,6 +203,8 @@ class _FormulaireTrancheState extends ConsumerState<_FormulaireTranche> {
           children: [
             Text('Enregistrer un versement', style: AppFonts.heading(fontSize: 18, color: AppColors.texteEncre)),
             const SizedBox(height: 4),
+            Text(widget.nomMembre, style: const TextStyle(fontWeight: FontWeight.w600)),
+            const SizedBox(height: 2),
             Text('Reste dû : ${formatMontant(restant)}', style: const TextStyle(color: AppColors.texteSecondaire)),
             const SizedBox(height: 16),
             TextFormField(
