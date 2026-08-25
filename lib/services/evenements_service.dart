@@ -2,9 +2,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/evenement.dart';
 import '../utils/cache_hors_ligne.dart';
 
-/// Table `evenements`. Pas de trigger de recalcul côté base pour
-/// montant_collecte/participants (contrairement aux tranches de
-/// cotisation) : on lit la valeur courante puis on l'incrémente ici.
+/// Table `evenements`. montant_collecte/participants sont recalculés
+/// automatiquement côté base à chaque fiche insérée/supprimée dans
+/// "contributions_evenement" (trigger) : ne jamais les modifier directement.
 class EvenementsService {
   final SupabaseClient _client = Supabase.instance.client;
 
@@ -15,22 +15,23 @@ class EvenementsService {
 
   Future<void> creer(Evenement evenement) => _client.from('evenements').insert(evenement.toInsertMap());
 
-  /// Enregistre une contribution à la collecte : ajoute [montant] au total
-  /// collecté et incrémente le nombre de participants d'une unité.
-  Future<void> enregistrerCollecte(String evenementId, double montant) async {
-    final row = await _client
-        .from('evenements')
-        .select('montant_collecte, participants')
-        .eq('id', evenementId)
-        .single();
-    final montantCollecte = (row['montant_collecte'] as num).toDouble() + montant;
-    final participants = (row['participants'] as num).toInt() + 1;
-    await _client
-        .from('evenements')
-        .update({'montant_collecte': montantCollecte, 'participants': participants})
-        .eq('id', evenementId);
-  }
-
   Future<void> changerStatut(String evenementId, StatutEvenement statut) =>
       _client.from('evenements').update({'statut': statut.valeurBdd}).eq('id', evenementId);
+}
+
+/// Table `contributions_evenement` — une fiche par contribution individuelle.
+class ContributionsEvenementService {
+  final SupabaseClient _client = Supabase.instance.client;
+
+  Stream<List<ContributionEvenement>> streamContributions(String evenementId) {
+    return _client
+        .from('contributions_evenement')
+        .stream(primaryKey: ['id'])
+        .eq('evenement_id', evenementId)
+        .order('date', ascending: false)
+        .map((rows) => rows.map(ContributionEvenement.fromMap).toList());
+  }
+
+  Future<void> creer(ContributionEvenement contribution) =>
+      _client.from('contributions_evenement').insert(contribution.toInsertMap());
 }

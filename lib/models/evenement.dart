@@ -1,3 +1,5 @@
+import 'cotisation.dart' show ModePaiement;
+
 enum StatutEvenement {
   planifie('planifie', 'Planifié'),
   actif('actif', 'En cours'),
@@ -66,5 +68,47 @@ class Evenement {
         'montant_cible': montantCible,
         'montant_suggere': montantSuggere,
         'statut': statut.valeurBdd,
+      };
+}
+
+/// Table `contributions_evenement` — une fiche par contribution individuelle
+/// à une collecte. montant_collecte/participants de l'événement parent se
+/// recalculent automatiquement côté base (trigger), comme pour les tranches
+/// de cotisation : ne jamais les modifier directement.
+class ContributionEvenement {
+  final String id;
+  final String evenementId;
+  final String nomContributeur;
+  final double montant;
+  final ModePaiement modePaiement;
+  final String responsable;
+  final DateTime date;
+
+  ContributionEvenement({
+    required this.id,
+    required this.evenementId,
+    required this.nomContributeur,
+    required this.montant,
+    required this.modePaiement,
+    required this.responsable,
+    required this.date,
+  });
+
+  factory ContributionEvenement.fromMap(Map<String, dynamic> map) => ContributionEvenement(
+        id: map['id'] as String,
+        evenementId: map['evenement_id'] as String,
+        nomContributeur: map['nom_contributeur'] as String,
+        montant: (map['montant'] as num).toDouble(),
+        modePaiement: ModePaiement.fromBdd(map['mode_paiement'] as String?),
+        responsable: map['responsable'] as String? ?? '',
+        date: DateTime.parse(map['date'] as String),
+      );
+
+  Map<String, dynamic> toInsertMap() => {
+        'evenement_id': evenementId,
+        'nom_contributeur': nomContributeur,
+        'montant': montant,
+        'mode_paiement': modePaiement.valeurBdd,
+        'responsable': responsable,
       };
 }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../models/cotisation.dart' show ModePaiement;
 import '../../models/evenement.dart';
+import '../../providers/auth_providers.dart';
 import '../../providers/data_providers.dart';
 import '../../theme/app_theme.dart';
 import '../../utils/format.dart';
@@ -24,6 +26,7 @@ class _EvenementDetailScreenState extends ConsumerState<EvenementDetailScreen> {
       orElse: () => widget.evenement,
     );
     final progression = evenement.progression;
+    final contributionsAsync = ref.watch(contributionsEvenementProvider(evenement.id));
 
     return Scaffold(
       appBar: AppBar(title: Text(evenement.nom)),
@@ -106,6 +109,27 @@ class _EvenementDetailScreenState extends ConsumerState<EvenementDetailScreen> {
               ),
             ),
           ),
+          const SizedBox(height: 24),
+          Text('Contributions', style: AppFonts.heading(fontSize: 16, color: AppColors.texteEncre)),
+          const SizedBox(height: 8),
+          contributionsAsync.when(
+            loading: () => const Padding(
+              padding: EdgeInsets.symmetric(vertical: 16),
+              child: Center(child: CircularProgressIndicator()),
+            ),
+            error: (e, _) => Text('Erreur : $e', style: const TextStyle(color: AppColors.terre)),
+            data: (contributions) {
+              if (contributions.isEmpty) {
+                return const Text('Aucune contribution enregistrée pour le moment',
+                    style: TextStyle(color: AppColors.texteSecondaire));
+              }
+              return Column(
+                children: [
+                  for (final contribution in contributions) _LigneContribution(contribution: contribution),
+                ],
+              );
+            },
+          ),
         ],
       ),
     );
@@ -148,6 +172,25 @@ class _Resume extends StatelessWidget {
   }
 }
 
+/// Une fiche de contribution : qui a donné, combien, comment et quand.
+class _LigneContribution extends StatelessWidget {
+  final ContributionEvenement contribution;
+
+  const _LigneContribution({required this.contribution});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 6),
+      child: ListTile(
+        title: Text(contribution.nomContributeur),
+        subtitle: Text('${contribution.modePaiement.libelle} · ${formatDate(contribution.date)}'),
+        trailing: Text(formatMontant(contribution.montant), style: AppFonts.montant(fontSize: 14)),
+      ),
+    );
+  }
+}
+
 class _FormulaireCollecte extends ConsumerStatefulWidget {
   final Evenement evenement;
 
@@ -159,9 +202,11 @@ class _FormulaireCollecte extends ConsumerStatefulWidget {
 
 class _FormulaireCollecteState extends ConsumerState<_FormulaireCollecte> {
   final _formKey = GlobalKey<FormState>();
+  final _nomCtrl = TextEditingController();
   late final _montantCtrl = TextEditingController(
     text: widget.evenement.montantSuggere?.toStringAsFixed(0) ?? '',
   );
+  ModePaiement _mode = ModePaiement.especes;
   bool _enCours = false;
   String? _erreur;
 
@@ -172,10 +217,16 @@ class _FormulaireCollecteState extends ConsumerState<_FormulaireCollecte> {
       _erreur = null;
     });
     try {
-      await ref.read(evenementsServiceProvider).enregistrerCollecte(
-            widget.evenement.id,
-            double.parse(_montantCtrl.text.replaceAll(',', '.')),
-          );
+      final responsable = ref.read(currentUserProvider)?.email ?? '';
+      await ref.read(contributionsEvenementServiceProvider).creer(ContributionEvenement(
+            id: '',
+            evenementId: widget.evenement.id,
+            nomContributeur: _nomCtrl.text.trim(),
+            montant: double.parse(_montantCtrl.text.replaceAll(',', '.')),
+            modePaiement: _mode,
+            responsable: responsable,
+            date: DateTime.now(),
+          ));
       if (mounted) Navigator.of(context).pop();
     } catch (e) {
       setState(() => _erreur = "Enregistrement impossible : ${e.toString()}");
@@ -202,6 +253,13 @@ class _FormulaireCollecteState extends ConsumerState<_FormulaireCollecte> {
             Text('Enregistrer une contribution', style: AppFonts.heading(fontSize: 18, color: AppColors.texteEncre)),
             const SizedBox(height: 16),
             TextFormField(
+              controller: _nomCtrl,
+              textCapitalization: TextCapitalization.words,
+              decoration: const InputDecoration(labelText: 'Nom du contributeur'),
+              validator: (v) => (v == null || v.trim().isEmpty) ? 'Nom requis' : null,
+            ),
+            const SizedBox(height: 14),
+            TextFormField(
               controller: _montantCtrl,
               keyboardType: const TextInputType.numberWithOptions(decimal: true),
               decoration: const InputDecoration(labelText: 'Montant reçu (FCFA)'),
@@ -209,6 +267,15 @@ class _FormulaireCollecteState extends ConsumerState<_FormulaireCollecte> {
                 final n = double.tryParse((v ?? '').replaceAll(',', '.'));
                 return (n == null || n <= 0) ? 'Montant invalide' : null;
               },
+            ),
+            const SizedBox(height: 14),
+            DropdownButtonFormField<ModePaiement>(
+              initialValue: _mode,
+              decoration: const InputDecoration(labelText: 'Mode de paiement'),
+              items: ModePaiement.values
+                  .map((m) => DropdownMenuItem(value: m, child: Text(m.libelle)))
+                  .toList(),
+              onChanged: (v) => setState(() => _mode = v!),
             ),
             if (_erreur != null) ...[
               const SizedBox(height: 12),
