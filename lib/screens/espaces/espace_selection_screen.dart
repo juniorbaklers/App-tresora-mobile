@@ -6,6 +6,7 @@ import '../../providers/auth_providers.dart';
 import '../../providers/espace_providers.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/motif.dart';
+import '../auth/login_screen.dart';
 import '../home/home_shell.dart';
 
 /// Premier écran après connexion : choisir l'espace à gérer (ou en créer
@@ -26,7 +27,15 @@ class EspaceSelectionScreen extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.logout),
             tooltip: 'Se déconnecter',
-            onPressed: () => ref.read(authServiceProvider).deconnexion(),
+            onPressed: () async {
+              await ref.read(authServiceProvider).deconnexion();
+              if (context.mounted) {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (_) => const LoginScreen()),
+                  (route) => false,
+                );
+              }
+            },
           ),
         ],
       ),

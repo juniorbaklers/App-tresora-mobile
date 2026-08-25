@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/auth_providers.dart';
 import '../../providers/espace_providers.dart';
 import '../../theme/app_theme.dart';
+import '../auth/login_screen.dart';
 import '../espaces/espace_selection_screen.dart';
 
 class ProfilScreen extends ConsumerWidget {
@@ -78,7 +79,16 @@ class ProfilScreen extends ConsumerWidget {
               ),
             const SizedBox(height: 32),
             OutlinedButton.icon(
-              onPressed: () => ref.read(authServiceProvider).deconnexion(),
+              onPressed: () async {
+                await ref.read(authServiceProvider).deconnexion();
+                ref.read(currentEspaceIdProvider.notifier).state = null;
+                if (context.mounted) {
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (_) => const LoginScreen()),
+                    (route) => false,
+                  );
+                }
+              },
               icon: const Icon(Icons.logout),
               label: const Text('Se déconnecter'),
               style: OutlinedButton.styleFrom(
