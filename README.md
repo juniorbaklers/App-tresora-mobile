@@ -24,12 +24,18 @@ Ce projet est **indépendant** de `gestion-caisse-eglise` (site web mono-
   une église, cotisation en cours (progression, payé/partiel/impayé),
   événements actifs, contributions demandées et derniers paiements pour un
   groupe/association/perso
-- ✅ Recettes & Dépenses : liste temps réel, saisie
+- ✅ Recettes & Dépenses : liste temps réel, saisie. Recette : catégorie
+  (filtrée par module), libellé, commentaire optionnel. Dépense :
+  catégorie libre, description, bénéficiaire, mode de paiement, case
+  "justificatif" — chaque écriture enregistre désormais qui l'a saisie
+  (responsable), plus jamais vide
 - ✅ Membres : registre nominatif par espace (prénom, nom, téléphone, email
   optionnel, fonction optionnelle), activation/désactivation
 - ✅ Cotisations payables en plusieurs tranches : création (assignée à
-  tous les membres actifs), suivi des versements par membre, montant
-  payé/statut recalculés automatiquement côté base à chaque tranche.
+  tous les membres actifs), ajout de membres après coup depuis le détail
+  (icône dans l'AppBar, pour un membre arrivé après la création), suivi
+  des versements par membre, montant payé/statut recalculés
+  automatiquement côté base à chaque tranche.
   Écran "Paiement" (icône dans l'AppBar de Cotisations) pour encaisser
   directement la cotisation due d'un membre recherché par nom, sans passer
   par une cotisation précise — reprend `PaiementView` de tresora-app

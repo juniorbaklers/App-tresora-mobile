@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../models/cotisation.dart';
+import '../../models/membre.dart';
 import '../../providers/auth_providers.dart';
 import '../../providers/data_providers.dart';
 import '../../theme/app_theme.dart';
@@ -20,7 +21,35 @@ class CotisationDetailScreen extends ConsumerWidget {
     final membresParId = {for (final m in membres) m.id: m};
 
     return Scaffold(
-      appBar: AppBar(title: Text(cotisation.nom)),
+      appBar: AppBar(
+        title: Text(cotisation.nom),
+        actions: [
+          RoleGate(
+            peutAcceder: (r) => r.peutGererMembres,
+            child: IconButton(
+              icon: const Icon(Icons.person_add_alt),
+              tooltip: 'Ajouter des membres',
+              onPressed: () {
+                final dejaInclus = (ref
+                            .read(paiementsCotisationProvider(cotisation.id))
+                            .valueOrNull ??
+                        [])
+                    .map((p) => p.membreId)
+                    .toSet();
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  builder: (_) => _DialogueAjouterMembres(
+                    cotisation: cotisation,
+                    membres: membres,
+                    dejaInclus: dejaInclus,
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
       body: paiementsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Erreur : $e')),
@@ -101,6 +130,148 @@ class _Resume extends StatelessWidget {
           const SizedBox(height: 4),
           Text(formatMontant(montant),
               style: AppFonts.montant(fontSize: 16, color: couleur)),
+        ],
+      ),
+    );
+  }
+}
+
+/// Ajoute des membres qui ne font pas encore partie de cette cotisation
+/// (ligne paiements_cotisation à zéro, statut impayé) — pour un membre
+/// arrivé après coup. Reprend `AjouterMembresDialog` de tresora-app.
+class _DialogueAjouterMembres extends ConsumerStatefulWidget {
+  final Cotisation cotisation;
+  final List<Membre> membres;
+  final Set<String> dejaInclus;
+
+  const _DialogueAjouterMembres({
+    required this.cotisation,
+    required this.membres,
+    required this.dejaInclus,
+  });
+
+  @override
+  ConsumerState<_DialogueAjouterMembres> createState() =>
+      _DialogueAjouterMembresState();
+}
+
+class _DialogueAjouterMembresState
+    extends ConsumerState<_DialogueAjouterMembres> {
+  String _recherche = '';
+  final Set<String> _selectionnes = {};
+  bool _enCours = false;
+  String? _erreur;
+
+  Future<void> _valider() async {
+    if (_selectionnes.isEmpty) return;
+    setState(() {
+      _enCours = true;
+      _erreur = null;
+    });
+    try {
+      await ref.read(cotisationsServiceProvider).ajouterMembres(
+          widget.cotisation.id,
+          widget.cotisation.montant,
+          _selectionnes.toList());
+      if (mounted) Navigator.of(context).pop();
+    } catch (e) {
+      setState(() => _erreur = "Ajout impossible : ${e.toString()}");
+    } finally {
+      if (mounted) setState(() => _enCours = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final disponibles = widget.membres
+        .where((m) => !widget.dejaInclus.contains(m.id))
+        .where((m) =>
+            _recherche.isEmpty ||
+            m.nomComplet.toLowerCase().contains(_recherche.toLowerCase()))
+        .toList();
+
+    return Padding(
+      padding: EdgeInsets.only(
+        left: 20,
+        right: 20,
+        top: 20,
+        bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text('Ajouter des membres',
+              style:
+                  AppFonts.heading(fontSize: 18, color: AppColors.texteEncre)),
+          const SizedBox(height: 4),
+          const Text(
+            'Seuls les membres qui n\'en font pas encore partie sont proposés.',
+            style: TextStyle(fontSize: 12, color: AppColors.texteSecondaire),
+          ),
+          const SizedBox(height: 16),
+          TextField(
+            decoration: const InputDecoration(
+                prefixIcon: Icon(Icons.search),
+                hintText: 'Rechercher un membre…'),
+            onChanged: (v) => setState(() => _recherche = v.trim()),
+          ),
+          const SizedBox(height: 8),
+          SizedBox(
+            height: 280,
+            child: widget.membres.isEmpty
+                ? const Center(
+                    child: Text('Cet espace n\'a encore aucun membre.',
+                        style: TextStyle(color: AppColors.texteSecondaire)))
+                : disponibles.isEmpty
+                    ? Center(
+                        child: Text(
+                          _recherche.isNotEmpty
+                              ? 'Aucun membre trouvé.'
+                              : 'Tous les membres de cet espace font déjà partie de cette cotisation.',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                              color: AppColors.texteSecondaire),
+                        ),
+                      )
+                    : ListView.builder(
+                        itemCount: disponibles.length,
+                        itemBuilder: (context, i) {
+                          final m = disponibles[i];
+                          final coche = _selectionnes.contains(m.id);
+                          return CheckboxListTile(
+                            contentPadding: EdgeInsets.zero,
+                            value: coche,
+                            title: Text(m.nomComplet),
+                            onChanged: (v) => setState(() {
+                              if (v == true) {
+                                _selectionnes.add(m.id);
+                              } else {
+                                _selectionnes.remove(m.id);
+                              }
+                            }),
+                          );
+                        },
+                      ),
+          ),
+          if (_erreur != null) ...[
+            const SizedBox(height: 8),
+            Text(_erreur!, style: const TextStyle(color: AppColors.terre)),
+          ],
+          const SizedBox(height: 12),
+          ElevatedButton(
+            onPressed: (_enCours || _selectionnes.isEmpty) ? null : _valider,
+            child: _enCours
+                ? const SizedBox(
+                    height: 18,
+                    width: 18,
+                    child: CircularProgressIndicator(
+                        strokeWidth: 2, color: Colors.white),
+                  )
+                : Text(_selectionnes.isEmpty
+                    ? 'AJOUTER'
+                    : 'AJOUTER (${_selectionnes.length})'),
+          ),
         ],
       ),
     );

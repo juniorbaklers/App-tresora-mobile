@@ -1,3 +1,5 @@
+import 'cotisation.dart' show ModePaiement;
+
 enum CategorieRecette {
   dime('dime', 'Dîme'),
   offrandeOrdinaire('offrande_ordinaire', 'Offrande ordinaire'),
@@ -26,6 +28,7 @@ class Recette {
   final CategorieRecette categorie;
   final String libelle;
   final String responsable;
+  final String? commentaire;
 
   Recette({
     required this.id,
@@ -35,6 +38,7 @@ class Recette {
     required this.categorie,
     required this.libelle,
     required this.responsable,
+    this.commentaire,
   });
 
   factory Recette.fromMap(Map<String, dynamic> map) => Recette(
@@ -45,6 +49,7 @@ class Recette {
         categorie: CategorieRecette.fromBdd(map['categorie'] as String),
         libelle: map['libelle'] as String? ?? '',
         responsable: map['responsable'] as String? ?? '',
+        commentaire: map['commentaire'] as String?,
       );
 
   Map<String, dynamic> toInsertMap() => {
@@ -54,6 +59,7 @@ class Recette {
         'categorie': categorie.valeurBdd,
         'libelle': libelle,
         'responsable': responsable,
+        'commentaire': commentaire,
       };
 }
 
@@ -66,7 +72,9 @@ class Depense {
   final String categorie;
   final String description;
   final String beneficiaire;
+  final ModePaiement modePaiement;
   final String responsable;
+  final bool justificatif;
 
   Depense({
     required this.id,
@@ -76,7 +84,9 @@ class Depense {
     required this.categorie,
     required this.description,
     required this.beneficiaire,
+    this.modePaiement = ModePaiement.especes,
     required this.responsable,
+    this.justificatif = false,
   });
 
   factory Depense.fromMap(Map<String, dynamic> map) => Depense(
@@ -87,7 +97,9 @@ class Depense {
         categorie: map['categorie'] as String? ?? 'autre',
         description: map['description'] as String? ?? '',
         beneficiaire: map['beneficiaire'] as String? ?? '',
+        modePaiement: ModePaiement.fromBdd(map['mode_paiement'] as String?),
         responsable: map['responsable'] as String? ?? '',
+        justificatif: map['justificatif'] as bool? ?? false,
       );
 
   Map<String, dynamic> toInsertMap() => {
@@ -97,6 +109,8 @@ class Depense {
         'categorie': categorie,
         'description': description,
         'beneficiaire': beneficiaire,
+        'mode_paiement': modePaiement.valeurBdd,
         'responsable': responsable,
+        'justificatif': justificatif,
       };
 }

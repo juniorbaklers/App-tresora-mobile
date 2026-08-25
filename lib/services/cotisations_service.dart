@@ -37,6 +37,23 @@ class CotisationsService {
         },
     ]);
   }
+
+  /// Ajoute des membres à une cotisation déjà créée (ligne
+  /// `paiements_cotisation` à zéro, statut impayé) — pour un membre arrivé
+  /// après coup, sans avoir à recréer la cotisation. Reprend
+  /// `AjouterMembresDialog` de tresora-app.
+  Future<void> ajouterMembres(
+      String cotisationId, double montant, List<String> membreIds) async {
+    if (membreIds.isEmpty) return;
+    await _client.from('paiements_cotisation').insert([
+      for (final membreId in membreIds)
+        {
+          'cotisation_id': cotisationId,
+          'membre_id': membreId,
+          'montant_du': montant,
+        },
+    ]);
+  }
 }
 
 /// Table `paiements_cotisation` — statut de paiement d'un membre pour une

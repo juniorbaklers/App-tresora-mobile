@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../models/cotisation.dart' show ModePaiement;
 import '../../models/module_espace.dart';
 import '../../models/tresorerie.dart';
+import '../../providers/auth_providers.dart';
 import '../../providers/data_providers.dart';
 import '../../providers/espace_providers.dart';
 import '../../theme/app_theme.dart';
@@ -38,8 +40,12 @@ class _TresorerieFormScreenState extends ConsumerState<TresorerieFormScreen> {
   _TypeEcriture _type = _TypeEcriture.recette;
   CategorieRecette? _categorieRecette;
   final _libelleCtrl = TextEditingController();
+  final _commentaireCtrl = TextEditingController();
   final _beneficiaireCtrl = TextEditingController();
+  final _categorieDepenseCtrl = TextEditingController();
   final _montantCtrl = TextEditingController();
+  ModePaiement _modePaiement = ModePaiement.especes;
+  bool _justificatif = false;
   DateTime _date = DateTime.now();
   bool _enCours = false;
   String? _erreur;
@@ -54,6 +60,7 @@ class _TresorerieFormScreenState extends ConsumerState<TresorerieFormScreen> {
     });
     try {
       final montant = double.parse(_montantCtrl.text.replaceAll(',', '.'));
+      final responsable = ref.read(currentUserProvider)?.email ?? '';
       if (_type == _TypeEcriture.recette) {
         await ref.read(recettesServiceProvider).creer(Recette(
               id: '',
@@ -62,7 +69,10 @@ class _TresorerieFormScreenState extends ConsumerState<TresorerieFormScreen> {
               montant: montant,
               categorie: _categorieRecette!,
               libelle: _libelleCtrl.text.trim(),
-              responsable: '',
+              responsable: responsable,
+              commentaire: _commentaireCtrl.text.trim().isEmpty
+                  ? null
+                  : _commentaireCtrl.text.trim(),
             ));
       } else {
         await ref.read(depensesServiceProvider).creer(Depense(
@@ -70,10 +80,12 @@ class _TresorerieFormScreenState extends ConsumerState<TresorerieFormScreen> {
               espaceId: espaceId,
               date: _date,
               montant: montant,
-              categorie: 'autre',
+              categorie: _categorieDepenseCtrl.text.trim(),
               description: _libelleCtrl.text.trim(),
               beneficiaire: _beneficiaireCtrl.text.trim(),
-              responsable: '',
+              modePaiement: _modePaiement,
+              responsable: responsable,
+              justificatif: _justificatif,
             ));
       }
       if (mounted) Navigator.of(context).pop();
@@ -132,6 +144,17 @@ class _TresorerieFormScreenState extends ConsumerState<TresorerieFormScreen> {
                   ),
                 if (_type == _TypeEcriture.depense) ...[
                   TextFormField(
+                    controller: _categorieDepenseCtrl,
+                    decoration: const InputDecoration(
+                      labelText: 'Catégorie',
+                      hintText:
+                          'Entretien bâtiment, Transport, Communication…',
+                    ),
+                    validator: (v) =>
+                        (v == null || v.trim().isEmpty) ? 'Requis' : null,
+                  ),
+                  const SizedBox(height: 14),
+                  TextFormField(
                     controller: _beneficiaireCtrl,
                     decoration:
                         const InputDecoration(labelText: 'Bénéficiaire'),
@@ -147,6 +170,37 @@ class _TresorerieFormScreenState extends ConsumerState<TresorerieFormScreen> {
                         : 'Description',
                   ),
                 ),
+                if (_type == _TypeEcriture.recette) ...[
+                  const SizedBox(height: 14),
+                  TextFormField(
+                    controller: _commentaireCtrl,
+                    minLines: 2,
+                    maxLines: 4,
+                    decoration: const InputDecoration(
+                        labelText: 'Commentaire (optionnel)'),
+                  ),
+                ],
+                if (_type == _TypeEcriture.depense) ...[
+                  const SizedBox(height: 14),
+                  DropdownButtonFormField<ModePaiement>(
+                    initialValue: _modePaiement,
+                    decoration:
+                        const InputDecoration(labelText: 'Mode de paiement'),
+                    items: ModePaiement.values
+                        .map((m) =>
+                            DropdownMenuItem(value: m, child: Text(m.libelle)))
+                        .toList(),
+                    onChanged: (v) => setState(() => _modePaiement = v!),
+                  ),
+                  const SizedBox(height: 14),
+                  SwitchListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: const Text('Justificatif'),
+                    subtitle: const Text('Reçu joint pour cette dépense'),
+                    value: _justificatif,
+                    onChanged: (v) => setState(() => _justificatif = v),
+                  ),
+                ],
                 const SizedBox(height: 14),
                 TextFormField(
                   controller: _montantCtrl,
