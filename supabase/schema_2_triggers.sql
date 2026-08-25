@@ -235,3 +235,103 @@ create trigger journal_depenses after insert or update or delete on depenses
   for each row execute function journaliser();
 create trigger journal_membres after insert or update or delete on membres
   for each row execute function journaliser();
+
+-- ============================================================
+-- 7. Notifications programmées — temps réel pour les paiements, et
+--    quotidien (pg_cron) pour les retards de cotisation et les
+--    événements qui approchent.
+-- ============================================================
+
+create or replace function notifier_nouveau_paiement()
+returns trigger
+language plpgsql
+security definer set search_path = public
+as $$
+declare
+  v_espace_id uuid;
+  v_nom_membre text;
+  v_nom_cotisation text;
+begin
+  select c.espace_id, c.nom into v_espace_id, v_nom_cotisation
+    from paiements_cotisation pc join cotisations c on c.id = pc.cotisation_id
+    where pc.id = new.paiement_cotisation_id;
+
+  select m.prenom || ' ' || m.nom into v_nom_membre
+    from paiements_cotisation pc join membres m on m.id = pc.membre_id
+    where pc.id = new.paiement_cotisation_id;
+
+  insert into notifications (espace_id, user_id, type, titre, description)
+  select v_espace_id, em.user_id, 'nouveau_paiement',
+         'Nouveau paiement',
+         coalesce(v_nom_membre, 'Un membre') || ' — ' || coalesce(v_nom_cotisation, '') || ' : ' || new.montant::text
+  from espace_membres em
+  where em.espace_id = v_espace_id
+    and em.role in ('proprietaire', 'administrateur', 'tresorier');
+  return new;
+end;
+$$;
+
+create trigger on_tranche_creee_notif
+  after insert on tranches
+  for each row execute function notifier_nouveau_paiement();
+
+create or replace function notifier_cotisations_en_retard()
+returns void
+language plpgsql
+security definer set search_path = public
+as $$
+begin
+  update paiements_cotisation pc
+  set statut = 'en_retard'
+  from cotisations c
+  where c.id = pc.cotisation_id
+    and c.date_limite < current_date
+    and pc.statut in ('impaye', 'partiel');
+
+  insert into notifications (espace_id, user_id, type, titre, description)
+  select c.espace_id, em.user_id, 'cotisation_retard',
+         'Cotisations en retard',
+         count(*)::text || ' paiement(s) en retard'
+  from paiements_cotisation pc
+  join cotisations c on c.id = pc.cotisation_id
+  join espace_membres em on em.espace_id = c.espace_id
+    and em.role in ('proprietaire', 'administrateur', 'tresorier')
+  where pc.statut = 'en_retard'
+    and not exists (
+      select 1 from notifications n
+      where n.espace_id = c.espace_id and n.user_id = em.user_id
+        and n.type = 'cotisation_retard' and n.date::date = current_date
+    )
+  group by c.espace_id, em.user_id;
+end;
+$$;
+
+create or replace function notifier_evenements_bientot()
+returns void
+language plpgsql
+security definer set search_path = public
+as $$
+begin
+  insert into notifications (espace_id, user_id, type, titre, description)
+  select e.espace_id, em.user_id, 'evenement_bientot',
+         'Événement bientôt', e.nom || ' commence le ' || to_char(e.date_debut, 'DD/MM/YYYY')
+  from evenements e
+  join espace_membres em on em.espace_id = e.espace_id
+    and em.role in ('proprietaire', 'administrateur', 'tresorier')
+  where e.statut in ('planifie', 'actif')
+    and e.date_debut between current_date and current_date + interval '3 days'
+    and not exists (
+      select 1 from notifications n
+      where n.espace_id = e.espace_id and n.user_id = em.user_id
+        and n.type = 'evenement_bientot' and n.date::date = current_date
+    );
+end;
+$$;
+
+create extension if not exists pg_cron with schema extensions;
+
+select cron.schedule(
+  'notifications-quotidiennes',
+  '0 6 * * *',
+  $$ select notifier_cotisations_en_retard(); select notifier_evenements_bientot(); $$
+);

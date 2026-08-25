@@ -39,9 +39,12 @@ Ce projet est **indépendant** de `gestion-caisse-eglise` (site web mono-
   ses versements sans que le demandeur ne voie comment la somme a été
   réunie — montant reçu/statut recalculés côté base à chaque versement
 - ✅ Notifications : boîte personnelle par utilisateur, alimentée
-  automatiquement par des triggers côté base (nouvelle demande de
-  contribution reçue, versement reçu) — accessible via la cloche du
-  tableau de bord, avec badge du nombre de non lues
+  automatiquement par des triggers côté base — accessible via la cloche du
+  tableau de bord, avec badge du nombre de non lues. En temps réel :
+  nouvelle demande de contribution, versement reçu, nouveau paiement de
+  cotisation. En quotidien (pg_cron, 6h UTC) : cotisations en retard
+  (statut recalculé automatiquement), événements démarrant sous 3 jours —
+  au plus une notification par jour et par espace pour éviter le spam
 - ✅ Journal d'audit : chaque création/modification/suppression de recette,
   dépense ou membre est tracée automatiquement côté base (qui, quand,
   ancienne/nouvelle valeur) — consultable en lecture seule depuis Réglages
@@ -59,9 +62,7 @@ Ce projet est **indépendant** de `gestion-caisse-eglise` (site web mono-
   catégorie) sur une période choisie, partageable directement depuis le
   téléphone — accessible depuis l'icône PDF de l'écran Recettes & Dépenses
 
-**Pas encore fait** : notifications programmées (cotisation en retard,
-événement bientôt — nécessiteraient un job planifié type pg_cron, pas
-encore mis en place), mode hors-ligne.
+**Pas encore fait** : mode hors-ligne.
 
 ## Stack
 
