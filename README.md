@@ -66,6 +66,9 @@ Ce projet est **indépendant** de `gestion-caisse-eglise` (site web mono-
   journal, clôtures) restent consultables sans connexion grâce à un cache
   local des dernières données reçues ; un bandeau discret l'indique. Pas
   de saisie hors-ligne — les formulaires nécessitent toujours le réseau.
+- ✅ Écran de démarrage animé (pastille, nom, motif de tissage qui se
+  dessine progressivement, ~2,8s) avant de rejoindre l'écran de connexion
+  ou de sélection d'espace.
 
 ## Stack
 
@@ -117,6 +120,7 @@ lib/
 ├── widgets/                 RoleGate (masque l'UI selon le rôle dans l'espace courant),
 │                             StatCard, BandeTissee (motif signature), BandeauHorsLigne
 └── screens/
+    ├── splash/               Écran de démarrage animé (premier écran, avant AuthGate)
     ├── auth/                Connexion, inscription
     ├── espaces/               Sélection / création d'espace (premier écran après connexion)
     ├── home/                   Navigation par onglets

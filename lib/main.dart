@@ -7,6 +7,7 @@ import 'config/supabase_config.dart';
 import 'providers/auth_providers.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/espaces/espace_selection_screen.dart';
+import 'screens/splash/splash_screen.dart';
 import 'theme/app_theme.dart';
 
 Future<void> main() async {
@@ -30,7 +31,7 @@ class TresoraApp extends StatelessWidget {
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
       themeMode: ThemeMode.system,
-      home: const AuthGate(),
+      home: const SplashScreen(),
     );
   }
 }

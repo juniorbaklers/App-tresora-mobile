@@ -245,35 +245,49 @@ class _CarteEspace extends StatelessWidget {
     final tonalite = _tonalites[index % _tonalites.length];
 
     return Padding(
-      padding: const EdgeInsets.only(top: 6, bottom: 2),
+      padding: const EdgeInsets.only(top: 10, bottom: 8),
       child: Stack(
         clipBehavior: Clip.none,
         children: [
+          // Feuillet du fond : nettement plus sombre et le plus décalé, pour
+          // qu'il se lise sans ambiguïté comme "en dessous" plutôt que comme
+          // un artefact de rendu de la carte principale.
           Positioned(
-            top: 10,
-            left: 10,
-            right: -6,
+            top: 16,
+            left: 14,
+            right: -10,
             child: Transform.rotate(
-              angle: -0.035,
+              angle: -0.05,
               child: Container(
                 height: 74,
                 decoration: BoxDecoration(
-                  color: AppColors.carte,
+                  color: AppColors.bordure,
                   borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: AppColors.bordure),
+                  boxShadow: [
+                    BoxShadow(
+                        color: Colors.black.withValues(alpha: .10),
+                        blurRadius: 6,
+                        offset: const Offset(0, 3)),
+                  ],
                 ),
               ),
             ),
           ),
           Positioned(
-            top: 5,
-            left: 5,
-            right: -3,
+            top: 8,
+            left: 7,
+            right: -5,
             child: Transform.rotate(
-              angle: 0.02,
+              angle: 0.03,
               child: Container(
                 height: 74,
                 decoration: BoxDecoration(
+                  boxShadow: [
+                    BoxShadow(
+                        color: Colors.black.withValues(alpha: .07),
+                        blurRadius: 5,
+                        offset: const Offset(0, 2)),
+                  ],
                   color: AppColors.carte,
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(color: AppColors.bordure),
