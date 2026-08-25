@@ -118,11 +118,13 @@ begin
   update contributions
   set
     montant_recu = v_total,
-    statut = case
+    -- Cast explicite : voir la même remarque sur
+    -- recalculer_paiement_cotisation() plus haut dans ce fichier.
+    statut = (case
       when v_total >= v_demande then 'paye'
       when v_total > 0 then 'partiel'
       else 'en_attente'
-    end
+    end)::statut_contribution
   where id = v_contribution_id;
 
   return coalesce(new, old);
