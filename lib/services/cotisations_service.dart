@@ -68,6 +68,21 @@ class PaiementsCotisationService {
         .eq('cotisation_id', cotisationId)
         .map((rows) => rows.map(PaiementCotisation.fromMap).toList());
   }
+
+  /// Récupère en une seule requête les paiements de plusieurs cotisations
+  /// (au lieu d'ouvrir un flux temps réel par cotisation) — utilisé par les
+  /// écrans qui agrègent sur toutes les cotisations d'un espace (Paiement,
+  /// tableau de bord groupe, fiche membre) pour éviter d'accumuler des
+  /// dizaines de connexions temps réel simultanées.
+  Future<List<PaiementCotisation>> fetchPourCotisations(
+      List<String> cotisationIds) async {
+    if (cotisationIds.isEmpty) return [];
+    final rows = await _client
+        .from('paiements_cotisation')
+        .select()
+        .inFilter('cotisation_id', cotisationIds);
+    return rows.map(PaiementCotisation.fromMap).toList();
+  }
 }
 
 /// Table `tranches` — un versement isolé sur un paiement de cotisation.
@@ -87,4 +102,17 @@ class TranchesService {
 
   Future<void> creer(Tranche tranche) =>
       _client.from('tranches').insert(tranche.toInsertMap());
+
+  /// Récupère en une seule requête les tranches de plusieurs paiements
+  /// (au lieu d'ouvrir un flux temps réel par paiement) — même logique que
+  /// [PaiementsCotisationService.fetchPourCotisations].
+  Future<List<Tranche>> fetchPourPaiements(List<String> paiementIds) async {
+    if (paiementIds.isEmpty) return [];
+    final rows = await _client
+        .from('tranches')
+        .select()
+        .inFilter('paiement_cotisation_id', paiementIds)
+        .order('date', ascending: false);
+    return rows.map(Tranche.fromMap).toList();
+  }
 }

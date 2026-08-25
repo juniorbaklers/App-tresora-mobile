@@ -105,6 +105,29 @@ Ce projet est **indépendant** de `gestion-caisse-eglise` (site web mono-
   l'accès aux Clôtures depuis Réglages suivent aussi les modules Dîmes/
   Offrandes actifs sur l'espace, comme sur l'app web.
 
+## Performance / connexions temps réel
+
+Les écrans qui agrègent sur *toutes* les cotisations d'un espace (Paiement,
+tableau de bord des espaces non-église, fiche membre) ouvraient auparavant
+un flux Supabase Realtime **par cotisation** (et, pour "derniers paiements"
+du tableau de bord, un flux **par paiement**) — potentiellement des dizaines
+de connexions temps réel simultanées rien que pour afficher un écran,
+d'où une lenteur perceptible surtout sur réseau mobile. Ils utilisent
+maintenant `paiementsEspaceProvider`/`tranchesCotisationProvider`
+(`lib/providers/data_providers.dart`) : une seule requête groupée
+(`.inFilter(...)`) au lieu d'un flux par élément. Les écrans qui affichent
+le détail d'une cotisation ou d'un versement précis gardent leur flux temps
+réel individuel (peu nombreux, mise à jour instantanée utile).
+
+Les polices de marque (Fraunces, Plus Jakarta Sans, IBM Plex Mono) ne sont
+pas encore embarquées comme assets locaux ; `google_fonts` tenterait sinon
+de les télécharger au premier affichage de chaque écran à chaque lancement
+(cache froid), bloquant le rendu sur une requête réseau. `main.dart` désactive
+ce téléchargement à l'exécution (`GoogleFonts.config.allowRuntimeFetching =
+false`) — l'app retombe sur la police système en attendant un vrai
+embarquement des `.ttf`, mais ne bloque plus jamais sur un appel réseau pour
+afficher du texte.
+
 ## Stack
 
 - Flutter 3.x / Dart 3.x

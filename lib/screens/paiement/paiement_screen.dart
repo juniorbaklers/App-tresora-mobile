@@ -46,6 +46,7 @@ class _PaiementScreenState extends ConsumerState<PaiementScreen> {
   Widget build(BuildContext context) {
     final membresAsync = ref.watch(membresStreamProvider);
     final cotisationsAsync = ref.watch(cotisationsStreamProvider);
+    final paiementsAsync = ref.watch(paiementsEspaceProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Paiement')),
@@ -79,10 +80,16 @@ class _PaiementScreenState extends ConsumerState<PaiementScreen> {
                   loading: () =>
                       const Center(child: CircularProgressIndicator()),
                   error: (e, _) => Center(child: Text('Erreur : $e')),
-                  data: (cotisations) => _Liste(
-                    membres: membres,
-                    cotisations: cotisations,
-                    recherche: _recherche,
+                  data: (cotisations) => paiementsAsync.when(
+                    loading: () =>
+                        const Center(child: CircularProgressIndicator()),
+                    error: (e, _) => Center(child: Text('Erreur : $e')),
+                    data: (paiements) => _Liste(
+                      membres: membres,
+                      cotisations: cotisations,
+                      paiements: paiements,
+                      recherche: _recherche,
+                    ),
                   ),
                 ),
               ),
@@ -98,32 +105,32 @@ class _Liste extends ConsumerWidget {
   const _Liste(
       {required this.membres,
       required this.cotisations,
+      required this.paiements,
       required this.recherche});
 
   final List<Membre> membres;
   final List<Cotisation> cotisations;
+  final List<PaiementCotisation> paiements;
   final String recherche;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final paiementsParCotisation = <String, List<PaiementCotisation>>{};
-    for (final c in cotisations) {
-      paiementsParCotisation[c.id] =
-          ref.watch(paiementsCotisationProvider(c.id)).valueOrNull ?? [];
+    final cotisationsParId = {for (final c in cotisations) c.id: c};
+    final paiementsParMembre = <String, List<PaiementCotisation>>{};
+    for (final p in paiements) {
+      (paiementsParMembre[p.membreId] ??= []).add(p);
     }
 
     final lignes = membres.map((membre) {
       final dus = <_Du>[];
-      for (final c in cotisations) {
-        final paiement = paiementsParCotisation[c.id]!
-            .where((p) => p.membreId == membre.id)
-            .firstOrNull;
-        if (paiement == null) continue;
+      for (final paiement in paiementsParMembre[membre.id] ?? const []) {
+        final cotisation = cotisationsParId[paiement.cotisationId];
+        if (cotisation == null) continue;
         if (paiement.statut == StatutPaiement.paye ||
             paiement.statut == StatutPaiement.exonere) {
           continue;
         }
-        dus.add(_Du(cotisation: c, paiement: paiement));
+        dus.add(_Du(cotisation: cotisation, paiement: paiement));
       }
       return _LigneMembre(membre: membre, dus: dus);
     }).toList();
@@ -257,10 +264,6 @@ class _CarteMembreState extends ConsumerState<_CarteMembre> {
   }
 }
 
-extension _FirstOrNull<T> on Iterable<T> {
-  T? get firstOrNull => isEmpty ? null : first;
-}
-
 class _FormulaireVersement extends ConsumerStatefulWidget {
   const _FormulaireVersement({required this.membre, required this.du});
 
@@ -295,6 +298,7 @@ class _FormulaireVersementState extends ConsumerState<_FormulaireVersement> {
             responsable: responsable,
             modePaiement: _mode,
           ));
+      ref.invalidate(paiementsEspaceProvider);
       if (mounted) Navigator.of(context).pop();
     } catch (e) {
       setState(() => _erreur = "Enregistrement impossible : ${e.toString()}");

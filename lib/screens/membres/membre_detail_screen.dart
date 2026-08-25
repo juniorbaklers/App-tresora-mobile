@@ -20,6 +20,7 @@ class MembreDetailScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final cotisationsAsync = ref.watch(cotisationsStreamProvider);
+    final paiementsAsync = ref.watch(paiementsEspaceProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -126,8 +127,18 @@ class MembreDetailScreen extends ConsumerWidget {
               child: Center(child: CircularProgressIndicator()),
             ),
             error: (e, _) => Text('Erreur : $e'),
-            data: (cotisations) =>
-                _HistoriqueFinancier(cotisations: cotisations, membre: membre),
+            data: (cotisations) => paiementsAsync.when(
+              loading: () => const Padding(
+                padding: EdgeInsets.symmetric(vertical: 24),
+                child: Center(child: CircularProgressIndicator()),
+              ),
+              error: (e, _) => Text('Erreur : $e'),
+              data: (paiements) => _HistoriqueFinancier(
+                cotisations: cotisations,
+                paiements: paiements,
+                membre: membre,
+              ),
+            ),
           ),
         ],
       ),
@@ -153,22 +164,24 @@ class _Ligne extends StatelessWidget {
   }
 }
 
-class _HistoriqueFinancier extends ConsumerWidget {
+class _HistoriqueFinancier extends StatelessWidget {
   final List<Cotisation> cotisations;
+  final List<PaiementCotisation> paiements;
   final Membre membre;
 
   const _HistoriqueFinancier(
-      {required this.cotisations, required this.membre});
+      {required this.cotisations,
+      required this.paiements,
+      required this.membre});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
+    final cotisationsParId = {for (final c in cotisations) c.id: c};
     final lignes = <(Cotisation, PaiementCotisation)>[];
-    for (final c in cotisations) {
-      final paiements =
-          ref.watch(paiementsCotisationProvider(c.id)).valueOrNull ?? [];
-      final paiement =
-          paiements.where((p) => p.membreId == membre.id).firstOrNull;
-      if (paiement != null) lignes.add((c, paiement));
+    for (final p in paiements) {
+      if (p.membreId != membre.id) continue;
+      final cotisation = cotisationsParId[p.cotisationId];
+      if (cotisation != null) lignes.add((cotisation, p));
     }
 
     if (lignes.isEmpty) {
@@ -212,8 +225,4 @@ class _HistoriqueFinancier extends ConsumerWidget {
         StatutPaiement.enRetard => AppColors.terre,
         StatutPaiement.impaye => AppColors.terre,
       };
-}
-
-extension _FirstOrNull<T> on Iterable<T> {
-  T? get firstOrNull => isEmpty ? null : first;
 }

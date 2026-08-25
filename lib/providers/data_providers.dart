@@ -123,6 +123,37 @@ final tranchesProvider =
       .streamTranches(paiementCotisationId);
 });
 
+/// Paiements de TOUTES les cotisations de l'espace courant, en une seule
+/// requête (pas un flux temps réel par cotisation) — utilisé par les écrans
+/// qui doivent agréger sur l'ensemble des cotisations (Paiement, tableau de
+/// bord groupe, fiche membre) pour éviter d'ouvrir des dizaines de
+/// connexions temps réel simultanées quand l'espace a beaucoup de
+/// cotisations.
+final paiementsEspaceProvider =
+    FutureProvider.autoDispose<List<PaiementCotisation>>((ref) async {
+  final cotisations = ref.watch(cotisationsStreamProvider).valueOrNull ?? [];
+  if (cotisations.isEmpty) return [];
+  return ref
+      .watch(paiementsCotisationServiceProvider)
+      .fetchPourCotisations(cotisations.map((c) => c.id).toList());
+});
+
+/// Tranches des paiements (avec versement) d'une cotisation précise, en une
+/// seule requête — utilisé pour "derniers paiements" sur le tableau de bord
+/// groupe, à la place d'un flux temps réel par paiement.
+final tranchesCotisationProvider =
+    FutureProvider.autoDispose.family<List<Tranche>, String>(
+        (ref, cotisationId) async {
+  final paiements =
+      ref.watch(paiementsCotisationProvider(cotisationId)).valueOrNull ?? [];
+  final ids = paiements
+      .where((p) => p.montantPaye > 0)
+      .map((p) => p.id)
+      .toList();
+  if (ids.isEmpty) return [];
+  return ref.watch(tranchesServiceProvider).fetchPourPaiements(ids);
+});
+
 /// Fiches de contribution d'un événement précis — provider "family" utilisé
 /// sur l'écran de détail (analogue à tranchesProvider pour les cotisations).
 final contributionsEvenementProvider =

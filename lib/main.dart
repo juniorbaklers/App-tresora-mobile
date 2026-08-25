@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -12,6 +13,13 @@ import 'theme/app_theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // Les polices de marque ne sont pas encore embarquées comme assets locaux :
+  // sans cette ligne, google_fonts tente de les télécharger au premier
+  // affichage de chaque écran (à chaque lancement tant que le cache est
+  // froid), ce qui bloque le rendu sur une requête réseau et donne une
+  // impression de lenteur, surtout sur réseau mobile instable. On retombe
+  // sur la police système en attendant un vrai embarquement des .ttf.
+  GoogleFonts.config.allowRuntimeFetching = false;
   await initializeDateFormatting('fr_FR');
   await Supabase.initialize(
     url: SupabaseConfig.url,

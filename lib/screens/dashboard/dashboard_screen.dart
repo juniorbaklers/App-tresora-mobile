@@ -267,13 +267,26 @@ class _CorpsGroupeCharge extends ConsumerWidget {
     final membresParId = {for (final m in membres) m.id: m};
 
     final derniers = <_PaiementRecent>[];
-    for (final p in paiements.where((p) => p.montantPaye > 0)) {
-      final tranches = ref.watch(tranchesProvider(p.id)).valueOrNull ?? [];
-      if (tranches.isEmpty) continue;
-      final membre = membresParId[p.membreId];
-      if (membre == null) continue;
-      derniers.add(_PaiementRecent(
-          membre: membre, montant: p.montantPaye, date: tranches.first.date));
+    if (cotisationActive != null) {
+      final toutesTranches = ref
+              .watch(tranchesCotisationProvider(cotisationActive.id))
+              .valueOrNull ??
+          [];
+      final derniereDateParPaiement = <String, DateTime>{};
+      for (final t in toutesTranches) {
+        final actuelle = derniereDateParPaiement[t.paiementCotisationId];
+        if (actuelle == null || t.date.isAfter(actuelle)) {
+          derniereDateParPaiement[t.paiementCotisationId] = t.date;
+        }
+      }
+      for (final p in paiements.where((p) => p.montantPaye > 0)) {
+        final date = derniereDateParPaiement[p.id];
+        if (date == null) continue;
+        final membre = membresParId[p.membreId];
+        if (membre == null) continue;
+        derniers.add(
+            _PaiementRecent(membre: membre, montant: p.montantPaye, date: date));
+      }
     }
     derniers.sort((a, b) => b.date.compareTo(a.date));
     final derniersTop5 = derniers.take(5).toList();
