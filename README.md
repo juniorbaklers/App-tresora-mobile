@@ -38,12 +38,28 @@ Ce projet est **indépendant** de `gestion-caisse-eglise` (site web mono-
   l'icône dans l'AppBar du tableau de bord ; l'espace sollicité enregistre
   ses versements sans que le demandeur ne voie comment la somme a été
   réunie — montant reçu/statut recalculés côté base à chaque versement
+- ✅ Notifications : boîte personnelle par utilisateur, alimentée
+  automatiquement par des triggers côté base (nouvelle demande de
+  contribution reçue, versement reçu) — accessible via la cloche du
+  tableau de bord, avec badge du nombre de non lues
+- ✅ Journal d'audit : chaque création/modification/suppression de recette,
+  dépense ou membre est tracée automatiquement côté base (qui, quand,
+  ancienne/nouvelle valeur) — consultable en lecture seule depuis Réglages
+- ✅ Clôtures (du dimanche ou de tout culte) : saisie de ce qui a été
+  compté en caisse face à ce que les écritures de recette déclarent, écart
+  calculé et justifiable, historique consultable depuis Réglages
+- ✅ Réglages de l'espace : modifier nom/devise/solde initial (propriétaire/
+  administrateur), gérer le rôle de chaque membre ou le retirer de
+  l'espace — plus besoin de passer par Supabase pour ça
+- ✅ Identité visuelle "pile de carnets" sur l'écran de sélection d'espace :
+  chaque carte d'espace est présentée comme un carnet de comptes, avec
+  deux feuillets décalés en arrière-plan et une tranche colorée (motif de
+  tissage) qui varie d'un espace à l'autre
 
 **Pas encore fait** (modèle déjà prêt côté base, voir
-`supabase/schema_1_types_tables.sql`) : notifications, journal d'audit
-affiché dans l'app, clôtures, rapports/exports, gestion des rôles depuis
-l'app (à faire directement dans Supabase pour l'instant), identité visuelle
-"pile de carnets" sur l'écran de sélection d'espace, mode hors-ligne.
+`supabase/schema_1_types_tables.sql`) : rapports/exports, notifications
+programmées (cotisation en retard, événement bientôt — nécessiteraient un
+job planifié type pg_cron, pas encore mis en place), mode hors-ligne.
 
 ## Stack
 
@@ -79,7 +95,8 @@ build.
 lib/
 ├── config/            URL + clé Supabase
 ├── models/             Profil, Espace, Membre, Cotisation/PaiementCotisation/Tranche,
-│                        Recette/Depense, Evenement, Invitation, Contribution, Role —
+│                        Recette/Depense, Evenement, Invitation, Contribution,
+│                        NotificationTresora, EntreeJournal, Cloture, MembreCompte, Role —
 │                        reflètent supabase/schema_1_types_tables.sql
 ├── services/            Appels Supabase (CRUD + flux temps réel par table)
 ├── providers/            État Riverpod : session, mes espaces, espace courant + rôle,
@@ -97,7 +114,11 @@ lib/
     ├── cotisations/               Liste, création, détail (suivi des tranches par membre)
     ├── evenements/                  Liste (progression), création, détail (contributions)
     ├── contributions/                Envoyées/reçues, création, détail (versements), accessible depuis le tableau de bord
+    ├── notifications/                 Boîte personnelle, accessible depuis la cloche du tableau de bord
     ├── membres/                    Liste + formulaire + invitations (envoi, annulation)
+    ├── reglages/                    Réglages de l'espace + rôles des membres, accessible depuis Profil
+    ├── journal/                      Journal d'audit (lecture seule), accessible depuis Réglages
+    ├── clotures/                     Liste + saisie d'une clôture, accessible depuis Réglages
     └── profil/                      Identité, espace courant + rôle, déconnexion
 ```
 
@@ -112,6 +133,5 @@ lib/
 | `membre` | Lecture seule |
 
 Le créateur d'un espace en devient automatiquement `proprietaire` (trigger
-SQL). Les rôles suivants s'ajoutent pour l'instant directement dans la
-table `espace_membres` sur Supabase — pas encore d'écran d'invitation dans
-l'app.
+SQL). Les membres suivants rejoignent l'espace par invitation par email
+(écran Membres) et leur rôle se gère ensuite depuis Réglages.

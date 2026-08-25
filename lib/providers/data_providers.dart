@@ -1,13 +1,17 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../models/cloture.dart';
 import '../models/contribution.dart';
 import '../models/cotisation.dart';
+import '../models/entree_journal.dart';
 import '../models/evenement.dart';
 import '../models/invitation.dart';
 import '../models/membre.dart';
 import '../models/tresorerie.dart';
+import '../services/clotures_service.dart';
 import '../services/contributions_service.dart';
 import '../services/cotisations_service.dart';
 import '../services/evenements_service.dart';
+import '../services/journal_service.dart';
 import '../services/membres_service.dart';
 import '../services/tresorerie_service.dart';
 import 'espace_providers.dart';
@@ -20,6 +24,8 @@ final recettesServiceProvider = Provider((ref) => RecettesService());
 final depensesServiceProvider = Provider((ref) => DepensesService());
 final evenementsServiceProvider = Provider((ref) => EvenementsService());
 final contributionsServiceProvider = Provider((ref) => ContributionsService());
+final journalServiceProvider = Provider((ref) => JournalService());
+final cloturesServiceProvider = Provider((ref) => CloturesService());
 
 /// Tous les providers de données ci-dessous sont scopés à l'espace
 /// sélectionné (currentEspaceIdProvider) : flux vide tant qu'aucun espace
@@ -75,6 +81,18 @@ final contributionsRecuesStreamProvider = StreamProvider<List<Contribution>>((re
 
 final versementsContributionProvider = StreamProvider.family((ref, String contributionId) {
   return ref.watch(contributionsServiceProvider).streamVersements(contributionId);
+});
+
+final journalStreamProvider = StreamProvider<List<EntreeJournal>>((ref) {
+  final espaceId = ref.watch(currentEspaceIdProvider);
+  if (espaceId == null) return Stream.value(<EntreeJournal>[]);
+  return ref.watch(journalServiceProvider).streamJournal(espaceId);
+});
+
+final cloturesStreamProvider = StreamProvider<List<Cloture>>((ref) {
+  final espaceId = ref.watch(currentEspaceIdProvider);
+  if (espaceId == null) return Stream.value(<Cloture>[]);
+  return ref.watch(cloturesServiceProvider).streamClotures(espaceId);
 });
 
 /// Paiements d'une cotisation précise — provider "family" paramétré par

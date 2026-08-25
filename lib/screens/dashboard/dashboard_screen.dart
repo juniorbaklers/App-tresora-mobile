@@ -8,6 +8,7 @@ import '../../utils/format.dart';
 import '../../widgets/motif.dart';
 import '../../widgets/stat_card.dart';
 import '../contributions/contributions_list_screen.dart';
+import '../notifications/notifications_list_screen.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -17,6 +18,8 @@ class DashboardScreen extends ConsumerWidget {
     final espace = ref.watch(currentEspaceProvider)?.espace;
     final recettesAsync = ref.watch(recettesStreamProvider);
     final depensesAsync = ref.watch(depensesStreamProvider);
+    final notificationsNonLues =
+        (ref.watch(mesNotificationsProvider).valueOrNull ?? []).where((n) => !n.lue).length;
 
     return Scaffold(
       appBar: AppBar(
@@ -27,6 +30,17 @@ class DashboardScreen extends ConsumerWidget {
             tooltip: 'Contributions inter-espaces',
             onPressed: () => Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => const ContributionsListScreen()),
+            ),
+          ),
+          IconButton(
+            icon: Badge(
+              label: Text('$notificationsNonLues'),
+              isLabelVisible: notificationsNonLues > 0,
+              child: const Icon(Icons.notifications_outlined),
+            ),
+            tooltip: 'Notifications',
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const NotificationsListScreen()),
             ),
           ),
         ],

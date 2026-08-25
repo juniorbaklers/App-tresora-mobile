@@ -1,5 +1,7 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/espace.dart';
+import '../models/membre_compte.dart';
+import '../models/profil.dart';
 import '../models/role.dart';
 
 /// Tables `espaces` + `espace_membres` — le concept central : chaque
@@ -59,4 +61,41 @@ class EspacesService {
         .single();
     return Espace.fromMap(row);
   }
+
+  /// Modifie les réglages de l'espace (nom/devise/solde initial) — réservé
+  /// aux propriétaires/administrateurs (RLS `espaces_maj`).
+  Future<void> modifier(String espaceId, Map<String, dynamic> champs) =>
+      _client.from('espaces').update(champs).eq('id', espaceId);
+
+  /// Comptes utilisateurs de l'espace avec leur rôle — pour la gestion des
+  /// rôles dans Réglages. `.stream()` ne supportant pas les jointures, le
+  /// profil de chaque membre est récupéré à part.
+  Stream<List<MembreCompte>> streamMembresCompte(String espaceId) {
+    return _client
+        .from('espace_membres')
+        .stream(primaryKey: ['espace_id', 'user_id'])
+        .eq('espace_id', espaceId)
+        .asyncMap((lignes) async {
+      if (lignes.isEmpty) return <MembreCompte>[];
+      final userIds = lignes.map((l) => l['user_id'] as String).toList();
+      final profilsData = await _client.from('profils').select().inFilter('id', userIds);
+      final profilsParId = {for (final p in profilsData) p['id'] as String: Profil.fromMap(p)};
+      return lignes
+          .where((l) => profilsParId.containsKey(l['user_id']))
+          .map((l) => MembreCompte(
+                profil: profilsParId[l['user_id']]!,
+                role: RoleEspace.fromBdd(l['role'] as String),
+              ))
+          .toList();
+    });
+  }
+
+  Future<void> changerRole(String espaceId, String userId, RoleEspace role) => _client
+      .from('espace_membres')
+      .update({'role': role.valeurBdd})
+      .eq('espace_id', espaceId)
+      .eq('user_id', userId);
+
+  Future<void> retirerMembre(String espaceId, String userId) =>
+      _client.from('espace_membres').delete().eq('espace_id', espaceId).eq('user_id', userId);
 }

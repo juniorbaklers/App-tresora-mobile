@@ -3,8 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/auth_providers.dart';
 import '../../providers/espace_providers.dart';
 import '../../theme/app_theme.dart';
+import '../../widgets/role_gate.dart';
 import '../auth/login_screen.dart';
 import '../espaces/espace_selection_screen.dart';
+import '../reglages/reglages_espace_screen.dart';
 
 class ProfilScreen extends ConsumerWidget {
   const ProfilScreen({super.key});
@@ -75,6 +77,23 @@ class ProfilScreen extends ConsumerWidget {
                       child: const Text('Changer'),
                     ),
                   ],
+                ),
+              ),
+            if (espaceAvecRole != null)
+              RoleGate(
+                peutAcceder: (r) => r.peutAdministrer,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 12),
+                  child: Card(
+                    child: ListTile(
+                      leading: const Icon(Icons.settings_outlined),
+                      title: const Text('Réglages de l\'espace'),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) => const ReglagesEspaceScreen()),
+                      ),
+                    ),
+                  ),
                 ),
               ),
             const SizedBox(height: 32),

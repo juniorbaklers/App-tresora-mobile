@@ -129,3 +129,109 @@ $$;
 create trigger on_versement_contribution_change
   after insert or update or delete on contribution_versements
   for each row execute function recalculer_contribution();
+
+-- ============================================================
+-- 5. Notifications automatiques — l'app ne crée jamais de notification
+--    elle-même, seule la base sait avec certitude quand un événement
+--    notifiable s'est produit. Envoyées aux gérants (propriétaire,
+--    administrateur, trésorier) de l'espace concerné.
+-- ============================================================
+
+create or replace function notifier_nouvelle_contribution()
+returns trigger
+language plpgsql
+security definer set search_path = public
+as $$
+begin
+  insert into notifications (espace_id, user_id, type, titre, description)
+  select new.espace_cible_id, em.user_id, 'contribution_demandee',
+         'Nouvelle demande de contribution',
+         new.projet || ' — ' || new.montant_demande::text || ' demandés'
+  from espace_membres em
+  where em.espace_id = new.espace_cible_id
+    and em.role in ('proprietaire', 'administrateur', 'tresorier');
+  return new;
+end;
+$$;
+
+create trigger on_contribution_creee
+  after insert on contributions
+  for each row execute function notifier_nouvelle_contribution();
+
+create or replace function notifier_versement_contribution()
+returns trigger
+language plpgsql
+security definer set search_path = public
+as $$
+declare
+  v_espace_demandeur uuid;
+  v_projet text;
+begin
+  select espace_demandeur_id, projet into v_espace_demandeur, v_projet
+    from contributions where id = new.contribution_id;
+
+  insert into notifications (espace_id, user_id, type, titre, description)
+  select v_espace_demandeur, em.user_id, 'contribution_recue',
+         'Versement reçu', v_projet || ' — ' || new.montant::text || ' reçus'
+  from espace_membres em
+  where em.espace_id = v_espace_demandeur
+    and em.role in ('proprietaire', 'administrateur', 'tresorier');
+  return new;
+end;
+$$;
+
+create trigger on_versement_cree
+  after insert on contribution_versements
+  for each row execute function notifier_versement_contribution();
+
+-- ============================================================
+-- 6. Journal d'audit — trace automatiquement les écritures de
+--    trésorerie et les changements du registre des membres. L'app
+--    n'écrit jamais elle-même dans entrees_journal.
+-- ============================================================
+
+create or replace function journaliser()
+returns trigger
+language plpgsql
+security definer set search_path = public
+as $$
+declare
+  v_espace_id uuid := coalesce(new.espace_id, old.espace_id);
+  v_utilisateur text;
+  v_role text;
+  v_libelle_table text;
+  v_action text;
+begin
+  select nom_complet into v_utilisateur from profils where id = auth.uid();
+  v_role := coalesce((role_dans_espace(v_espace_id))::text, '');
+  v_libelle_table := case TG_TABLE_NAME
+    when 'recettes' then 'Recette'
+    when 'depenses' then 'Dépense'
+    when 'membres' then 'Membre'
+    else TG_TABLE_NAME
+  end;
+  v_action := v_libelle_table || ' ' || case TG_OP
+    when 'INSERT' then 'créée'
+    when 'UPDATE' then 'modifiée'
+    when 'DELETE' then 'supprimée'
+  end;
+
+  insert into entrees_journal (espace_id, utilisateur, role, action, ancienne_valeur, nouvelle_valeur)
+  values (
+    v_espace_id,
+    coalesce(v_utilisateur, 'Compte supprimé'),
+    v_role,
+    v_action,
+    case when TG_OP in ('UPDATE', 'DELETE') then row_to_json(old)::text else null end,
+    case when TG_OP in ('INSERT', 'UPDATE') then row_to_json(new)::text else null end
+  );
+  return coalesce(new, old);
+end;
+$$;
+
+create trigger journal_recettes after insert or update or delete on recettes
+  for each row execute function journaliser();
+create trigger journal_depenses after insert or update or delete on depenses
+  for each row execute function journaliser();
+create trigger journal_membres after insert or update or delete on membres
+  for each row execute function journaliser();

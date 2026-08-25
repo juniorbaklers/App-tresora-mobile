@@ -87,9 +87,10 @@ class EspaceSelectionScreen extends ConsumerWidget {
                 ],
                 if (espaces.isNotEmpty) const SizedBox(height: 8),
               ],
-              for (final e in espaces) ...[
+              for (final (i, e) in espaces.indexed) ...[
                 _CarteEspace(
                   espaceAvecRole: e,
+                  index: i,
                   onTap: () {
                     ref.read(currentEspaceIdProvider.notifier).state = e.espace.id;
                     Navigator.of(context).pushReplacement(
@@ -190,57 +191,121 @@ class _CarteInvitationState extends ConsumerState<_CarteInvitation> {
   }
 }
 
+/// Carte d'espace en "pile de carnets" : deux feuillets décalés et
+/// légèrement pivotés derrière la carte principale, comme une pile de
+/// carnets vue de dessus — chaque espace est un carnet de comptes séparé.
 class _CarteEspace extends StatelessWidget {
   final EspaceAvecRole espaceAvecRole;
+  final int index;
   final VoidCallback onTap;
 
-  const _CarteEspace({required this.espaceAvecRole, required this.onTap});
+  const _CarteEspace({required this.espaceAvecRole, required this.index, required this.onTap});
+
+  static const _tonalites = [Tonalite.or, Tonalite.palme, Tonalite.terre, Tonalite.indigo, Tonalite.mixte];
 
   @override
   Widget build(BuildContext context) {
     final espace = espaceAvecRole.espace;
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(14),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: AppColors.carte,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AppColors.bordure),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 48,
-              height: 48,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: AppColors.indigoProfond,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                espace.initiales,
-                style: const TextStyle(color: AppColors.or, fontWeight: FontWeight.bold),
+    final tonalite = _tonalites[index % _tonalites.length];
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 6, bottom: 2),
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Positioned(
+            top: 10,
+            left: 10,
+            right: -6,
+            child: Transform.rotate(
+              angle: -0.035,
+              child: Container(
+                height: 74,
+                decoration: BoxDecoration(
+                  color: AppColors.carte,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: AppColors.bordure),
+                ),
               ),
             ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(espace.nom, style: AppFonts.heading(fontSize: 16, color: AppColors.texteEncre)),
-                  const SizedBox(height: 2),
-                  Text(
-                    '${espace.type.libelle} · ${espaceAvecRole.role.libelle}',
-                    style: const TextStyle(fontSize: 12, color: AppColors.texteSecondaire),
-                  ),
-                ],
+          ),
+          Positioned(
+            top: 5,
+            left: 5,
+            right: -3,
+            child: Transform.rotate(
+              angle: 0.02,
+              child: Container(
+                height: 74,
+                decoration: BoxDecoration(
+                  color: AppColors.carte,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: AppColors.bordure),
+                ),
               ),
             ),
-            const Icon(Icons.chevron_right, color: AppColors.texteSecondaire),
-          ],
-        ),
+          ),
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: onTap,
+              borderRadius: BorderRadius.circular(14),
+              child: Container(
+                clipBehavior: Clip.antiAlias,
+                decoration: BoxDecoration(
+                  color: AppColors.carte,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: AppColors.bordure),
+                  boxShadow: [
+                    BoxShadow(color: Colors.black.withValues(alpha: .08), blurRadius: 10, offset: const Offset(0, 4)),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    LisiereVerticale(tonalite: tonalite, epaisseur: 5),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 48,
+                              height: 48,
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                color: AppColors.indigoProfond,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                espace.initiales,
+                                style: const TextStyle(color: AppColors.or, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            const SizedBox(width: 14),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(espace.nom, style: AppFonts.heading(fontSize: 16, color: AppColors.texteEncre)),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    '${espace.type.libelle} · ${espaceAvecRole.role.libelle}',
+                                    style: const TextStyle(fontSize: 12, color: AppColors.texteSecondaire),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const Icon(Icons.chevron_right, color: AppColors.texteSecondaire),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
