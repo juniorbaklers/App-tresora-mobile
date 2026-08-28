@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #101014; font-family: 'Schibsted Grotesk', system-ui, sans-serif; letter-spacing: -.011em; -webkit-font-smoothing: antialiased; }
+  @keyframes tsPulse { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  [style*="cursor: pointer"] { transition: transform .12s ease, filter .15s ease, opacity .15s ease, background .15s ease, border-color .15s ease; }
+  [style*="cursor: pointer"]:active { transform: scale(.96); }
+</style>
+</helmet>
+<div style="min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 48px 24px 60px; position: relative; overflow: hidden">
+  <div style="position: absolute; top: -220px; left: 50%; transform: translateX(-50%); width: 640px; height: 640px; border-radius: 50%; background: radial-gradient(circle, rgba(242,101,34,.16), rgba(242,101,34,0) 70%); pointer-events: none"></div>
+
+  <div style="position: relative; display: flex; align-items: center; gap: 10px; animation: fadeUp .4s ease both">
+    <img src="assets/logo-mark.png" alt="Trésora" style="height: 30px; width: auto; display: block">
+    <div style="color: #fff; font-size: 17px; font-weight: 800; letter-spacing: -.02em">Trésora</div>
+    <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #9A9AA8; letter-spacing: .12em; text-transform: uppercase; padding-left: 12px; border-left: 1px solid rgba(255,255,255,.14)">Application Android · 13 écrans</div>
+  </div>
+
+  <div style="position: relative; display: flex; align-items: center; gap: 22px; margin-top: 40px">
+
+    <div onClick="{{ prev }}" style="flex: 0 0 auto; width: 46px; height: 46px; border-radius: 50%; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); display: grid; place-items: center; cursor: pointer" style-hover="background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.22)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+    </div>
+
+    <div style="flex: 0 0 auto; border-radius: 46px; padding: 10px; background: #1C1C25; box-shadow: 0 40px 90px -30px rgba(0,0,0,.7), 0 0 0 1px rgba(255,255,255,.06) inset; animation: fadeUp .5s ease .05s both">
+      <div style="width: 372px; height: 742px; border-radius: 38px; overflow: hidden; position: relative; background: #000">
+        <div style="{{ trackStyle }}">
+
+          <div style="flex: 0 0 372px; width: 372px; height: 100%; overflow: hidden">
+            <div style="height: 742px; border-radius: 36px; overflow: hidden; background: #17171F; background-image: repeating-linear-gradient(45deg, rgba(255,255,255,.04) 0 1px, transparent 1px 30px), repeating-linear-gradient(-45deg, rgba(255,255,255,.04) 0 1px, transparent 1px 30px); display: flex; flex-direction: column">
+              <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; color: #fff; padding: 18px 24px 0"><div>1:06</div><div style="width: 14px; height: 8px; border: 1px solid #fff; border-radius: 2px"></div></div>
+              <div style="flex: 1; display: grid; place-items: center; position: relative">
+                <div style="position: absolute; width: 300px; height: 300px; border-radius: 50%; background: radial-gradient(circle, rgba(242,101,34,.18), rgba(242,101,34,0) 70%)"></div>
+                <div style="position: relative; width: 216px; height: 216px; display: grid; place-items: center">
+                <img src="assets/logo-full.png" alt="Trésora" style="width: 216px; height: auto; display: block; position: relative; border-radius: 30px"></div>
+              </div>
+              <div style="padding: 0 34px 40px; text-align: center">
+                <div style="font-size: 13px; font-weight: 700; color: #fff; letter-spacing: .02em">Trésorerie multi-espace</div>
+                <div style="font-size: 11.5px; color: #77778A; margin-top: 5px">Église · Groupe · Association</div>
+                <div style="display: flex; gap: 7px; justify-content: center; margin-top: 22px">
+                  <div style="width: 7px; height: 7px; border-radius: 2px; transform: rotate(45deg); background: #F26522; animation: tsPulse 1.2s infinite"></div>
+                  <div style="width: 7px; height: 7px; border-radius: 2px; transform: rotate(45deg); background: #FFB300; animation: tsPulse 1.2s infinite .2s"></div>
+                  <div style="width: 7px; height: 7px; border-radius: 2px; transform: rotate(45deg); background: #FFC220; animation: tsPulse 1.2s infinite .4s"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="flex: 0 0 372px; width: 372px; height: 100%; overflow: hidden">
+            <div style="height: 742px; border-radius: 36px; overflow: hidden; background: #FFF6EE; display: flex; flex-direction: column">
+              <div style="position: relative; padding: 18px 24px 0; background: #FFF6EE; overflow: hidden">
+                <div style="position: absolute; top: -120px; left: -110px; width: 240px; height: 240px; border-radius: 50%; background: linear-gradient(135deg,#FFC220,#F26522)"></div>
+                <div style="position: absolute; top: 40px; left: -20px; width: 150px; height: 190px; opacity: .35; background-image: repeating-linear-gradient(45deg, rgba(242,101,34,.5) 0 1px, transparent 1px 14px), repeating-linear-gradient(-45deg, rgba(242,101,34,.5) 0 1px, transparent 1px 14px)"></div>
+                <div style="position: relative; display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; color: #1A1A22"><div>23:18</div><div style="width: 14px; height: 8px; border: 1px solid #1A1A22; border-radius: 2px"></div></div><div style="position: relative; display: grid; place-items: center; padding: 22px 0 30px">
+                  <img src="assets/logo-mark.png" alt="Trésora" style="width: 108px; height: auto; display: block">
+                </div>
+              </div>
+              <div style="flex: 1; background: #fff; border-radius: 30px 30px 0 0; margin-top: -22px; padding: 22px 22px 26px; display: flex; flex-direction: column; box-shadow: 0 -12px 30px -18px rgba(20,20,26,.35)">
+                <div style="display: flex; gap: 5px; background: #F2F2F6; border-radius: 30px; padding: 4px">
+                  <div style="flex: 1; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; padding: 12px; border-radius: 26px; background: linear-gradient(135deg,#FFB300,#F26522); color: #fff">Connexion</div>
+                  <div style="flex: 1; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; padding: 12px; color: #9C9CAC">Changer d'utilisateur</div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px; background: #FFF8F1; border: 1px solid #FFD2A8; border-radius: 16px; padding: 12px 14px; margin-top: 16px">
+                  <div style="width: 42px; height: 42px; border-radius: 50%; background: #FFE0B2; background-image: repeating-linear-gradient(135deg, rgba(242,101,34,.14) 0 3px, transparent 3px 6px); display: grid; place-items: center; font-family: 'JetBrains Mono', monospace; font-size: 7px; color: #A05A00; flex: 0 0 42px">photo</div>
+                  <div style="flex: 1; min-width: 0">
+                    <div style="font-size: 13.5px; font-weight: 800; color: #1A1A22; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">KOFFI N'GUESSAN</div>
+                    <div style="font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: #9C9CAC">+225 07 88 41 20</div>
+                  </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px; margin-top: 18px">
+                  <div style="width: 3px; height: 14px; border-radius: 2px; background: linear-gradient(180deg,#FFC220,#F26522)"></div>
+                  <div style="font-size: 13px; font-weight: 700; color: #1A1A22">Mot de passe</div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px; border: 1.5px solid #E8E8EE; border-radius: 30px; padding: 14px 17px; margin-top: 9px">
+                  <div style="width: 13px; height: 11px; border: 1.5px solid #9C9CAC; border-radius: 2px; position: relative; flex: 0 0 13px"><div style="position: absolute; left: 2px; top: -6px; width: 9px; height: 6px; border: 1.5px solid #9C9CAC; border-bottom: none; border-radius: 4px 4px 0 0"></div></div>
+                  <div style="flex: 1; font-size: 13.5px; color: #9C9CAC">Entrez votre mot de passe</div>
+                  <div style="width: 17px; height: 11px; border: 1.5px solid #9C9CAC; border-radius: 9px; position: relative"><div style="position: absolute; left: 5.5px; top: 2.5px; width: 4px; height: 4px; border-radius: 50%; background: #9C9CAC"></div><div style="position: absolute; left: -2px; top: 4px; width: 21px; height: 1.5px; background: #9C9CAC; transform: rotate(-30deg)"></div></div>
+                </div>
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 14px">
+                  <div style="display: flex; align-items: center; gap: 9px">
+                    <div style="width: 40px; height: 22px; border-radius: 12px; background: linear-gradient(135deg,#FFB300,#F26522); padding: 2px; display: flex; justify-content: flex-end"><div style="width: 18px; height: 18px; border-radius: 50%; background: #fff; display: grid; place-items: center; color: #F26522; font-size: 11px; font-weight: 800">✓</div></div>
+                    <div style="font-size: 12px; font-weight: 600; color: #52525E">Se souvenir de moi</div>
+                  </div>
+                  <div style="font-size: 12px; font-weight: 700; color: #F26522">Mot de passe oublié ?</div>
+                </div>
+                <div style="display: flex; align-items: center; justify-content: center; gap: 10px; background: linear-gradient(135deg,#FFB300,#F26522); color: #fff; font-size: 14.5px; font-weight: 800; letter-spacing: .04em; padding: 16px; border-radius: 30px; margin-top: 20px; box-shadow: 0 12px 26px -12px rgba(242,101,34,.7)">
+                  <div style="width: 12px; height: 10px; border: 1.5px solid #fff; border-radius: 2px; position: relative"><div style="position: absolute; left: 2px; top: -5px; width: 8px; height: 5px; border: 1.5px solid #fff; border-bottom: none; border-radius: 4px 4px 0 0"></div></div>
+                  <div>SE CONNECTER</div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px; margin-top: 14px"><div style="flex: 1; height: 1px; background: #E8E8EE"></div><div style="font-size: 11px; color: #9C9CAC">ou</div><div style="flex: 1; height: 1px; background: #E8E8EE"></div></div>
+                <div style="display: flex; align-items: center; justify-content: center; gap: 10px; border: 1.5px solid #1C1C25; color: #1C1C25; font-size: 13.5px; font-weight: 800; letter-spacing: .04em; padding: 15px; border-radius: 30px; margin-top: 14px">
+                  <div style="width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid #1C1C25"></div>
+                  <div>CRÉER UN COMPTE</div>
+                </div>
+                <div style="margin-top: auto; text-align: center">
+                  <div style="font-size: 12.5px; color: #52525E">Besoin d'aide ? <span style="font-weight: 800; color: #F26522">Assistance</span></div>
+                  <div style="font-size: 11.5px; color: #9C9CAC; margin-top: 7px">ou <span style="font-weight: 700; color: #C2410C">découvrir avec des données démo</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="flex: 0 0 372px; width: 372px; height: 100%; overflow: hidden">
+            <div style="height: 742px; border-radius: 36px; overflow: hidden; background: #F7F7FA; display: flex; flex-direction: column">
+              <div style="padding: 16px 20px 0">
+                <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; color: #1A1A22; padding-bottom: 14px"><div>9:41</div><div style="width: 14px; height: 8px; border: 1px solid #1A1A22; border-radius: 2px"></div></div>
+                <div style="display: flex; align-items: center; gap: 11px">
+                  <div style="width: 38px; height: 38px; border-radius: 50%; background: #E6E6EC; background-image: repeating-linear-gradient(135deg, rgba(20,20,26,.07) 0 3px, transparent 3px 6px); display: grid; place-items: center; font-family: 'JetBrains Mono', monospace; font-size: 7px; color: #8E8E9C">photo</div>
+                  <div style="flex: 1"><div style="font-size: 11px; color: #6E6E7C">Bonjour,</div><div style="font-size: 15px; font-weight: 800; color: #1A1A22">Koffi N'Guessan</div></div>
+                  <div style="position: relative; width: 36px; height: 36px; border-radius: 11px; background: #fff; border: 1px solid #E8E8EE"><div style="position: absolute; top: 8px; right: 9px; width: 7px; height: 7px; border-radius: 50%; background: #E14B5C"></div></div>
+                </div>
+              </div>
+              <div style="flex: 1; overflow: hidden; padding: 16px 20px 0">
+                <div style="border-radius: 20px; padding: 18px; color: #fff; background: #1C1C25; background-image: repeating-linear-gradient(45deg, rgba(255,255,255,.05) 0 1px, transparent 1px 26px), repeating-linear-gradient(-45deg, rgba(255,255,255,.05) 0 1px, transparent 1px 26px), #1C1C25">
+                  <div style="display: flex; align-items: center; justify-content: space-between">
+                    <div style="display: flex; align-items: center; gap: 8px"><div style="width: 22px; height: 22px; border-radius: 7px; background: #F97316; color: #3D1A00; font-size: 9px; font-weight: 800; display: grid; place-items: center">ÉB</div><div style="font-size: 12px; font-weight: 700">Église Bethel</div></div>
+                    <div style="font-size: 10px; color: #9A9AA8">Août 2026</div>
+                  </div>
+                  <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: .14em; color: #9A9AA8; margin-top: 16px">SOLDE</div>
+                  <div style="font-size: 30px; font-weight: 800; letter-spacing: -.02em; font-variant-numeric: tabular-nums">4 812 500 F</div>
+                  <svg viewBox="0 0 300 60" preserveAspectRatio="none" style="width: 100%; height: 56px; margin-top: 8px"><path d="M0 48 C 40 42, 60 24, 100 30 C 140 36, 160 12, 200 16 C 240 20, 265 34, 300 22" fill="none" stroke="#F97316" stroke-width="2.5"></path></svg>
+                  <div style="display: flex; gap: 10px; margin-top: 10px">
+                    <div style="flex: 1; background: rgba(255,255,255,.07); border-radius: 12px; padding: 10px"><div style="font-size: 10px; color: #9A9AA8">Recettes</div><div style="font-size: 13px; font-weight: 800; color: #FFC96B">+1,96 M</div></div>
+                    <div style="flex: 1; background: rgba(255,255,255,.07); border-radius: 12px; padding: 10px"><div style="font-size: 10px; color: #9A9AA8">Dépenses</div><div style="font-size: 13px; font-weight: 800; color: #F7B39B">−742 K</div></div>
+                  </div>
+                </div>
+                <div style="display: flex; gap: 9px; margin-top: 14px">
+                  <div style="flex: 1; background: #fff; border: 1px solid #E8E8EE; border-radius: 14px; padding: 12px 8px; text-align: center"><div style="width: 26px; height: 26px; margin: 0 auto 7px; border-radius: 9px; background: rgba(249,115,22,.14)"><div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#F97316"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-4"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg></div></div><div style="font-size: 10px; font-weight: 700; color: #1A1A22">Encaisser</div></div>
+                  <div style="flex: 1; background: #fff; border: 1px solid #E8E8EE; border-radius: 14px; padding: 12px 8px; text-align: center"><div style="width: 26px; height: 26px; margin: 0 auto 7px; border-radius: 9px; background: rgba(225,75,92,.13)"><div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#E14B5C"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M8 7h8M8 11h8M8 15h5"/></svg></div></div><div style="font-size: 10px; font-weight: 700; color: #1A1A22">Dépense</div></div>
+                  <div style="flex: 1; background: #fff; border: 1px solid #E8E8EE; border-radius: 14px; padding: 12px 8px; text-align: center"><div style="width: 26px; height: 26px; margin: 0 auto 7px; border-radius: 9px; background: rgba(194,65,12,.13)"><div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#C2410C"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><rect x="9" y="9" width="6" height="6"/></svg></div></div><div style="font-size: 10px; font-weight: 700; color: #1A1A22">Scanner</div></div>
+                  <div style="flex: 1; background: #fff; border: 1px solid #E8E8EE; border-radius: 14px; padding: 12px 8px; text-align: center"><div style="width: 26px; height: 26px; margin: 0 auto 7px; border-radius: 9px; background: rgba(255,179,0,.15)"><div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#A05A00"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/></svg></div></div><div style="font-size: 10px; font-weight: 700; color: #1A1A22">Rapport</div></div>
+                </div>
+                <div style="display: flex; align-items: baseline; justify-content: space-between; margin-top: 18px"><div style="font-size: 14px; font-weight: 800; color: #1A1A22">Dernières écritures</div><div style="font-size: 11px; font-weight: 700; color: #C2410C">Tout voir</div></div>
+                <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px">
+                  <div style="display: flex; align-items: center; gap: 11px; background: #fff; border-radius: 14px; padding: 11px 12px"><div style="width: 34px; height: 34px; border-radius: 11px; background: rgba(249,115,22,.13)"><div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#F97316"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5l7 7Z"/></svg></div></div><div style="flex: 1"><div style="font-size: 12px; font-weight: 700; color: #1A1A22">Dîme — culte</div><div style="font-size: 10px; color: #9C9CAC">Espèces · aujourd'hui</div></div><div style="font-size: 13px; font-weight: 800; color: #21A97A">+486 000</div></div>
+                  <div style="display: flex; align-items: center; gap: 11px; background: #fff; border-radius: 14px; padding: 11px 12px"><div style="width: 34px; height: 34px; border-radius: 11px; background: rgba(194,65,12,.13)"><div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#C2410C"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div></div><div style="flex: 1"><div style="font-size: 12px; font-weight: 700; color: #1A1A22">Cotisation toiture 2/3</div><div style="font-size: 10px; color: #9C9CAC">Orange Money · Aya K.</div></div><div style="font-size: 13px; font-weight: 800; color: #21A97A">+15 000</div></div>
+                  <div style="display: flex; align-items: center; gap: 11px; background: #fff; border-radius: 14px; padding: 11px 12px"><div style="width: 34px; height: 34px; border-radius: 11px; background: rgba(225,75,92,.11)"><div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#E14B5C"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8Z"/></svg></div></div><div style="flex: 1"><div style="font-size: 12px; font-weight: 700; color: #1A1A22">Électricité juillet</div><div style="font-size: 10px; color: #9C9CAC">Chèque · corrigé</div></div><div style="font-size: 13px; font-weight: 800; color: #1A1A22">−118 400</div></div>
+                </div>
+              </div>
+              <div style="background: #fff; border-top: 1px solid #E8E8EE; padding: 10px 18px 20px; display: flex; align-items: center; justify-content: space-between">
+                <div style="text-align: center; width: 52px"><div style="width: 8px; height: 8px; margin: 0 auto 6px; background: #F97316; transform: rotate(45deg); border-radius: 2px"></div><div style="font-size: 9px; font-weight: 700; color: #1A1A22">Accueil</div></div>
+                <div style="text-align: center; width: 52px"><div style="width: 8px; height: 8px; margin: 0 auto 6px; background: #CCCCD6; transform: rotate(45deg); border-radius: 2px"></div><div style="font-size: 9px; color: #9C9CAC">Cotis.</div></div>
+                <div style="width: 50px; height: 50px; border-radius: 17px; background: #1C1C25; display: grid; place-items: center; margin-top: -22px; box-shadow: 0 10px 20px -8px rgba(20,20,26,.6)"><div style="color: #F97316; font-size: 24px; font-weight: 700; line-height: 1">+</div></div>
+                <div style="text-align: center; width: 52px"><div style="width: 8px; height: 8px; margin: 0 auto 6px; background: #CCCCD6; transform: rotate(45deg); border-radius: 2px"></div><div style="font-size: 9px; color: #9C9CAC">Membres</div></div>
+                <div style="text-align: center; width: 52px"><div style="width: 8px; height: 8px; margin: 0 auto 6px; background: #CCCCD6; transform: rotate(45deg); border-radius: 2px"></div><div style="font-size: 9px; color: #9C9CAC">Profil</div></div>
+              </div>
+            </div>
+          </div>
+
+          <div style="flex: 0 0 372px; width: 372px; height: 100%; overflow: hidden">
+            <div style="height: 742px; border-radius: 36px; overflow: hidden; background: #F7F7FA; display: flex; flex-direction: column; padding: 16px 20px 24px">
+              <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; color: #1A1A22; padding-bottom: 18px"><div>9:41</div><div style="width: 14px; height: 8px; border: 1px solid #1A1A22; border-radius: 2px"></div></div>
+              <div style="font-size: 22px; font-weight: 800; color: #1A1A22; letter-spacing: -.02em">Mes espaces</div>
+              <div style="display: flex; flex-direction: column; gap: 11px; margin-top: 18px">
+                <div style="border-radius: 18px; padding: 16px; color: #fff; background: #1C1C25; background-image: repeating-linear-gradient(45deg, rgba(255,255,255,.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(-45deg, rgba(255,255,255,.05) 0 1px, transparent 1px 24px), #1C1C25">
+                  <div style="display: flex; align-items: center; gap: 10px"><div style="width: 34px; height: 34px; border-radius: 11px; background: #F97316; color: #3D1A00; font-size: 11px; font-weight: 800; display: grid; place-items: center">ÉB</div><div style="flex: 1"><div style="font-size: 14px; font-weight: 800">Église Bethel</div><div style="font-size: 10px; color: #9A9AA8">Église · 182 membres</div></div><div style="font-size: 9px; font-weight: 800; color: #3D1A00; background: #F97316; padding: 4px 8px; border-radius: 6px">ACTIF</div></div>
+                  <div style="font-size: 22px; font-weight: 800; margin-top: 14px; font-variant-numeric: tabular-nums">4 812 500 F</div>
+                </div>
+                <div style="background: #fff; border: 1px solid #E8E8EE; border-radius: 18px; padding: 16px">
+                  <div style="display: flex; align-items: center; gap: 10px"><div style="width: 34px; height: 34px; border-radius: 11px; background: rgba(194,65,12,.12); color: #C2410C; font-size: 11px; font-weight: 800; display: grid; place-items: center">GC</div><div style="flex: 1"><div style="font-size: 14px; font-weight: 800; color: #1A1A22">Groupe Chorale</div><div style="font-size: 10px; color: #6E6E7C">Groupe · 34 membres</div></div></div>
+                  <div style="font-size: 22px; font-weight: 800; color: #1A1A22; margin-top: 14px; font-variant-numeric: tabular-nums">612 000 F</div>
+                </div>
+                <div style="background: #fff; border: 1px solid #E8E8EE; border-radius: 18px; padding: 16px">
+                  <div style="display: flex; align-items: center; gap: 10px"><div style="width: 34px; height: 34px; border-radius: 11px; background: rgba(255,179,0,.14); color: #A05A00; font-size: 11px; font-weight: 800; display: grid; place-items: center">AS</div><div style="flex: 1"><div style="font-size: 14px; font-weight: 800; color: #1A1A22">Assoc. Solidarité</div><div style="font-size: 10px; color: #6E6E7C">Association · 76 membres</div></div></div>
+                  <div style="font-size: 22px; font-weight: 800; color: #1A1A22; margin-top: 14px; font-variant-numeric: tabular-nums">1 240 800 F</div>
+                </div>
+              </div>
+              <div style="margin-top: auto; display: flex; flex-direction: column; gap: 9px">
+                <div style="background: #1C1C25; color: #fff; font-size: 14px; font-weight: 700; text-align: center; padding: 15px; border-radius: 14px">+ Créer un espace</div>
+                <div style="border: 1px solid #E8E8EE; background: #fff; color: #52525E; font-size: 13px; font-weight: 600; text-align: center; padding: 14px; border-radius: 14px">Transfert inter-espaces</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="flex: 0 0 372px; width: 372px; height: 100%; overflow: hidden">
+            <div style="height: 742px; border-radius: 36px; overflow: hidden; background: #F7F7FA; display: flex; flex-direction: column; padding: 16px 20px 24px">
+              <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; color: #1A1A22; padding-bottom: 16px"><div>9:41</div><div style="width: 14px; height: 8px; border: 1px solid #1A1A22; border-radius: 2px"></div></div>
+              <div style="display: flex; align-items: center; gap: 12px"><div style="font-size: 18px; color: #1A1A22">←</div><div style="font-size: 17px; font-weight: 800; color: #1A1A22">Réfection toiture</div></div>
+              <div style="background: #fff; border: 1px solid #E8E8EE; border-radius: 18px; padding: 16px; margin-top: 14px">
+                <div style="display: flex; justify-content: space-between; align-items: flex-end">
+                  <div><div style="font-size: 11px; color: #6E6E7C">Collecté</div><div style="font-size: 24px; font-weight: 800; color: #1A1A22; font-variant-numeric: tabular-nums">5 620 000 F</div></div>
+                  <div style="text-align: right"><div style="font-size: 11px; color: #6E6E7C">Objectif</div><div style="font-size: 13px; font-weight: 700; color: #52525E">8 200 000 F</div></div>
+                </div>
+                <div style="height: 8px; border-radius: 5px; background: #F2F2F6; margin-top: 12px"><div style="width: 68%; height: 8px; border-radius: 5px; background: #F97316"></div></div>
+                <div style="display: flex; justify-content: space-between; margin-top: 8px; font-size: 10px; color: #9C9CAC"><div>68 % · 164 membres</div><div>échéance 30 sept. 2026</div></div>
+              </div>
+              <div style="display: flex; gap: 8px; margin-top: 14px; font-family: 'JetBrains Mono', monospace; font-size: 10px">
+                <div style="flex: 1; background: #fff; border: 1px solid #E8E8EE; border-radius: 12px; padding: 10px; text-align: center; color: #21A97A">V1<br><strong style="color: #1A1A22">payé</strong></div>
+                <div style="flex: 1; background: #fff; border: 1px solid #E8E8EE; border-radius: 12px; padding: 10px; text-align: center; color: #21A97A">V2<br><strong style="color: #1A1A22">payé</strong></div>
+                <div style="flex: 1; background: #fff; border: 2px solid #FFB300; border-radius: 12px; padding: 9px; text-align: center; color: #A05A00">V3<br><strong>3 jours</strong></div>
+              </div>
+              <div style="font-size: 13px; font-weight: 800; color: #1A1A22; margin-top: 18px">Membres concernés</div>
+              <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px">
+                <div style="display: flex; align-items: center; gap: 10px; background: #fff; border-radius: 14px; padding: 11px 12px"><div style="width: 32px; height: 32px; border-radius: 50%; background: #F2F2F6; display: grid; place-items: center; font-size: 10px; font-weight: 700; color: #52525E">AK</div><div style="flex: 1"><div style="font-size: 12px; font-weight: 700; color: #1A1A22">Aya Koné</div><div style="font-size: 10px; color: #9C9CAC">2 / 3 versements</div></div><div style="font-size: 11px; font-weight: 700; color: #FFB300">16 666 F</div></div>
+                <div style="display: flex; align-items: center; gap: 10px; background: #fff; border-radius: 14px; padding: 11px 12px"><div style="width: 32px; height: 32px; border-radius: 50%; background: #F2F2F6; display: grid; place-items: center; font-size: 10px; font-weight: 700; color: #52525E">MB</div><div style="flex: 1"><div style="font-size: 12px; font-weight: 700; color: #1A1A22">Mariam Bamba</div><div style="font-size: 10px; color: #9C9CAC">3 / 3 versements</div></div><div style="font-size: 11px; font-weight: 700; color: #21A97A">soldé</div></div>
+                <div style="display: flex; align-items: center; gap: 10px; background: #fff; border-radius: 14px; padding: 11px 12px"><div style="width: 32px; height: 32px; border-radius: 50%; background: #F2F2F6; display: grid; place-items: center; font-size: 10px; font-weight: 700; color: #52525E">FG</div><div style="flex: 1"><div style="font-size: 12px; font-weight: 700; color: #1A1A22">Fatou Guéï</div><div style="font-size: 10px; color: #9C9CAC">0 / 3 versements</div></div><div style="font-size: 11px; font-weight: 700; color: #E14B5C">50 000 F</div></div>
+                <div style="display: flex; align-items: center; gap: 10px; background: #fff; border-radius: 14px; padding: 11px 12px"><div style="width: 32px; height: 32px; border-radius: 50%; background: #F2F2F6; display: grid; place-items: center; font-size: 10px; font-weight: 700; color: #52525E">YT</div><div style="flex: 1"><div style="font-size: 12px; font-weight: 700; color: #1A1A22">Yao Tanoh</div><div style="font-size: 10px; color: #9C9CAC">1,5 / 3 versements</div></div><div style="font-size: 11px; font-weight: 700; color: #FFB300">26 666 F</div></div>
+              </div>
+              <div style="margin-top: auto; display: flex; gap: 9px">
+                <div style="flex: 1; background: #F97316; color: #3D1A00; font-size: 14px; font-weight: 800; text-align: center; padding: 15px; border-radius: 14px">Encaisser</div>
+                <div style="border: 1px solid #E8E8EE; background: #fff; color: #52525E; font-size: 13px; font-weight: 600; text-align: center; padding: 15px 16px; border-radius: 14px">Relancer</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="flex: 0 0 372px; width: 372px; height: 100%; overflow: hidden">
+            <div style="height: 742px; border-radius: 36px; overflow: hidden; background: #F7F7FA; display: flex; flex-direction: column; padding: 16px 20px 24px">
+              <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; color: #1A1A22; padding-bottom: 16px"><div>9:41</div><div style="width: 14px; height: 8px; border: 1px solid #1A1A22; border-radius: 2px"></div></div>
+              <div style="font-size: 20px; font-weight: 800; color: #1A1A22">Encaisser</div>
+              <div style="display: flex; gap: 5px; background: #EDEDF2; border-radius: 12px; padding: 4px; margin-top: 14px">
+                <div style="flex: 1; text-align: center; font-size: 11px; font-weight: 800; padding: 9px 4px; border-radius: 9px; background: #fff; color: #1A1A22">Membre</div>
+                <div style="flex: 1; text-align: center; font-size: 11px; font-weight: 600; padding: 9px 4px; color: #6E6E7C">Cotisation</div>
+                <div style="flex: 1; text-align: center; font-size: 11px; font-weight: 600; padding: 9px 4px; color: #6E6E7C">Événement</div>
+              </div>
+              <div style="display: flex; align-items: center; gap: 9px; border: 2px solid #F97316; background: #fff; border-radius: 14px; padding: 13px 14px; margin-top: 14px"><div style="width: 13px; height: 13px; border: 1.5px solid #F97316; border-radius: 50%"></div><div style="font-size: 14px; font-weight: 600; color: #1A1A22">aya k</div></div>
+              <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: .12em; color: #9C9CAC; margin-top: 18px">RÉSULTATS</div>
+              <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px">
+                <div style="display: flex; align-items: center; gap: 11px; background: #fff; border: 2px solid #F97316; border-radius: 14px; padding: 12px"><div style="width: 36px; height: 36px; border-radius: 50%; background: #F97316; color: #3D1A00; display: grid; place-items: center; font-size: 12px; font-weight: 800">AK</div><div style="flex: 1"><div style="font-size: 13px; font-weight: 800; color: #1A1A22">Aya Koné</div><div style="font-size: 10px; color: #6E6E7C">Actif · 2 cotisations ouvertes</div></div><div style="font-size: 11px; font-weight: 800; color: #E14B5C">20 000 F</div></div>
+                <div style="display: flex; align-items: center; gap: 11px; background: #fff; border-radius: 14px; padding: 12px"><div style="width: 36px; height: 36px; border-radius: 50%; background: #F2F2F6; color: #52525E; display: grid; place-items: center; font-size: 12px; font-weight: 700">AK</div><div style="flex: 1"><div style="font-size: 13px; font-weight: 700; color: #1A1A22">Ayaba Kouassi</div><div style="font-size: 10px; color: #6E6E7C">Actif · à jour</div></div></div>
+              </div>
+              <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: .12em; color: #9C9CAC; margin-top: 20px">AFFECTER À</div>
+              <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px">
+                <div style="display: flex; align-items: center; gap: 10px; background: #fff; border: 2px solid #C2410C; border-radius: 14px; padding: 12px"><div style="width: 15px; height: 15px; border-radius: 50%; border: 4px solid #C2410C"></div><div style="flex: 1; font-size: 12px; font-weight: 700; color: #1A1A22">Toiture — versement 3/3</div><div style="font-size: 12px; font-weight: 800; color: #C2410C">16 666 F</div></div>
+                <div style="display: flex; align-items: center; gap: 10px; background: #fff; border-radius: 14px; padding: 12px"><div style="width: 15px; height: 15px; border-radius: 50%; border: 1.5px solid #CCCCD6"></div><div style="flex: 1; font-size: 12px; color: #52525E">Retraite jeunesse</div><div style="font-size: 12px; color: #6E6E7C">10 000 F</div></div>
+                <div style="display: flex; align-items: center; gap: 10px; background: #fff; border-radius: 14px; padding: 12px"><div style="width: 15px; height: 15px; border-radius: 50%; border: 1.5px solid #CCCCD6"></div><div style="flex: 1; font-size: 12px; color: #52525E">Dîme / offrande / don</div></div>
+              </div>
+              <div style="margin-top: auto; background: #1C1C25; color: #fff; font-size: 14px; font-weight: 800; text-align: center; padding: 16px; border-radius: 14px">Continuer</div>
+            </div>
+          </div>
+
+          <div style="flex: 0 0 372px; width: 372px; height: 100%; overflow: hidden">
+            <div style="height: 742px; border-radius: 36px; overflow: hidden; background: #F7F7FA; display: flex; flex-direction: column; padding: 16px 20px 24px">
+              <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; color: #1A1A22; padding-bottom: 16px"><div>9:41</div><div style="width: 14px; height: 8px; border: 1px solid #1A1A22; border-radius: 2px"></div></div>
+              <div style="display: flex; align-items: center; gap: 12px"><div style="font-size: 18px; color: #1A1A22">←</div><div style="font-size: 17px; font-weight: 800; color: #1A1A22">Paiement · Aya Koné</div></div>
+              <div style="background: #1C1C25; background-image: repeating-linear-gradient(45deg, rgba(255,255,255,.05) 0 1px, transparent 1px 24px), repeating-linear-gradient(-45deg, rgba(255,255,255,.05) 0 1px, transparent 1px 24px), #1C1C25; border-radius: 18px; padding: 18px; margin-top: 14px; color: #fff; text-align: center">
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: .14em; color: #9A9AA8">MONTANT</div>
+                <div style="font-size: 34px; font-weight: 800; margin-top: 4px; font-variant-numeric: tabular-nums">16 666 F</div>
+                <div style="display: flex; gap: 6px; margin-top: 12px">
+                  <div style="flex: 1; font-size: 11px; color: #B0B0BE; background: rgba(255,255,255,.08); padding: 8px 4px; border-radius: 9px">5 000</div>
+                  <div style="flex: 1; font-size: 11px; color: #B0B0BE; background: rgba(255,255,255,.08); padding: 8px 4px; border-radius: 9px">10 000</div>
+                  <div style="flex: 1; font-size: 11px; font-weight: 800; color: #3D1A00; background: #F97316; padding: 8px 4px; border-radius: 9px">Solde</div>
+                </div>
+              </div>
+              <div style="font-size: 13px; font-weight: 800; color: #1A1A22; margin-top: 18px">Moyen</div>
+              <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px">
+                <div style="background: #fff; border: 1px solid #E8E8EE; border-radius: 14px; padding: 12px 6px; text-align: center"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" style="display:block;margin:0 auto"><rect x="2" y="6" width="20" height="12" rx="2.5" stroke="#52525E" stroke-width="1.6"></rect><circle cx="12" cy="12" r="3" stroke="#52525E" stroke-width="1.6"></circle><path d="M5.2 9.6v4.8M18.8 9.6v4.8" stroke="#52525E" stroke-width="1.6" stroke-linecap="round"></path></svg><div style="font-size: 10px; font-weight: 700; color: #52525E; margin-top: 7px">Espèces</div></div>
+                <div style="background: rgba(249,115,22,.08); border: 2px solid #F97316; border-radius: 14px; padding: 11px 5px; text-align: center"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" style="display:block;margin:0 auto"><rect x="3.5" y="2.5" width="12" height="19" rx="2.5" stroke="#C2410C" stroke-width="1.6"></rect><path d="M8 19.2h3" stroke="#C2410C" stroke-width="1.6" stroke-linecap="round"></path><circle cx="17.8" cy="8.8" r="4.6" fill="#fff" stroke="#C2410C" stroke-width="1.6"></circle><path d="M17.8 6.4v4.8M16 8.1h3.6M16 9.7h3.6" stroke="#C2410C" stroke-width="1.3" stroke-linecap="round"></path></svg><div style="font-size: 10px; font-weight: 800; color: #A8480A; margin-top: 7px">Mobile Money</div></div>
+                <div style="background: #fff; border: 1px solid #E8E8EE; border-radius: 14px; padding: 12px 6px; text-align: center"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" style="display:block;margin:0 auto"><path d="M3 9.4 12 4l9 5.4" stroke="#52525E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path><path d="M5.8 11.4v6M10 11.4v6M14 11.4v6M18.2 11.4v6" stroke="#52525E" stroke-width="1.6" stroke-linecap="round"></path><path d="M3.5 20h17" stroke="#52525E" stroke-width="1.6" stroke-linecap="round"></path></svg><div style="font-size: 10px; font-weight: 700; color: #52525E; margin-top: 7px">Virement</div></div>
+                <div style="background: #fff; border: 1px solid #E8E8EE; border-radius: 14px; padding: 12px 6px; text-align: center"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" style="display:block;margin:0 auto"><rect x="2" y="5.5" width="20" height="13" rx="2" stroke="#52525E" stroke-width="1.6"></rect><path d="M5.4 9.8h6M5.4 12.6h3.2" stroke="#52525E" stroke-width="1.4" stroke-linecap="round"></path><path d="M12.2 15.6c1.3-3 2.4-3 3.2 0 .5-1.8 1.5-2.2 2.6-1.3" stroke="#52525E" stroke-width="1.4" stroke-linecap="round"></path></svg><div style="font-size: 10px; font-weight: 700; color: #52525E; margin-top: 7px">Chèque</div></div>
+                <div style="background: #fff; border: 1px solid #E8E8EE; border-radius: 14px; padding: 12px 6px; text-align: center"><div style="width: 24px; height: 24px; margin: 0 auto; border-radius: 7px; background: #635BFF; display: grid; place-items: center; color: #fff; font-size: 14px; font-weight: 800; line-height: 1">S</div><div style="font-size: 10px; font-weight: 700; color: #52525E; margin-top: 7px">Stripe</div></div>
+                <div style="background: #fff; border: 1px dashed #CCCCD6; border-radius: 14px; padding: 12px 6px; text-align: center"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" style="display:block;margin:0 auto"><path d="M3 8V5.6A2.6 2.6 0 0 1 5.6 3H8M16 3h2.4A2.6 2.6 0 0 1 21 5.6V8M21 16v2.4A2.6 2.6 0 0 1 18.4 21H16M8 21H5.6A2.6 2.6 0 0 1 3 18.4V16" stroke="#52525E" stroke-width="1.7" stroke-linecap="round"></path><path d="M6.6 12h10.8" stroke="#F26522" stroke-width="1.7" stroke-linecap="round"></path></svg><div style="font-size: 10px; font-weight: 700; color: #6E6E7C; margin-top: 7px">Scanner</div></div>
+              </div>
+              <div style="font-size: 13px; font-weight: 800; color: #1A1A22; margin-top: 18px">Opérateur</div>
+              <div style="display: flex; gap: 7px; margin-top: 10px">
+                <div title="Orange Money" style="flex: 1; display: grid; place-items: center; height: 44px; padding: 6px; background: #FFF8F1; border: 2px solid #F97316; border-radius: 12px; box-shadow: 0 0 0 3px rgba(249,115,22,.14)"><img src="assets/icon-orange.png" alt="Orange Money" style="max-width: 100%; max-height: 28px; width: auto; height: auto; display: block; object-fit: contain"></div>
+                <div title="MTN MoMo" style="flex: 1; display: grid; place-items: center; height: 44px; padding: 6px; background: #fff; border: 1px solid #E8E8EE; border-radius: 12px"><img src="assets/icon-mtn.png" alt="MTN MoMo" style="max-width: 100%; max-height: 28px; width: auto; height: auto; display: block; object-fit: contain"></div>
+                <div title="Moov Money" style="flex: 1; display: grid; place-items: center; height: 44px; padding: 6px; background: #fff; border: 1px solid #E8E8EE; border-radius: 12px"><img src="assets/icon-moov.png" alt="Moov Money" style="max-width: 100%; max-height: 28px; width: auto; height: auto; display: block; object-fit: contain"></div>
+                <div title="Wave" style="flex: 1; display: grid; place-items: center; height: 44px; padding: 6px; background: #fff; border: 1px solid #E8E8EE; border-radius: 12px"><img src="assets/icon-wave.png" alt="Wave" style="max-width: 100%; max-height: 28px; width: auto; height: auto; display: block; object-fit: contain"></div>
+              </div>
+              <div style="margin-top: 14px">
+                <div style="font-size: 11px; font-weight: 700; color: #6E6E7C; margin-bottom: 6px">Référence de transaction</div>
+                <div style="background: #fff; border: 1px solid #E8E8EE; border-radius: 12px; padding: 12px 13px; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #1A1A22">OM-2608-77412</div>
+              </div>
+              <div style="margin-top: auto; background: #F97316; color: #3D1A00; font-size: 15px; font-weight: 800; text-align: center; padding: 16px; border-radius: 14px">Valider l'encaissement</div>
+            </div>
+          </div>
+
+          <div style="flex: 0 0 372px; width: 372px; height: 100%; overflow: hidden">
+            <div style="height: 742px; border-radius: 36px; overflow: hidden; background: #101015; display: flex; flex-direction: column; padding: 16px 20px 24px">
+              <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; color: #fff; padding-bottom: 16px"><div>9:41</div><div style="width: 14px; height: 8px; border: 1px solid #fff; border-radius: 2px"></div></div>
+              <div style="display: flex; align-items: center; gap: 12px"><div style="font-size: 18px; color: #fff">←</div><div style="font-size: 16px; font-weight: 800; color: #fff">Scanner un compte</div></div>
+              <div style="flex: 1; margin-top: 20px; border-radius: 22px; background: #17171F; background-image: repeating-linear-gradient(45deg, rgba(255,255,255,.05) 0 1px, transparent 1px 26px), repeating-linear-gradient(-45deg, rgba(255,255,255,.05) 0 1px, transparent 1px 26px); position: relative; display: grid; place-items: center; overflow: hidden">
+                <div style="width: 214px; height: 214px; position: relative">
+                  <div style="position: absolute; top: 0; left: 0; width: 42px; height: 42px; border-top: 3px solid #F97316; border-left: 3px solid #F97316; border-radius: 12px 0 0 0"></div>
+                  <div style="position: absolute; top: 0; right: 0; width: 42px; height: 42px; border-top: 3px solid #F97316; border-right: 3px solid #F97316; border-radius: 0 12px 0 0"></div>
+                  <div style="position: absolute; bottom: 0; left: 0; width: 42px; height: 42px; border-bottom: 3px solid #F97316; border-left: 3px solid #F97316; border-radius: 0 0 0 12px"></div>
+                  <div style="position: absolute; bottom: 0; right: 0; width: 42px; height: 42px; border-bottom: 3px solid #F97316; border-right: 3px solid #F97316; border-radius: 0 0 12px 0"></div>
+                  <div style="position: absolute; left: 10px; right: 10px; top: 96px; height: 2px; background: #F97316; box-shadow: 0 0 18px 3px rgba(249,115,22,.75)"></div>
+                </div>
+                <div style="position: absolute; bottom: 20px; left: 20px; right: 20px; text-align: center; font-size: 12px; color: #9A9AA8">Cadrez le code du compte marchand ou du membre</div>
+              </div>
+              <div style="background: #17171F; border: 1px solid rgba(255,255,255,.1); border-radius: 18px; padding: 16px; margin-top: 16px">
+                <div style="display: flex; align-items: center; gap: 10px"><div style="width: 8px; height: 8px; border-radius: 50%; background: #F97316; animation: tsPulse 1.6s infinite"></div><div style="font-size: 12px; font-weight: 700; color: #fff">Compte détecté</div></div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px; font-size: 12px"><div style="color: #9A9AA8">Opérateur</div><div style="display: flex; align-items: center; gap: 8px"><img src="assets/icon-orange.png" alt="Orange Money" style="height: 20px; width: auto; display: block; border-radius: 3px"><div style="color: #fff; font-weight: 700">Orange Money CI</div></div></div>
+                <div style="display: flex; justify-content: space-between; margin-top: 7px; font-size: 12px"><div style="color: #9A9AA8">Numéro</div><div style="color: #fff; font-family: 'JetBrains Mono', monospace">+225 07 45 12 88</div></div>
+                <div style="display: flex; justify-content: space-between; margin-top: 7px; font-size: 12px"><div style="color: #9A9AA8">Titulaire</div><div style="color: #fff; font-weight: 700">Aya Koné</div></div>
+              </div>
+              <div style="display: flex; gap: 9px; margin-top: 14px">
+                <div style="flex: 1; background: #F97316; color: #3D1A00; font-size: 14px; font-weight: 800; text-align: center; padding: 15px; border-radius: 14px">Recevoir 16 666 F</div>
+                <div style="border: 1px solid rgba(255,255,255,.16); color: #fff; font-size: 13px; font-weight: 600; text-align: center; padding: 15px 16px; border-radius: 14px">Saisir</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="flex: 0 0 372px; width: 372px; height: 100%; overflow: hidden">
+            <div style="height: 742px; border-radius: 36px; overflow: hidden; background: #F7F7FA; display: flex; flex-direction: column; padding: 16px 20px 24px">
+              <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; color: #1A1A22; padding-bottom: 24px"><div>9:41</div><div style="width: 14px; height: 8px; border: 1px solid #1A1A22; border-radius: 2px"></div></div>
+              <div style="width: 74px; height: 74px; margin: 8px auto 0; border-radius: 50%; background: rgba(249,115,22,.15); display: grid; place-items: center"><div style="width: 46px; height: 46px; border-radius: 50%; background: #F97316; display: grid; place-items: center; color: #3D1A00; font-size: 22px; font-weight: 800">✓</div></div>
+              <div style="text-align: center; font-size: 20px; font-weight: 800; color: #1A1A22; margin-top: 18px">Paiement enregistré</div>
+              <div style="text-align: center; font-size: 12px; color: #6E6E7C; margin-top: 5px">Cotisation soldée pour Aya Koné</div>
+              <div style="background: #fff; border: 1px solid #E8E8EE; border-radius: 18px; padding: 18px; margin-top: 22px">
+                <div style="text-align: center; font-size: 28px; font-weight: 800; color: #1A1A22; font-variant-numeric: tabular-nums">16 666 F</div>
+                <div style="border-top: 1px dashed #E2E2EA; margin: 16px -18px 16px; position: relative"><div style="position: absolute; left: -8px; top: -8px; width: 16px; height: 16px; border-radius: 50%; background: #F7F7FA"></div><div style="position: absolute; right: -8px; top: -8px; width: 16px; height: 16px; border-radius: 50%; background: #F7F7FA"></div></div>
+                <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 9px"><div style="color: #6E6E7C">Membre</div><div style="font-weight: 700; color: #1A1A22">Aya Koné</div></div>
+                <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 9px"><div style="color: #6E6E7C">Affectation</div><div style="font-weight: 700; color: #1A1A22">Toiture · V3/3</div></div>
+                <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 9px"><div style="color: #6E6E7C">Moyen</div><div style="font-weight: 700; color: #1A1A22">Orange Money</div></div>
+                <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 9px"><div style="color: #6E6E7C">Référence</div><div style="font-family: 'JetBrains Mono', monospace; color: #1A1A22">OM-2608-77412</div></div>
+                <div style="display: flex; justify-content: space-between; font-size: 12px"><div style="color: #6E6E7C">Encaissé par</div><div style="font-weight: 700; color: #1A1A22">Koffi N. · 09:14</div></div>
+              </div>
+              <div style="display: flex; align-items: center; gap: 10px; background: rgba(255,179,0,.1); border-radius: 14px; padding: 12px 14px; margin-top: 14px"><div style="width: 8px; height: 8px; transform: rotate(45deg); background: #FFB300"></div><div style="font-size: 11px; color: #8A5A10">Enregistré hors ligne · sera synchronisé automatiquement</div></div>
+              <div style="margin-top: auto; display: flex; flex-direction: column; gap: 9px">
+                <div style="background: #1C1C25; color: #fff; font-size: 14px; font-weight: 800; text-align: center; padding: 15px; border-radius: 14px">Partager le reçu</div>
+                <div style="border: 1px solid #E8E8EE; background: #fff; color: #52525E; font-size: 13px; font-weight: 600; text-align: center; padding: 14px; border-radius: 14px">Nouvel encaissement</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="flex: 0 0 372px; width: 372px; height: 100%; overflow: hidden">
+            <div style="height: 742px; border-radius: 36px; overflow: hidden; background: #F7F7FA; display: flex; flex-direction: column; padding: 16px 20px 24px">
+              <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; color: #1A1A22; padding-bottom: 16px"><div>9:41</div><div style="width: 14px; height: 8px; border: 1px solid #1A1A22; border-radius: 2px"></div></div>
+              <div style="display: flex; align-items: center; justify-content: space-between"><div style="font-size: 20px; font-weight: 800; color: #1A1A22">Écritures</div><div style="font-size: 11px; font-weight: 700; color: #C2410C">Août 2026</div></div>
+              <div style="display: flex; gap: 9px; margin-top: 14px">
+                <div style="flex: 1; background: #fff; border: 1px solid #E8E8EE; border-radius: 14px; padding: 12px"><div style="font-size: 10px; color: #6E6E7C">Recettes</div><div style="font-size: 16px; font-weight: 800; color: #21A97A; font-variant-numeric: tabular-nums">1 965 000</div></div>
+                <div style="flex: 1; background: #fff; border: 1px solid #E8E8EE; border-radius: 14px; padding: 12px"><div style="font-size: 10px; color: #6E6E7C">Dépenses</div><div style="font-size: 16px; font-weight: 800; color: #E14B5C; font-variant-numeric: tabular-nums">742 300</div></div>
+              </div>
+              <div style="display: flex; gap: 6px; margin-top: 14px">
+                <div style="font-size: 11px; font-weight: 800; color: #fff; background: #1C1C25; border-radius: 9px; padding: 8px 13px">Tout</div>
+                <div style="font-size: 11px; font-weight: 600; color: #52525E; background: #fff; border: 1px solid #E8E8EE; border-radius: 9px; padding: 8px 13px">Recettes</div>
+                <div style="font-size: 11px; font-weight: 600; color: #52525E; background: #fff; border: 1px solid #E8E8EE; border-radius: 9px; padding: 8px 13px">Dépenses</div>
+              </div>
+              <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: .12em; color: #9C9CAC; margin-top: 18px">26 AOÛT</div>
+              <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px">
+                <div style="display: flex; align-items: center; gap: 11px; background: #fff; border-radius: 14px; padding: 11px 12px"><div style="width: 34px; height: 34px; border-radius: 11px; background: rgba(249,115,22,.13)"><div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#F97316"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5l7 7Z"/></svg></div></div><div style="flex: 1"><div style="font-size: 12px; font-weight: 700; color: #1A1A22">Dîme — culte</div><div style="font-size: 10px; color: #9C9CAC">Espèces · 164 contributeurs</div></div><div style="font-size: 13px; font-weight: 800; color: #21A97A">+486 000</div></div>
+                <div style="display: flex; align-items: center; gap: 11px; background: #fff; border-radius: 14px; padding: 11px 12px"><div style="width: 34px; height: 34px; border-radius: 11px; background: rgba(255,179,0,.15)"><div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#A05A00"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5l7 7Z"/></svg></div></div><div style="flex: 1"><div style="font-size: 12px; font-weight: 700; color: #1A1A22">Don Fondation Espoir</div><div style="font-size: 10px; color: #9C9CAC">Stripe · STR-40912</div></div><div style="font-size: 13px; font-weight: 800; color: #21A97A">+250 000</div></div>
+              </div>
+              <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: .12em; color: #9C9CAC; margin-top: 18px">25 AOÛT</div>
+              <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px">
+                <div style="background: #fff; border-radius: 14px; padding: 11px 12px">
+                  <div style="display: flex; align-items: center; gap: 11px"><div style="width: 34px; height: 34px; border-radius: 11px; background: rgba(225,75,92,.11)"><div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#E14B5C"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div></div><div style="flex: 1"><div style="font-size: 12px; font-weight: 700; color: #1A1A22">Location sonorisation</div><div style="font-size: 10px; color: #9C9CAC">Virement · Retraite jeunesse</div></div><div style="font-size: 13px; font-weight: 800; color: #1A1A22">−85 000</div></div>
+                  <div style="display: flex; align-items: center; gap: 8px; margin-top: 10px; padding-top: 10px; border-top: 1px dashed #EDEDF2"><div style="font-size: 9px; font-weight: 800; color: #A05A00; background: rgba(255,179,0,.13); padding: 3px 7px; border-radius: 5px">CORRIGÉ</div><div style="font-size: 10px; color: #6E6E7C">95 000 → 85 000 F · Awa T.</div><div style="font-size: 10px; font-weight: 700; color: #C2410C">Historique</div></div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 11px; background: #fff; border-radius: 14px; padding: 11px 12px"><div style="width: 34px; height: 34px; border-radius: 11px; background: rgba(225,75,92,.11)"><div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#E14B5C"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8Z"/></svg></div></div><div style="flex: 1"><div style="font-size: 12px; font-weight: 700; color: #1A1A22">Électricité juillet</div><div style="font-size: 10px; color: #9C9CAC">Chèque n° 004512</div></div><div style="font-size: 13px; font-weight: 800; color: #1A1A22">−118 400</div></div>
+              </div>
+              <div style="margin-top: auto; display: flex; gap: 9px">
+                <div style="flex: 1; background: #21A97A; color: #fff; font-size: 13px; font-weight: 800; text-align: center; padding: 15px; border-radius: 14px">+ Recette</div>
+                <div style="flex: 1; background: #E14B5C; color: #fff; font-size: 13px; font-weight: 800; text-align: center; padding: 15px; border-radius: 14px">+ Dépense</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="flex: 0 0 372px; width: 372px; height: 100%; overflow: hidden">
+            <div style="height: 742px; border-radius: 36px; overflow: hidden; background: #F7F7FA; display: flex; flex-direction: column; padding: 16px 20px 24px">
+              <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; color: #1A1A22; padding-bottom: 16px"><div>9:41</div><div style="width: 14px; height: 8px; border: 1px solid #1A1A22; border-radius: 2px"></div></div>
+              <div style="font-size: 20px; font-weight: 800; color: #1A1A22">Rappels</div>
+              <div style="font-size: 12px; color: #6E6E7C; margin-top: 4px">41 membres n'ont pas soldé leur cotisation.</div>
+              <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 16px">
+                <div style="background: #fff; border-radius: 14px; padding: 12px">
+                  <div style="display: flex; align-items: center; gap: 11px"><div style="width: 34px; height: 34px; border-radius: 50%; background: #F2F2F6; display: grid; place-items: center; font-size: 11px; font-weight: 700; color: #52525E">MB</div><div style="flex: 1"><div style="font-size: 12px; font-weight: 800; color: #1A1A22">Mariam Bamba</div><div style="font-size: 10px; color: #9C9CAC">Retraite jeunesse · 10 000 F</div></div><div style="font-size: 10px; font-weight: 800; color: #E14B5C; background: rgba(225,75,92,.11); padding: 4px 8px; border-radius: 6px">échue · 4 j</div></div>
+                  <div style="height: 5px; border-radius: 4px; background: #F2F2F6; margin-top: 10px"><div style="width: 100%; height: 5px; border-radius: 4px; background: #E14B5C"></div></div>
+                </div>
+                <div style="background: #fff; border-radius: 14px; padding: 12px">
+                  <div style="display: flex; align-items: center; gap: 11px"><div style="width: 34px; height: 34px; border-radius: 50%; background: #F2F2F6; display: grid; place-items: center; font-size: 11px; font-weight: 700; color: #52525E">AK</div><div style="flex: 1"><div style="font-size: 12px; font-weight: 800; color: #1A1A22">Aya Koné</div><div style="font-size: 10px; color: #9C9CAC">Toiture V3 · 16 666 F</div></div><div style="font-size: 10px; font-weight: 800; color: #A05A00; background: rgba(255,179,0,.13); padding: 4px 8px; border-radius: 6px">3 jours</div></div>
+                  <div style="height: 5px; border-radius: 4px; background: #F2F2F6; margin-top: 10px"><div style="width: 88%; height: 5px; border-radius: 4px; background: #FFB300"></div></div>
+                </div>
+                <div style="background: #fff; border-radius: 14px; padding: 12px">
+                  <div style="display: flex; align-items: center; gap: 11px"><div style="width: 34px; height: 34px; border-radius: 50%; background: #F2F2F6; display: grid; place-items: center; font-size: 11px; font-weight: 700; color: #52525E">SD</div><div style="flex: 1"><div style="font-size: 12px; font-weight: 800; color: #1A1A22">Serge Dosso</div><div style="font-size: 10px; color: #9C9CAC">Toiture V2–V3 · 33 333 F</div></div><div style="font-size: 10px; font-weight: 800; color: #A05A00; background: rgba(255,179,0,.13); padding: 4px 8px; border-radius: 6px">6 jours</div></div>
+                  <div style="height: 5px; border-radius: 4px; background: #F2F2F6; margin-top: 10px"><div style="width: 72%; height: 5px; border-radius: 4px; background: #FFB300"></div></div>
+                </div>
+                <div style="background: #fff; border-radius: 14px; padding: 12px">
+                  <div style="display: flex; align-items: center; gap: 11px"><div style="width: 34px; height: 34px; border-radius: 50%; background: #F2F2F6; display: grid; place-items: center; font-size: 11px; font-weight: 700; color: #52525E">YT</div><div style="flex: 1"><div style="font-size: 12px; font-weight: 800; color: #1A1A22">Yao Tanoh</div><div style="font-size: 10px; color: #9C9CAC">Toiture · 26 666 F</div></div><div style="font-size: 10px; font-weight: 800; color: #21A97A; background: rgba(33,169,122,.11); padding: 4px 8px; border-radius: 6px">11 jours</div></div>
+                  <div style="height: 5px; border-radius: 4px; background: #F2F2F6; margin-top: 10px"><div style="width: 45%; height: 5px; border-radius: 4px; background: #21A97A"></div></div>
+                </div>
+              </div>
+              <div style="background: #fff; border: 1px solid #E8E8EE; border-radius: 16px; padding: 14px; margin-top: 18px">
+                <div style="font-size: 12px; font-weight: 800; color: #1A1A22">Message envoyé</div>
+                <div style="background: #F7F7FA; border-radius: 12px; padding: 12px; margin-top: 10px; font-size: 11px; color: #52525E; line-height: 1.6">Bonjour Aya, il reste <strong style="color: #1A1A22">16 666 F</strong> sur « Réfection de la toiture ». Échéance dans <strong style="color: #E14B5C">3 jours</strong>.</div>
+                <div style="display: flex; gap: 7px; margin-top: 10px">
+                  <div style="flex: 1; text-align: center; font-size: 10px; font-weight: 800; color: #3D1A00; background: #F97316; padding: 8px; border-radius: 8px">SMS</div>
+                  <div style="flex: 1; text-align: center; font-size: 10px; font-weight: 600; color: #52525E; border: 1px solid #E8E8EE; padding: 8px; border-radius: 8px">WhatsApp</div>
+                  <div style="flex: 1; text-align: center; font-size: 10px; font-weight: 600; color: #52525E; border: 1px solid #E8E8EE; padding: 8px; border-radius: 8px">E-mail</div>
+                </div>
+              </div>
+              <div style="margin-top: auto; background: #1C1C25; color: #fff; font-size: 14px; font-weight: 800; text-align: center; padding: 16px; border-radius: 14px">Relancer les 41 membres</div>
+            </div>
+          </div>
+
+          <div style="flex: 0 0 372px; width: 372px; height: 100%; overflow: hidden">
+            <div style="height: 742px; border-radius: 36px; overflow: hidden; background: #F7F7FA; display: flex; flex-direction: column; padding: 16px 20px 24px">
+              <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; color: #1A1A22; padding-bottom: 16px"><div>9:41</div><div style="width: 14px; height: 8px; border: 1px solid #1A1A22; border-radius: 2px"></div></div>
+              <div style="font-size: 20px; font-weight: 800; color: #1A1A22">Rapports</div>
+              <div style="display: flex; gap: 6px; margin-top: 14px">
+                <div style="font-size: 11px; font-weight: 600; color: #52525E; background: #fff; border: 1px solid #E8E8EE; border-radius: 9px; padding: 8px 12px">Mois</div>
+                <div style="font-size: 11px; font-weight: 800; color: #fff; background: #1C1C25; border-radius: 9px; padding: 8px 12px">Trimestre</div>
+                <div style="font-size: 11px; font-weight: 600; color: #52525E; background: #fff; border: 1px solid #E8E8EE; border-radius: 9px; padding: 8px 12px">Année</div>
+                <div style="font-size: 11px; font-weight: 600; color: #52525E; background: #fff; border: 1px solid #E8E8EE; border-radius: 9px; padding: 8px 12px">Perso.</div>
+              </div>
+              <div style="border-radius: 18px; overflow: hidden; margin-top: 16px; border: 1px solid #E8E8EE; background: #fff">
+                <div style="padding: 16px; color: #fff; background: #1C1C25; background-image: repeating-linear-gradient(45deg, rgba(255,255,255,.05) 0 1px, transparent 1px 22px), repeating-linear-gradient(-45deg, rgba(255,255,255,.05) 0 1px, transparent 1px 22px), #1C1C25">
+                  <div style="font-family: 'JetBrains Mono', monospace; font-size: 8px; letter-spacing: .16em; color: #9A9AA8">TRÉSORA · ÉGLISE BETHEL</div>
+                  <div style="font-size: 15px; font-weight: 800; margin-top: 5px">Rapport financier T3 2026</div>
+                  <div style="font-size: 10px; color: #9A9AA8">1er juin – 31 août 2026</div>
+                </div>
+                <div style="padding: 14px">
+                  <div style="display: flex; gap: 8px">
+                    <div style="flex: 1; border: 1px solid #E8E8EE; border-radius: 10px; padding: 9px"><div style="font-size: 9px; color: #6E6E7C">Solde</div><div style="font-size: 12px; font-weight: 800; color: #1A1A22">4,81 M</div></div>
+                    <div style="flex: 1; border: 1px solid #E8E8EE; border-radius: 10px; padding: 9px"><div style="font-size: 9px; color: #6E6E7C">Recettes</div><div style="font-size: 12px; font-weight: 800; color: #21A97A">5,81 M</div></div>
+                    <div style="flex: 1; border: 1px solid #E8E8EE; border-radius: 10px; padding: 9px"><div style="font-size: 9px; color: #6E6E7C">Dépenses</div><div style="font-size: 12px; font-weight: 800; color: #E14B5C">2,24 M</div></div>
+                  </div>
+                  <div style="display: flex; flex-direction: column; gap: 7px; margin-top: 12px">
+                    <div style="display: flex; align-items: center; gap: 8px"><div style="width: 58px; font-size: 10px; color: #52525E">Dîmes</div><div style="flex: 1; height: 14px; border-radius: 4px; background: #F2F2F6"><div style="width: 82%; height: 14px; border-radius: 4px; background: #F97316"></div></div></div>
+                    <div style="display: flex; align-items: center; gap: 8px"><div style="width: 58px; font-size: 10px; color: #52525E">Offrandes</div><div style="flex: 1; height: 14px; border-radius: 4px; background: #F2F2F6"><div style="width: 56%; height: 14px; border-radius: 4px; background: #C2410C"></div></div></div>
+                    <div style="display: flex; align-items: center; gap: 8px"><div style="width: 58px; font-size: 10px; color: #52525E">Dons</div><div style="flex: 1; height: 14px; border-radius: 4px; background: #F2F2F6"><div style="width: 38%; height: 14px; border-radius: 4px; background: #FFB300"></div></div></div>
+                  </div>
+                </div>
+              </div>
+              <div style="font-size: 12px; font-weight: 800; color: #1A1A22; margin-top: 18px">Style de mise en forme</div>
+              <div style="display: flex; gap: 8px; margin-top: 10px">
+                <div style="flex: 1; border: 2px solid #C2410C; border-radius: 12px; padding: 7px; background: #fff"><div style="height: 34px; border-radius: 5px; background: #1C1C25"></div><div style="font-size: 9px; font-weight: 800; color: #1A1A22; text-align: center; margin-top: 5px">Institutionnel</div></div>
+                <div style="flex: 1; border: 1px solid #E8E8EE; border-radius: 12px; padding: 7px; background: #fff"><div style="height: 34px; border-radius: 5px; background: #F2F2F6; border-top: 3px solid #F97316"></div><div style="font-size: 9px; font-weight: 600; color: #52525E; text-align: center; margin-top: 5px">Épuré</div></div>
+                <div style="flex: 1; border: 1px solid #E8E8EE; border-radius: 12px; padding: 7px; background: #fff"><div style="height: 34px; border-radius: 5px; background: repeating-linear-gradient(0deg, #E8E8EE 0 1px, #fff 1px 7px)"></div><div style="font-size: 9px; font-weight: 600; color: #52525E; text-align: center; margin-top: 5px">Comptable</div></div>
+              </div>
+              <div style="margin-top: auto; display: flex; gap: 8px">
+                <div style="flex: 1; background: #E14B5C; color: #fff; font-size: 13px; font-weight: 800; text-align: center; padding: 15px 4px; border-radius: 13px">PDF</div>
+                <div style="flex: 1; background: #21A97A; color: #fff; font-size: 13px; font-weight: 800; text-align: center; padding: 15px 4px; border-radius: 13px">Excel</div>
+                <div style="flex: 1; background: #C2410C; color: #fff; font-size: 13px; font-weight: 800; text-align: center; padding: 15px 4px; border-radius: 13px">Word</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="flex: 0 0 372px; width: 372px; height: 100%; overflow: hidden">
+            <div style="height: 742px; border-radius: 36px; overflow: hidden; background: #F7F7FA; display: flex; flex-direction: column; padding: 16px 20px 24px">
+              <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; color: #1A1A22; padding-bottom: 16px"><div>9:41</div><div style="width: 14px; height: 8px; border: 1px solid #1A1A22; border-radius: 2px"></div></div>
+              <div style="display: flex; align-items: center; gap: 14px">
+                <div style="width: 66px; height: 66px; border-radius: 50%; background: #E6E6EC; background-image: repeating-linear-gradient(135deg, rgba(20,20,26,.07) 0 4px, transparent 4px 8px); display: grid; place-items: center; position: relative">
+                  <div style="font-family: 'JetBrains Mono', monospace; font-size: 8px; color: #8E8E9C">photo</div>
+                  <div style="position: absolute; bottom: -2px; right: -2px; width: 24px; height: 24px; border-radius: 50%; background: #F97316; border: 3px solid #F7F7FA; display: grid; place-items: center; color: #3D1A00; font-size: 12px; font-weight: 800">+</div>
+                </div>
+                <div><div style="font-size: 17px; font-weight: 800; color: #1A1A22">Koffi N'Guessan</div><div style="font-size: 11px; color: #6E6E7C">Trésorier principal</div><div style="font-size: 11px; color: #9C9CAC">+225 07 88 41 20</div></div>
+              </div>
+              <div style="background: #fff; border: 1px solid #E8E8EE; border-radius: 16px; padding: 14px; margin-top: 18px">
+                <div style="display: flex; align-items: center; gap: 12px"><div style="width: 8px; height: 8px; border-radius: 50%; background: #F97316; animation: tsPulse 2s infinite"></div><div style="flex: 1"><div style="font-size: 12px; font-weight: 800; color: #1A1A22">Sauvegarde locale active</div><div style="font-size: 10px; color: #6E6E7C">318 écritures · synchro il y a 2 min</div></div><div style="font-size: 11px; font-weight: 800; color: #C2410C">Sync</div></div>
+              </div>
+              <div style="display: flex; align-items: center; gap: 12px; border: 1px dashed #CCCCD6; border-radius: 16px; padding: 14px; margin-top: 10px"><div style="flex: 1"><div style="font-size: 12px; font-weight: 800; color: #1A1A22">Mode démonstration</div><div style="font-size: 10px; color: #6E6E7C">Données fictives, sans compte</div></div><div style="width: 38px; height: 21px; border-radius: 12px; background: #DBDBE3; padding: 2px; display: flex"><div style="width: 17px; height: 17px; border-radius: 50%; background: #fff"></div></div></div>
+              <div style="font-size: 13px; font-weight: 800; color: #1A1A22; margin-top: 20px">Journal d'audit</div>
+              <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 12px; border-left: 2px solid #E8E8EE; padding-left: 14px; margin-left: 4px">
+                <div style="position: relative"><div style="position: absolute; left: -21px; top: 3px; width: 8px; height: 8px; border-radius: 50%; background: #21A97A"></div><div style="font-size: 12px; font-weight: 700; color: #1A1A22">Encaissement validé</div><div style="font-size: 10px; color: #9C9CAC">Aya Koné · 15 000 F · Koffi N. · 09:14</div></div>
+                <div style="position: relative"><div style="position: absolute; left: -21px; top: 3px; width: 8px; height: 8px; border-radius: 50%; background: #FFB300"></div><div style="font-size: 12px; font-weight: 700; color: #1A1A22">Écriture corrigée</div><div style="font-size: 10px; color: #9C9CAC">95 000 → 85 000 F · Awa T. · hier</div></div>
+                <div style="position: relative"><div style="position: absolute; left: -21px; top: 3px; width: 8px; height: 8px; border-radius: 50%; background: #C2410C"></div><div style="font-size: 12px; font-weight: 700; color: #1A1A22">Rapport exporté</div><div style="font-size: 10px; color: #9C9CAC">T3 2026 · PDF · Pasteur K.</div></div>
+                <div style="position: relative"><div style="position: absolute; left: -21px; top: 3px; width: 8px; height: 8px; border-radius: 50%; background: #93939F"></div><div style="font-size: 12px; font-weight: 700; color: #1A1A22">Permission modifiée</div><div style="font-size: 10px; color: #9C9CAC">Jean-Marc Bilé · collecteur</div></div>
+              </div>
+              <div style="margin-top: auto; display: flex; flex-direction: column; gap: 9px">
+                <div style="background: #fff; border: 1px solid #E8E8EE; color: #1A1A22; font-size: 13px; font-weight: 700; text-align: center; padding: 14px; border-radius: 14px">Rôles &amp; permissions</div>
+                <div style="background: #fff; border: 1px solid #E8E8EE; color: #E14B5C; font-size: 13px; font-weight: 700; text-align: center; padding: 14px; border-radius: 14px">Se déconnecter</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      <x-import component-from-global-scope="AndroidNavBar" from="./android-frame.jsx" dark="{{ true }}" hint-size="372,24"></x-import>
+    </div>
+
+    <div onClick="{{ next }}" style="flex: 0 0 auto; width: 46px; height: 46px; border-radius: 50%; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); display: grid; place-items: center; cursor: pointer" style-hover="background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.22)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+    </div>
+
+  </div>
+
+  <div style="position: relative; display: flex; flex-direction: column; align-items: center; gap: 14px; margin-top: 28px">
+    <div style="text-align: center">
+      <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .14em; color: #77778A; text-transform: uppercase">{{ counterLabel }}</div>
+      <div style="font-size: 15px; font-weight: 700; color: #fff; margin-top: 4px">{{ screenTitle }}</div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 5px">
+      <sc-for list="{{ dots }}" as="d" hint-placeholder-count="13">
+        <div onClick="{{ d.go }}" style="{{ d.style }}"></div>
+      </sc-for>
+    </div>
+    <div onClick="{{ toggleAutoplay }}" style="display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; color: #fff; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.14); border-radius: 30px; padding: 9px 16px; cursor: pointer" style-hover="background: rgba(255,255,255,.13)">
+      <div style="{{ autoplayDotStyle }}"></div>
+      <div>{{ autoplayLabel }}</div>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:760,&quot;height&quot;:1000}}">
+class Component extends DCLogic {
+  state = { index: 0, autoplay: false };
+
+  titles = [
+    'Écran de lancement', 'Connexion', "Accueil de l'espace", "Changer d'espace",
+    'Cotisation & versements', 'Encaisser · rechercher', 'Moyen de paiement',
+    'Scanner Mobile Money', "Reçu d'encaissement", 'Recettes & dépenses',
+    'Rappels automatiques', 'Rapports & export', 'Profil, audit & hors ligne'
+  ];
+  SLIDE_W = 372;
+
+  componentDidMount() {
+    this._onKey = (e) => {
+      if (e.key === 'ArrowRight') this.go(1);
+      if (e.key === 'ArrowLeft') this.go(-1);
+    };
+    window.addEventListener('keydown', this._onKey);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('keydown', this._onKey);
+    if (this._timer) clearInterval(this._timer);
+  }
+
+  go(delta) {
+    const n = this.titles.length;
+    this.setState((s) => ({ index: (s.index + delta + n) % n }));
+  }
+
+  goTo(i) {
+    this.setState({ index: i });
+  }
+
+  toggleAutoplay() {
+    const turningOn = !this.state.autoplay;
+    if (turningOn) {
+      this._timer = setInterval(() => this.go(1), 2800);
+    } else if (this._timer) {
+      clearInterval(this._timer);
+    }
+    this.setState({ autoplay: turningOn });
+  }
+
+  renderVals() {
+    const { index, autoplay } = this.state;
+    const n = this.titles.length;
+    return {
+      trackStyle: 'display:flex; height:100%; transition: transform .45s cubic-bezier(.22,1,.36,1); transform: translateX(-' + (index * this.SLIDE_W) + 'px)',
+      counterLabel: String(index + 1).padStart(2, '0') + ' / ' + n,
+      screenTitle: this.titles[index],
+      prev: () => this.go(-1),
+      next: () => this.go(1),
+      autoplayLabel: autoplay ? 'Pause' : 'Lecture auto',
+      autoplayDotStyle: 'width:7px; height:7px; border-radius:50%; background:' + (autoplay ? '#F97316' : '#6E6E7C') + (autoplay ? '; animation: tsPulse 1.2s infinite' : ''),
+      toggleAutoplay: () => this.toggleAutoplay(),
+      dots: this.titles.map((t, i) => ({
+        go: () => this.goTo(i),
+        style: 'width:' + (i === index ? 18 : 6) + 'px; height:6px; border-radius:3px; cursor:pointer; transition: width .25s ease, background .25s ease; background:' +
+          (i === index ? 'linear-gradient(90deg,#FFC220,#F26522)' : '#3A3A46'),
+      })),
+    };
+  }
+}
+</script>
+</body>
+</html>
