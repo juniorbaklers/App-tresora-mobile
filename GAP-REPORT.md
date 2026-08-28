@@ -97,12 +97,31 @@ vu ce qui a été trouvé en §1). Pas traité dans cette passe — recommandé
 d'ajouter des tests au fil de l'eau sur ce qui est touché plutôt qu'un chantier
 séparé.
 
-## 3. Journal d'audit incomplet
+## 3. Journal d'audit incomplet — comblé le 2026-08-28
 
-`entrees_journal` (trigger `journaliser()`) ne couvre que recettes/dépenses/
+`entrees_journal` (trigger `journaliser()`) ne couvrait que recettes/dépenses/
 membres. Cotisations, tranches, contributions et clôtures — pourtant les
-mouvements d'argent les plus sensibles — n'y apparaissent pas. Non traité dans
-cette passe.
+mouvements d'argent les plus sensibles — n'y apparaissaient pas.
+
+Corrigé (migrations `journal_audit_cotisations_contributions_clotures` puis
+`journal_audit_fix_record_field_access`) : `journaliser()` calcule maintenant
+l'`espace_id` via les jointures nécessaires pour les tables qui n'ont pas de
+colonne `espace_id` directe (`paiements_cotisation`, `tranches`,
+`contribution_versements` — remontée via `cotisation_id`/
+`paiement_cotisation_id`/`contribution_id`), et 6 triggers `journal_*` ont été
+ajoutés sur `cotisations`, `paiements_cotisation`, `tranches`, `contributions`,
+`contribution_versements`, `clotures`.
+
+Piège rencontré en cours de route, pour référence : une fonction plpgsql
+partagée entre triggers de tables différentes ne peut pas faire `new.champ`/
+`old.champ` par branche selon `TG_TABLE_NAME` — Postgres valide TOUTES les
+branches d'un `case` contre le type réel de l'enregistrement du déclenchement
+en cours, y compris les branches non empruntées, et fait échouer la fonction
+("record "new" has no field ..."). Remplacé par un accès JSONB dynamique
+(`to_jsonb(new)->>'champ'`), qui ne référence aucun nom de champ au moment de
+la compilation. Testé en transaction avec rollback sur les 4 domaines
+(tranches + cascade paiements_cotisation, clôtures, contributions +
+contribution_versements) avant validation.
 
 ## 4. Mode hors-ligne ne couvre pas les paiements de cotisation
 
