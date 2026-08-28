@@ -62,10 +62,11 @@ class PaiementsCotisationService {
   final SupabaseClient _client = Supabase.instance.client;
 
   Stream<List<PaiementCotisation>> streamPaiements(String cotisationId) {
-    return _client
+    final flux = _client
         .from('paiements_cotisation')
         .stream(primaryKey: ['id'])
-        .eq('cotisation_id', cotisationId)
+        .eq('cotisation_id', cotisationId);
+    return avecCacheHorsLigne('paiements_cotisation_$cotisationId', flux)
         .map((rows) => rows.map(PaiementCotisation.fromMap).toList());
   }
 
@@ -73,14 +74,20 @@ class PaiementsCotisationService {
   /// (au lieu d'ouvrir un flux temps réel par cotisation) — utilisé par les
   /// écrans qui agrègent sur toutes les cotisations d'un espace (Paiement,
   /// tableau de bord groupe, fiche membre) pour éviter d'accumuler des
-  /// dizaines de connexions temps réel simultanées.
+  /// dizaines de connexions temps réel simultanées. [cacheKey] doit
+  /// identifier l'espace (stable d'un appel à l'autre) pour que le repli
+  /// hors-ligne retrouve le bon instantané.
   Future<List<PaiementCotisation>> fetchPourCotisations(
-      List<String> cotisationIds) async {
+      List<String> cotisationIds,
+      {required String cacheKey}) async {
     if (cotisationIds.isEmpty) return [];
-    final rows = await _client
-        .from('paiements_cotisation')
-        .select()
-        .inFilter('cotisation_id', cotisationIds);
+    final rows = await avecCacheHorsLigneFuture(
+      'paiements_espace_$cacheKey',
+      () => _client
+          .from('paiements_cotisation')
+          .select()
+          .inFilter('cotisation_id', cotisationIds),
+    );
     return rows.map(PaiementCotisation.fromMap).toList();
   }
 }
@@ -105,14 +112,20 @@ class TranchesService {
 
   /// Récupère en une seule requête les tranches de plusieurs paiements
   /// (au lieu d'ouvrir un flux temps réel par paiement) — même logique que
-  /// [PaiementsCotisationService.fetchPourCotisations].
-  Future<List<Tranche>> fetchPourPaiements(List<String> paiementIds) async {
+  /// [PaiementsCotisationService.fetchPourCotisations]. [cacheKey] doit
+  /// identifier le contexte d'appel (ex. la cotisation) pour que le repli
+  /// hors-ligne retrouve le bon instantané.
+  Future<List<Tranche>> fetchPourPaiements(List<String> paiementIds,
+      {required String cacheKey}) async {
     if (paiementIds.isEmpty) return [];
-    final rows = await _client
-        .from('tranches')
-        .select()
-        .inFilter('paiement_cotisation_id', paiementIds)
-        .order('date', ascending: false);
+    final rows = await avecCacheHorsLigneFuture(
+      'tranches_$cacheKey',
+      () => _client
+          .from('tranches')
+          .select()
+          .inFilter('paiement_cotisation_id', paiementIds)
+          .order('date', ascending: false),
+    );
     return rows.map(Tranche.fromMap).toList();
   }
 }

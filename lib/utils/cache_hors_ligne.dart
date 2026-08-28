@@ -23,6 +23,28 @@ class OfflineCache {
   }
 }
 
+/// Enrobe une requête Supabase ponctuelle (`.select()`, pas un flux temps
+/// réel) : tente le réseau, recache le résultat s'il réussit ; s'il échoue
+/// (hors-ligne), retombe sur le dernier instantané local au lieu de
+/// remonter l'erreur — pendant du [avecCacheHorsLigne] pour les écrans qui
+/// agrègent via une requête ponctuelle plutôt qu'un flux (Paiement rapide,
+/// tableau de bord groupe, fiche membre : voir
+/// `CotisationsService.fetchPourCotisations`/`fetchPourPaiements`).
+Future<List<Map<String, dynamic>>> avecCacheHorsLigneFuture(
+  String cle,
+  Future<List<Map<String, dynamic>>> Function() recuperer,
+) async {
+  try {
+    final lignes = await recuperer();
+    OfflineCache.sauvegarder(cle, lignes);
+    return lignes;
+  } catch (_) {
+    final brut = await OfflineCache.charger(cle);
+    if (brut is List) return brut.cast<Map<String, dynamic>>();
+    rethrow;
+  }
+}
+
 /// Enrobe un flux Supabase de lignes brutes (avant `.map(Modele.fromMap)`) :
 /// émet immédiatement le cache local au démarrage pour un rendu instantané
 /// même hors-ligne, puis les données réseau dès qu'elles arrivent (en les

@@ -131,11 +131,12 @@ final tranchesProvider =
 /// cotisations.
 final paiementsEspaceProvider =
     FutureProvider.autoDispose<List<PaiementCotisation>>((ref) async {
+  final espaceId = ref.watch(currentEspaceIdProvider);
   final cotisations = ref.watch(cotisationsStreamProvider).valueOrNull ?? [];
   if (cotisations.isEmpty) return [];
-  return ref
-      .watch(paiementsCotisationServiceProvider)
-      .fetchPourCotisations(cotisations.map((c) => c.id).toList());
+  return ref.watch(paiementsCotisationServiceProvider).fetchPourCotisations(
+      cotisations.map((c) => c.id).toList(),
+      cacheKey: espaceId ?? 'defaut');
 });
 
 /// Tranches des paiements (avec versement) d'une cotisation précise, en une
@@ -151,7 +152,9 @@ final tranchesCotisationProvider =
       .map((p) => p.id)
       .toList();
   if (ids.isEmpty) return [];
-  return ref.watch(tranchesServiceProvider).fetchPourPaiements(ids);
+  return ref
+      .watch(tranchesServiceProvider)
+      .fetchPourPaiements(ids, cacheKey: cotisationId);
 });
 
 /// Fiches de contribution d'un événement précis — provider "family" utilisé

@@ -123,11 +123,25 @@ la compilation. Testé en transaction avec rollback sur les 4 domaines
 (tranches + cascade paiements_cotisation, clôtures, contributions +
 contribution_versements) avant validation.
 
-## 4. Mode hors-ligne ne couvre pas les paiements de cotisation
+## 4. Mode hors-ligne ne couvre pas les paiements de cotisation — comblé le 2026-08-28
 
 Écrans Paiement rapide / Dashboard groupe / Fiche membre : aucun cache
 `shared_preferences` en secours si `connectivity_plus` signale une coupure.
-Non traité dans cette passe.
+
+Corrigé : `OfflineCache`/`avecCacheHorsLigne` existait déjà pour les flux
+temps réel (cotisations, recettes, dépenses...) mais pas pour les deux
+requêtes ponctuelles (`Future`, pas `Stream`) qui alimentent ces 3 écrans —
+`PaiementsCotisationService.fetchPourCotisations` (Paiement rapide, Fiche
+membre, via `paiementsEspaceProvider`) et `TranchesService.fetchPourPaiements`
+(« derniers paiements » du dashboard groupe, via `tranchesCotisationProvider`).
+Ajouté `avecCacheHorsLigneFuture` dans `cache_hors_ligne.dart` (même principe :
+réseau si possible, sinon dernier instantané local, jamais d'erreur remontée à
+l'écran) et branché les deux méthodes dessus. Au passage, le flux
+`PaiementsCotisationService.streamPaiements` (dont dépend directement le
+tableau de bord groupe pour ses totaux) n'était lui non plus jamais passé par
+le cache — corrigé de la même façon que `streamCotisations`, sinon
+`tranchesCotisationProvider` n'aurait jamais eu d'ids à chercher hors-ligne
+puisqu'il dépend de ce flux en amont.
 
 ## 5. Pas de design system centralisé
 
