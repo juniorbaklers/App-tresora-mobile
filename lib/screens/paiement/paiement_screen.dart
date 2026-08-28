@@ -182,7 +182,7 @@ class _CarteMembreState extends ConsumerState<_CarteMembre> {
               child: Row(
                 children: [
                   CircleAvatar(
-                    backgroundColor: AppColors.indigoProfond,
+                    backgroundColor: AppColors.graphite,
                     child: Text(
                       ligne.membre.nomComplet.isNotEmpty
                           ? ligne.membre.nomComplet[0].toUpperCase()

@@ -62,7 +62,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       width: 64,
                       height: 64,
                       decoration: BoxDecoration(
-                        color: AppColors.indigoProfond,
+                        color: AppColors.graphite,
                         borderRadius: BorderRadius.circular(18),
                       ),
                       child: const Icon(Icons.church,
@@ -73,7 +73,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       'Trésora',
                       textAlign: TextAlign.center,
                       style: AppFonts.heading(
-                          fontSize: 30, color: AppColors.indigoProfond),
+                          fontSize: 30, color: AppColors.graphite),
                     ),
                     const SizedBox(height: 4),
                     const Text(

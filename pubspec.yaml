@@ -42,17 +42,12 @@ flutter:
   # Typographie de marque embarquée en assets locaux (téléchargées depuis
   # google/fonts, licence OFL) : plus aucun appel réseau au premier
   # affichage, contrairement au paquet google_fonts en mode "runtime fetch".
-  # Fraunces et Plus Jakarta Sans sont des polices variables : un seul
-  # fichier par famille suffit, Flutter choisit la bonne instance selon le
-  # FontWeight/FontVariation demandé.
+  # Polices variables : un seul fichier par famille suffit, Flutter choisit
+  # la bonne instance selon le FontWeight demandé.
   fonts:
-    - family: Fraunces
+    - family: SchibstedGrotesk
       fonts:
-        - asset: assets/fonts/Fraunces-Variable.ttf
-    - family: PlusJakartaSans
+        - asset: assets/fonts/SchibstedGrotesk-Variable.ttf
+    - family: JetBrainsMono
       fonts:
-        - asset: assets/fonts/PlusJakartaSans-Variable.ttf
-    - family: IBMPlexMono
-      fonts:
-        - asset: assets/fonts/IBMPlexMono-SemiBold.ttf
-          weight: 600
+        - asset: assets/fonts/JetBrainsMono-Variable.ttf

@@ -198,7 +198,7 @@ class _MembreCompteTile extends ConsumerWidget {
     return Card(
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: AppColors.indigoProfond,
+          backgroundColor: AppColors.graphite,
           child: Text(
             (membreCompte.profil.nomComplet.isNotEmpty
                     ? membreCompte.profil.nomComplet[0]

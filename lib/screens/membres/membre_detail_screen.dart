@@ -46,7 +46,7 @@ class MembreDetailScreen extends ConsumerWidget {
             children: [
               CircleAvatar(
                 radius: 28,
-                backgroundColor: AppColors.indigoProfond,
+                backgroundColor: AppColors.graphite,
                 child: Text(
                   membre.nomComplet.isNotEmpty
                       ? membre.nomComplet[0].toUpperCase()

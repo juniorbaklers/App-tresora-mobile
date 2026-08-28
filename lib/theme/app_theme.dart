@@ -1,59 +1,78 @@
 import 'package:flutter/material.dart';
 
-/// Palette « tissage » — indigo de teinture, safran, terre de Korhogo, palme,
-/// coton écru. Reprise à l'identique de globals.css dans le dépôt tresora-app
-/// (mode clair). Les neutres sont teintés chaud, jamais de gris pur.
+/// Identité visuelle 2026-08 — refonte d'après les maquettes
+/// `Trésora, application financière multi-espace/Tresora Android App.dc.html`.
+/// Dégradé ambre → orange en signature de marque, neutres graphite (jamais
+/// de gris pur), accents recette/dépense directement repris des maquettes.
+/// Remplace l'ancienne palette « tissage » (indigo/or/palme/terre).
 class AppColors {
-  static const fond = Color(0xFFF6F1E7);
-  static const carte = Color(0xFFFFFCF6);
-  static const texteEncre = Color(0xFF1B2338);
-  static const texteSecondaire = Color(0xFF6E6555);
-  static const indigoProfond = Color(0xFF16203A);
-  static const or = Color(0xFFC88A2E);
-  static const palme = Color(0xFF16694F);
-  static const terre = Color(0xFFB34A24);
-  static const bordure = Color(0xFFE2D9C8);
+  static const fond = Color(0xFFF7F7FA);
+  static const carte = Color(0xFFFFFFFF);
+  static const texteEncre = Color(0xFF1A1A22);
+  static const texteSecondaire = Color(0xFF6E6E7C);
+  static const graphite = Color(0xFF1C1C25);
+  static const or = Color(0xFFFFB300);
+  static const palme = Color(0xFF21A97A);
+  static const terre = Color(0xFFC2410C);
+  static const alerte = Color(0xFFE14B5C);
+  static const bordure = Color(0xFFE8E8EE);
+  static const degradeDebut = Color(0xFFFFC220);
+  static const degradeFin = Color(0xFFF26522);
+
+  static const degradeMarque = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [degradeDebut, degradeFin],
+  );
 }
 
-/// Mode sombre — mêmes rôles, valeurs de globals.css `.dark`.
+/// Mode sombre — mêmes rôles, valeurs assombries en gardant la teinte.
 class AppColorsDark {
-  static const fond = Color(0xFF101827);
-  static const carte = Color(0xFF17223A);
-  static const texteEncre = Color(0xFFF0E8DA);
-  static const texteSecondaire = Color(0xFF9B937F);
-  static const indigoProfond = Color(0xFF0B1220);
-  static const or = Color(0xFFE0A33E);
-  static const palme = Color(0xFF3E9C7A);
-  static const terre = Color(0xFFD2703F);
-  static const bordure = Color(0x1CF0E8DA); // rgba(240,232,218,0.11)
+  static const fond = Color(0xFF101014);
+  static const carte = Color(0xFF1C1C25);
+  static const texteEncre = Color(0xFFF3F3F6);
+  static const texteSecondaire = Color(0xFF9C9CAC);
+  static const graphite = Color(0xFF0B0B0F);
+  static const or = Color(0xFFFFC65C);
+  static const palme = Color(0xFF3FCB9B);
+  static const terre = Color(0xFFE0703A);
+  static const alerte = Color(0xFFF17888);
+  static const bordure = Color(0x1EFFFFFF); // rgba(255,255,255,.12)
 }
 
-/// Titres : Fraunces (serif variable). Interface : Plus Jakarta Sans.
-/// Chiffres/tableaux : IBM Plex Mono, chasse tabulaire — jamais de police
-/// par défaut sur un montant, c'est ce qui donne au tableau de bord son
-/// sérieux de registre comptable plutôt qu'un look d'appli générique.
+/// Interface et titres : Schibsted Grotesk, une seule famille grotesque sur
+/// toute la hiérarchie (400 → 800). Petits libellés/eyebrows en capitales :
+/// JetBrains Mono, chasse tabulaire — jamais sur les montants eux-mêmes,
+/// qui restent en Schibsted Grotesk avec chiffres tabulaires (voir la carte
+/// « SOLDE » de la maquette : le libellé est en mono, le chiffre non).
 class AppFonts {
   static TextStyle heading(
           {double? fontSize, FontWeight? fontWeight, Color? color}) =>
       TextStyle(
-        fontFamily: 'Fraunces',
+        fontFamily: 'SchibstedGrotesk',
         fontSize: fontSize,
-        fontWeight: fontWeight ?? FontWeight.w600,
+        fontWeight: fontWeight ?? FontWeight.w800,
+        letterSpacing: -.2,
         color: color,
-      ).copyWith(fontVariations: const [
-        FontVariation('SOFT', 0),
-        FontVariation('WONK', 1)
-      ]);
+      );
 
   static TextStyle montant(
           {double? fontSize, FontWeight? fontWeight, Color? color}) =>
       TextStyle(
-        fontFamily: 'IBMPlexMono',
+        fontFamily: 'SchibstedGrotesk',
         fontSize: fontSize,
-        fontWeight: fontWeight ?? FontWeight.w600,
+        fontWeight: fontWeight ?? FontWeight.w800,
         color: color,
         fontFeatures: const [FontFeature.tabularFigures()],
         letterSpacing: -.2,
+      );
+
+  static TextStyle eyebrow({double? fontSize, Color? color}) => TextStyle(
+        fontFamily: 'JetBrainsMono',
+        fontSize: fontSize ?? 10,
+        fontWeight: FontWeight.w500,
+        letterSpacing: 1.4,
+        color: color,
       );
 }
 
@@ -64,7 +83,7 @@ class AppTheme {
           carte: AppColors.carte,
           texteEncre: AppColors.texteEncre,
           texteSecondaire: AppColors.texteSecondaire,
-          indigoProfond: AppColors.indigoProfond,
+          graphite: AppColors.graphite,
           or: AppColors.or,
           palme: AppColors.palme,
           terre: AppColors.terre,
@@ -79,7 +98,7 @@ class AppTheme {
           carte: AppColorsDark.carte,
           texteEncre: AppColorsDark.texteEncre,
           texteSecondaire: AppColorsDark.texteSecondaire,
-          indigoProfond: AppColorsDark.indigoProfond,
+          graphite: AppColorsDark.graphite,
           or: AppColorsDark.or,
           palme: AppColorsDark.palme,
           terre: AppColorsDark.terre,
@@ -94,7 +113,7 @@ class AppTheme {
       Color carte,
       Color texteEncre,
       Color texteSecondaire,
-      Color indigoProfond,
+      Color graphite,
       Color or,
       Color palme,
       Color terre,
@@ -106,7 +125,7 @@ class AppTheme {
             ? ThemeData.dark().textTheme
             : ThemeData.light().textTheme)
         .apply(
-      fontFamily: 'PlusJakartaSans',
+      fontFamily: 'SchibstedGrotesk',
       bodyColor: colors.texteEncre,
       displayColor: colors.texteEncre,
     );
@@ -116,7 +135,7 @@ class AppTheme {
       headlineMedium: AppFonts.heading(fontSize: 24, color: colors.texteEncre),
       headlineSmall: AppFonts.heading(fontSize: 20, color: colors.texteEncre),
       titleLarge: AppFonts.heading(
-          fontSize: 18, fontWeight: FontWeight.w600, color: colors.texteEncre),
+          fontSize: 18, fontWeight: FontWeight.w700, color: colors.texteEncre),
     );
 
     final base = ThemeData(
@@ -124,20 +143,20 @@ class AppTheme {
       brightness: brightness,
       colorScheme: ColorScheme.fromSeed(
         brightness: brightness,
-        seedColor: colors.or,
-        primary: colors.or,
+        seedColor: colors.terre,
+        primary: colors.terre,
         secondary: colors.palme,
         error: colors.terre,
         surface: colors.carte,
       ),
       scaffoldBackgroundColor: colors.fond,
       textTheme: textTheme,
-      fontFamily: 'PlusJakartaSans',
+      fontFamily: 'SchibstedGrotesk',
     );
 
     return base.copyWith(
       appBarTheme: AppBarTheme(
-        backgroundColor: colors.indigoProfond,
+        backgroundColor: colors.graphite,
         foregroundColor: colors.fond,
         elevation: 0,
         centerTitle: false,
@@ -147,7 +166,7 @@ class AppTheme {
         color: colors.carte,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(16),
           side: BorderSide(color: colors.bordure),
         ),
         margin: EdgeInsets.zero,
@@ -157,34 +176,34 @@ class AppTheme {
         fillColor: colors.carte,
         labelStyle: TextStyle(color: colors.texteSecondaire),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(color: colors.bordure, width: 1.5),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(color: colors.bordure, width: 1.5),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: colors.or, width: 2),
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide(color: colors.terre, width: 2),
         ),
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: colors.indigoProfond,
-          foregroundColor: colors.fond,
-          padding: const EdgeInsets.symmetric(vertical: 14),
+          backgroundColor: colors.terre,
+          foregroundColor: Colors.white,
+          padding: const EdgeInsets.symmetric(vertical: 16),
           shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          textStyle:
-              const TextStyle(fontWeight: FontWeight.w600, letterSpacing: .3),
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+          textStyle: const TextStyle(
+              fontWeight: FontWeight.w800, letterSpacing: .4),
         ),
       ),
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: colors.carte,
-        selectedItemColor: colors.or,
+        selectedItemColor: colors.terre,
         unselectedItemColor: colors.texteSecondaire,
         type: BottomNavigationBarType.fixed,
       ),

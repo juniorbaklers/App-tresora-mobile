@@ -27,7 +27,7 @@ class ProfilScreen extends ConsumerWidget {
           children: [
             CircleAvatar(
               radius: 36,
-              backgroundColor: AppColors.indigoProfond,
+              backgroundColor: AppColors.graphite,
               child: Text(
                 (profil?.nomComplet.isNotEmpty == true
                         ? profil!.nomComplet[0]

@@ -326,7 +326,7 @@ class _CarteEspace extends StatelessWidget {
                               height: 48,
                               alignment: Alignment.center,
                               decoration: BoxDecoration(
-                                color: AppColors.indigoProfond,
+                                color: AppColors.graphite,
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Text(

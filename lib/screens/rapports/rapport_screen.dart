@@ -173,7 +173,7 @@ class _Resume extends StatelessWidget {
   const _Resume(
       {required this.titre,
       required this.montant,
-      this.couleur = AppColors.indigoProfond});
+      this.couleur = AppColors.graphite});
 
   @override
   Widget build(BuildContext context) {
