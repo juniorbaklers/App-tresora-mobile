@@ -5,7 +5,6 @@ import '../../providers/auth_providers.dart';
 import '../../providers/data_providers.dart';
 import '../../providers/espace_providers.dart';
 import '../../theme/app_theme.dart';
-import '../../utils/format.dart';
 import 'paiement_recu_screen.dart';
 
 /// Saisie du montant et du moyen de paiement pour un versement de
