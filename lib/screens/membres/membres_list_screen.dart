@@ -227,13 +227,16 @@ class _MembreTile extends ConsumerWidget {
       child: ListTile(
         leading: CircleAvatar(
           backgroundColor: membre.actif
-              ? Colors.green.withValues(alpha: .12)
-              : Colors.grey.withValues(alpha: .15),
+              ? AppColors.palme.withValues(alpha: .12)
+              : AppColors.texteSecondaire.withValues(alpha: .15),
           child: Icon(Icons.person,
-              color: membre.actif ? Colors.green[700] : Colors.grey),
+              color: membre.actif
+                  ? AppColors.palme
+                  : AppColors.texteSecondaire),
         ),
         title: Text(membre.nomComplet,
-            style: TextStyle(color: membre.actif ? null : Colors.grey)),
+            style: TextStyle(
+                color: membre.actif ? null : AppColors.texteSecondaire)),
         subtitle: Text(
           [
             if (membre.fonction?.isNotEmpty == true) membre.fonction!,

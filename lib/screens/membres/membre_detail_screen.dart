@@ -78,8 +78,8 @@ class MembreDetailScreen extends ConsumerWidget {
                           label: Text(membre.actif ? 'Actif' : 'Inactif'),
                           visualDensity: VisualDensity.compact,
                           backgroundColor: membre.actif
-                              ? Colors.green.withValues(alpha: .12)
-                              : Colors.grey.withValues(alpha: .15),
+                              ? AppColors.palme.withValues(alpha: .12)
+                              : AppColors.texteSecondaire.withValues(alpha: .15),
                         ),
                       ],
                     ),
