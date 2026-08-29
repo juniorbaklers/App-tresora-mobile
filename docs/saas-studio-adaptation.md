@@ -97,23 +97,28 @@ une fois à la main.
   espace sera activé : ils sont déjà écrits pour Stripe + Supabase, donc
   directement applicables le moment venu, pas à réécrire maintenant.
 
-## Ce que le kit original ne couvre pas du tout : deux frontends, un backend partagé
+## Correction du 2026-08-29 : il n'y a pas deux frontends d'un même produit
 
-Ni les règles ni les agents originaux n'anticipent deux apps clientes
-(Flutter mobile + Next.js web) sur une base Supabase partagée — le template
-suppose une seule app Next.js. Ça laisse une vraie question d'architecture
-sans réponse toute faite : qui « possède » une migration de schéma quand
-elle affecte les deux clients ? Faut-il un seul `database-engineer` qui
-sert les deux (probablement oui), et comment éviter que les deux frontends
-divergent sur les types générés depuis le même schéma (Supabase peut générer
-des types TypeScript et Dart depuis la même base) ?
+Une hypothèse posée le 2026-08-28 (et le point #5 du plan ci-dessous, tel
+qu'écrit à l'origine) supposait que `gestion-caisse-eglise` était le backend
+du prototype web `tresora-app` — c'est-à-dire une deuxième interface du même
+produit que l'app mobile, sur une base Supabase à faire converger.
+**Vérifié faux le 2026-08-29** : `gestion-caisse-eglise`
+(`juniorbaklers/gestion-caisse-eglise`) est un produit entièrement
+différent — une app statique HTML/CSS/JS sans framework, un schéma
+mono-caisse (`params`, `caisses`, `membres`, `mouvements`,
+`compteur_recus`, `profils`, sans aucune notion d'`espaces`), un système de
+rôles propre (Trésorier Principal/Adjoint/Lecture seule). Ce n'est pas
+Trésora avec une autre interface, c'est un autre produit du même auteur sur
+le même thème (trésorerie d'église).
 
-Et le constat fait pendant l'audit RLS de cette session — les projets
-Supabase `App_tresors` (mobile) et `gestion-caisse-eglise` (web) sont
-aujourd'hui **séparés**, pas encore convergés — est exactement le genre de
-décision qu'un `technical-director` outillé par ce kit devrait trancher et
-figer en ADR (`.claude/templates/adr.md`) avant que la divergence coûte plus
-cher à corriger.
+Il n'y a donc pas de « backend partagé à faire converger » — cette
+question n'existe pas. Ce que le kit original ne couvre effectivement pas,
+en revanche, c'est le cas où Trésora aurait un jour un vrai second frontend
+(le `tresora-app` Next.js/shadcn du `REFACTOR-PLAN.md`, s'il est construit)
+sur le même backend `App_tresors` que le mobile — cette question-là reste
+valide en théorie, mais n'est pas urgente : ce second frontend n'existe pas
+encore comme code fonctionnel, seulement comme maquettes.
 
 ## Plan d'adaptation proposé, par ordre de valeur
 
@@ -128,9 +133,9 @@ cher à corriger.
 4. **`mobile-release-engineer`** — nouveau, formalise en skill réutilisable
    le pipeline CI → release GitHub qu'on vient de construire pour livrer
    l'APK.
-5. **`design-schema` adapté au schéma partagé** — une fois la convergence
-   des deux backends Supabase tranchée (pas avant, ça dépend de cette
-   décision produit).
+5. ~~`design-schema` adapté au schéma partagé~~ — retiré du plan (voir
+   correction ci-dessus : il n'y a pas de backend partagé à faire
+   converger, `gestion-caisse-eglise` est un produit différent).
 6. **Billing** — à activer tel quel, sans réécriture, le jour où
    l'abonnement par espace démarre.
 

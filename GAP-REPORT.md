@@ -81,12 +81,23 @@ directement en base (migration `audit_rls_durcissement`) :
   passe — à revisiter si le produit expose un jour la messagerie aux membres
   simples.
 
-**Architecture backend constatée pendant l'audit** : l'app mobile pointe sur le
-projet Supabase `App_tresors` (`ssceyciwrdslbubuwmnn`), distinct du projet
-`gestion-caisse-eglise` (`oilvgouoipdrripczigj`) qui semble être celui du
-prototype web `tresora-app`. Les deux ne sont donc **pas** convergés
-aujourd'hui — à confirmer/trancher (cf. décision producer du 2026-08-28 :
-convergence vers un backend unique recommandée, migration réelle à planifier).
+**Architecture backend constatée pendant l'audit — corrigé le 2026-08-29 :**
+l'app mobile pointe sur le projet Supabase `App_tresors` (`ssceyciwrdslbubuwmnn`),
+distinct du projet `gestion-caisse-eglise` (`oilvgouoipdrripczigj`). Une
+hypothèse du 2026-08-28 supposait que ce second projet était le backend du
+prototype web `tresora-app` (même produit que l'app mobile, juste une autre
+interface) et recommandait une convergence vers un backend unique.
+**C'était faux.** Vérification faite le 2026-08-29 : `gestion-caisse-eglise`
+est un produit entièrement différent — une app statique HTML/CSS/JS
+(`juniorbaklers/gestion-caisse-eglise`, sans framework, aucune notion
+multi-espace), avec son propre schéma (`params`, `caisses`, `membres`,
+`mouvements`, `compteur_recus`, `profils` — pas d'`espaces`/`espace_membres`)
+et son propre système de rôles (Trésorier Principal/Adjoint/Lecture seule).
+Il gère une seule caisse d'église, pas plusieurs organisations dans une base
+partagée. Rien à converger : ce n'est pas une deuxième interface de Trésora,
+donc pas de décision de backend partagé à trancher. Le point ouvert, si
+pertinent, est un choix produit distinct — garder les deux produits séparés
+ou les fusionner un jour — pas un chantier d'infrastructure.
 
 ## 2. Zéro test automatisé
 
