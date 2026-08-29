@@ -99,6 +99,9 @@ donc pas de décision de backend partagé à trancher. Le point ouvert, si
 pertinent, est un choix produit distinct — garder les deux produits séparés
 ou les fusionner un jour — pas un chantier d'infrastructure.
 
+**Décision producer du 2026-08-29** : les deux produits restent séparés
+pour l'instant (Trésora et Gestion Caisse Église). Rien à faire.
+
 ## 2. Zéro test automatisé
 
 `test/` est vide dans tout le dépôt. Pas de couverture sur les calculs
