@@ -23,20 +23,37 @@ as $$
 $$;
 
 -- Propriétaire/administrateur/trésorier : peut manipuler l'argent.
+-- search_path fixé : signalé par l'advisor Supabase, ces fonctions sont
+-- utilisées dans quasi toutes les policies RLS ci-dessous.
 create or replace function peut_gerer(p_espace_id uuid)
-returns boolean language sql stable
+returns boolean language sql stable set search_path = public
 as $$ select role_dans_espace(p_espace_id) in ('proprietaire', 'administrateur', 'tresorier'); $$;
 
 -- Propriétaire/administrateur : peut changer les réglages de l'espace.
 create or replace function peut_administrer(p_espace_id uuid)
-returns boolean language sql stable
+returns boolean language sql stable set search_path = public
 as $$ select role_dans_espace(p_espace_id) in ('proprietaire', 'administrateur'); $$;
 
 -- Ajoute les "responsables" (ex: chef de groupe/section) à la gestion des
 -- membres et cotisations, sans leur donner accès aux recettes/dépenses.
 create or replace function peut_gerer_membres(p_espace_id uuid)
-returns boolean language sql stable
+returns boolean language sql stable set search_path = public
 as $$ select role_dans_espace(p_espace_id) in ('proprietaire', 'administrateur', 'tresorier', 'responsable'); $$;
+
+-- Garde-fou séparé pour la table espace_membres elle-même : peut_administrer
+-- autorise aussi bien 'proprietaire' que 'administrateur', ce qui permettait
+-- à un simple administrateur de s'auto-promouvoir propriétaire, ou de
+-- rétrograder/supprimer le vrai propriétaire. Seul un 'proprietaire' peut
+-- désormais créer/modifier/supprimer une ligne dont le rôle actuel OU visé
+-- est 'proprietaire' (voir espace_membres_ajout/_maj/_suppr plus bas).
+create or replace function peut_gerer_role_membre(p_espace_id uuid, p_role_concerne role_espace)
+returns boolean language sql stable set search_path = public
+as $$
+  select case
+    when p_role_concerne = 'proprietaire' then role_dans_espace(p_espace_id) = 'proprietaire'
+    else peut_administrer(p_espace_id)
+  end;
+$$;
 
 -- ============================================================
 -- Activation RLS sur toutes les tables
@@ -66,7 +83,19 @@ alter table clotures enable row level security;
 -- PROFILS
 -- ============================================================
 
-create policy "profils_lecture" on profils for select using (auth.role() = 'authenticated');
+-- Un simple "auth.role() = 'authenticated'" laissait tout utilisateur
+-- connecté lire nom complet + email de TOUS les utilisateurs de la base,
+-- même sans aucun espace en commun. Restreint aux profils des utilisateurs
+-- partageant au moins un espace avec l'appelant (+ soi-même).
+create policy "profils_lecture" on profils for select using (
+  id = auth.uid()
+  or exists (
+    select 1
+    from espace_membres em_soi
+    join espace_membres em_cible on em_cible.espace_id = em_soi.espace_id
+    where em_soi.user_id = auth.uid() and em_cible.user_id = profils.id
+  )
+);
 create policy "profils_maj_soi_meme" on profils for update using (id = auth.uid());
 -- Pas de policy insert : la création passe uniquement par le trigger
 -- (security definer) sur auth.users, jamais par un insert direct de l'app.
@@ -85,9 +114,13 @@ create policy "espaces_suppr" on espaces for delete using (role_dans_espace(id) 
 -- ============================================================
 
 create policy "espace_membres_lecture" on espace_membres for select using (est_membre_espace(espace_id));
-create policy "espace_membres_ajout" on espace_membres for insert with check (peut_administrer(espace_id));
-create policy "espace_membres_maj" on espace_membres for update using (peut_administrer(espace_id));
-create policy "espace_membres_suppr" on espace_membres for delete using (peut_administrer(espace_id));
+create policy "espace_membres_ajout" on espace_membres for insert
+  with check (peut_gerer_role_membre(espace_id, role));
+create policy "espace_membres_maj" on espace_membres for update
+  using (peut_gerer_role_membre(espace_id, role))
+  with check (peut_gerer_role_membre(espace_id, role));
+create policy "espace_membres_suppr" on espace_membres for delete
+  using (peut_gerer_role_membre(espace_id, role));
 
 -- ============================================================
 -- INVITATIONS
@@ -141,6 +174,9 @@ begin
   return v_espace_id;
 end;
 $$;
+
+-- Exige auth.uid()/auth.jwt() : aucun appelant anonyme légitime.
+revoke execute on function accepter_invitation(uuid) from anon;
 
 -- ============================================================
 -- MEMBRES

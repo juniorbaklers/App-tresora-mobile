@@ -231,39 +231,89 @@ create trigger on_versement_cree
 --    n'écrit jamais elle-même dans entrees_journal.
 -- ============================================================
 
+-- Partagée entre triggers de tables différentes : cotisations et clotures
+-- ont un espace_id direct, mais paiements_cotisation/tranches/
+-- contribution_versements ne l'ont pas et doivent le résoudre par
+-- jointure. Piège plpgsql : on ne peut PAS faire new.champ/old.champ par
+-- branche TG_TABLE_NAME ici — Postgres valide TOUTES les branches d'un
+-- case contre le type réel de l'enregistrement du déclenchement en cours,
+-- même les branches jamais empruntées, et l'appel échoue avec
+-- "record "new" has no field ...". D'où l'accès JSONB dynamique
+-- (to_jsonb(new)->>'champ'), qui ne référence aucun nom de champ à la
+-- compilation.
 create or replace function journaliser()
 returns trigger
 language plpgsql
 security definer set search_path = public
 as $$
 declare
-  v_espace_id uuid := coalesce(new.espace_id, old.espace_id);
+  v_espace_id uuid;
+  v_new jsonb;
+  v_old jsonb;
   v_utilisateur text;
   v_role text;
   v_libelle_table text;
+  v_masculin boolean;
+  v_suffixe text;
   v_action text;
 begin
+  if TG_OP in ('INSERT', 'UPDATE') then
+    v_new := to_jsonb(new);
+  end if;
+  if TG_OP in ('UPDATE', 'DELETE') then
+    v_old := to_jsonb(old);
+  end if;
+
+  v_espace_id := case TG_TABLE_NAME
+    when 'paiements_cotisation' then
+      (select c.espace_id from cotisations c
+       where c.id = coalesce(v_new->>'cotisation_id', v_old->>'cotisation_id')::uuid)
+    when 'tranches' then
+      (select c.espace_id from paiements_cotisation pc
+         join cotisations c on c.id = pc.cotisation_id
+       where pc.id = coalesce(v_new->>'paiement_cotisation_id', v_old->>'paiement_cotisation_id')::uuid)
+    when 'contributions' then
+      coalesce(v_new->>'espace_demandeur_id', v_old->>'espace_demandeur_id')::uuid
+    when 'contribution_versements' then
+      (select co.espace_demandeur_id from contributions co
+       where co.id = coalesce(v_new->>'contribution_id', v_old->>'contribution_id')::uuid)
+    else
+      coalesce(v_new->>'espace_id', v_old->>'espace_id')::uuid
+  end;
+
   -- Une suppression d'espace entraîne la suppression en cascade de ses
-  -- recettes/dépenses/membres, ce qui déclenche ce trigger alors que
-  -- l'espace référencé disparaît dans la même transaction : inutile (et
-  -- impossible, contrainte de clé étrangère) de journaliser dans ce cas.
-  if not exists (select 1 from espaces where id = v_espace_id) then
+  -- recettes/dépenses/membres/cotisations/..., ce qui déclenche ce trigger
+  -- alors que l'espace référencé disparaît dans la même transaction :
+  -- inutile (et impossible, contrainte de clé étrangère) de journaliser
+  -- dans ce cas. v_espace_id peut aussi être null si la ligne parente a
+  -- déjà été supprimée dans la même transaction (cascade).
+  if v_espace_id is null or not exists (select 1 from espaces where id = v_espace_id) then
     return coalesce(new, old);
   end if;
 
   select nom_complet into v_utilisateur from profils where id = auth.uid();
   v_role := coalesce((role_dans_espace(v_espace_id))::text, '');
+
   v_libelle_table := case TG_TABLE_NAME
     when 'recettes' then 'Recette'
     when 'depenses' then 'Dépense'
     when 'membres' then 'Membre'
+    when 'cotisations' then 'Cotisation'
+    when 'paiements_cotisation' then 'Paiement de cotisation'
+    when 'tranches' then 'Versement de cotisation'
+    when 'contributions' then 'Contribution inter-espaces'
+    when 'contribution_versements' then 'Versement de contribution'
+    when 'clotures' then 'Clôture de caisse'
     else TG_TABLE_NAME
   end;
-  v_action := v_libelle_table || ' ' || case TG_OP
-    when 'INSERT' then 'créée'
-    when 'UPDATE' then 'modifiée'
-    when 'DELETE' then 'supprimée'
+  v_masculin := TG_TABLE_NAME in
+    ('membres', 'paiements_cotisation', 'tranches', 'contribution_versements');
+  v_suffixe := case TG_OP
+    when 'INSERT' then (case when v_masculin then 'créé' else 'créée' end)
+    when 'UPDATE' then (case when v_masculin then 'modifié' else 'modifiée' end)
+    when 'DELETE' then (case when v_masculin then 'supprimé' else 'supprimée' end)
   end;
+  v_action := v_libelle_table || ' ' || v_suffixe;
 
   insert into entrees_journal (espace_id, utilisateur, role, action, ancienne_valeur, nouvelle_valeur)
   values (
@@ -283,6 +333,18 @@ create trigger journal_recettes after insert or update or delete on recettes
 create trigger journal_depenses after insert or update or delete on depenses
   for each row execute function journaliser();
 create trigger journal_membres after insert or update or delete on membres
+  for each row execute function journaliser();
+create trigger journal_cotisations after insert or update or delete on cotisations
+  for each row execute function journaliser();
+create trigger journal_paiements_cotisation after insert or update or delete on paiements_cotisation
+  for each row execute function journaliser();
+create trigger journal_tranches after insert or update or delete on tranches
+  for each row execute function journaliser();
+create trigger journal_contributions after insert or update or delete on contributions
+  for each row execute function journaliser();
+create trigger journal_contribution_versements after insert or update or delete on contribution_versements
+  for each row execute function journaliser();
+create trigger journal_clotures after insert or update or delete on clotures
   for each row execute function journaliser();
 
 -- ============================================================
@@ -384,3 +446,32 @@ select cron.schedule(
   '0 6 * * *',
   $$ select notifier_cotisations_en_retard(); select notifier_evenements_bientot(); $$
 );
+
+-- ============================================================
+-- 8. Retrait des grants EXECUTE implicites — Postgres accorde EXECUTE à
+--    PUBLIC (donc anon + authenticated) par défaut à la création d'une
+--    fonction. notifier_cotisations_en_retard()/notifier_evenements_bientot()
+--    sont RETURNS void (pas trigger) et SECURITY DEFINER : sans ce retrait,
+--    n'importe qui, même non connecté, pouvait les appeler directement via
+--    /rest/v1/rpc/... — elles écrivent dans TOUS les espaces de la base,
+--    sans aucune vérification d'appartenance. Seul le job pg_cron
+--    ci-dessus doit les déclencher (il s'exécute avec les droits du
+--    propriétaire de la fonction, indépendant de ces grants).
+--    Les fonctions RETURNS trigger ci-dessous ne sont de toute façon
+--    jamais appelables directement (Postgres le refuse hors contexte
+--    trigger) : le retrait est une question d'hygiène de la surface d'API
+--    publique, pas une faille exploitable.
+-- ============================================================
+
+revoke execute on function notifier_cotisations_en_retard() from anon, authenticated;
+revoke execute on function notifier_evenements_bientot() from anon, authenticated;
+
+revoke execute on function gerer_nouvel_utilisateur() from anon, authenticated;
+revoke execute on function gerer_nouvel_espace() from anon, authenticated;
+revoke execute on function journaliser() from anon, authenticated;
+revoke execute on function recalculer_paiement_cotisation() from anon, authenticated;
+revoke execute on function recalculer_contribution() from anon, authenticated;
+revoke execute on function recalculer_evenement() from anon, authenticated;
+revoke execute on function notifier_nouvelle_contribution() from anon, authenticated;
+revoke execute on function notifier_versement_contribution() from anon, authenticated;
+revoke execute on function notifier_nouveau_paiement() from anon, authenticated;
