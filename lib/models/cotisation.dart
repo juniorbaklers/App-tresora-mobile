@@ -117,6 +117,26 @@ enum ModePaiement {
       .firstWhere((m) => m.valeurBdd == v, orElse: () => ModePaiement.especes);
 }
 
+/// Type Postgres `operateur_mobile_money` — pertinent seulement quand
+/// `mode_paiement = mobile_money`. Existait déjà côté base (colonne
+/// `tranches.operateur`) sans jamais être exposé côté app.
+enum OperateurMobileMoney {
+  orangeMoney('orange_money', 'Orange Money'),
+  mtnMoney('mtn_money', 'MTN Money'),
+  moovMoney('moov_money', 'Moov Money'),
+  wave('wave', 'Wave');
+
+  final String valeurBdd;
+  final String libelle;
+  const OperateurMobileMoney(this.valeurBdd, this.libelle);
+
+  static OperateurMobileMoney? fromBdd(String? v) {
+    if (v == null) return null;
+    return OperateurMobileMoney.values.firstWhere((o) => o.valeurBdd == v,
+        orElse: () => OperateurMobileMoney.orangeMoney);
+  }
+}
+
 /// Table `tranches` — un versement isolé pour une cotisation d'un membre.
 class Tranche {
   final String id;
@@ -125,6 +145,8 @@ class Tranche {
   final double montant;
   final String responsable;
   final ModePaiement? modePaiement;
+  final OperateurMobileMoney? operateur;
+  final String? reference;
 
   Tranche({
     required this.id,
@@ -133,6 +155,8 @@ class Tranche {
     required this.montant,
     required this.responsable,
     this.modePaiement,
+    this.operateur,
+    this.reference,
   });
 
   factory Tranche.fromMap(Map<String, dynamic> map) => Tranche(
@@ -144,6 +168,8 @@ class Tranche {
         modePaiement: map['mode_paiement'] == null
             ? null
             : ModePaiement.fromBdd(map['mode_paiement'] as String),
+        operateur: OperateurMobileMoney.fromBdd(map['operateur'] as String?),
+        reference: map['reference'] as String?,
       );
 
   Map<String, dynamic> toInsertMap() => {
@@ -151,5 +177,7 @@ class Tranche {
         'montant': montant,
         'responsable': responsable,
         'mode_paiement': modePaiement?.valeurBdd,
+        'operateur': operateur?.valeurBdd,
+        'reference': reference,
       };
 }
