@@ -11,6 +11,9 @@ on:
       - .github/workflows/build-apk.yml
   workflow_dispatch: {}
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -30,3 +33,18 @@ jobs:
           name: tresora-mobile-apk
           path: build/app/outputs/flutter-apk/app-release.apk
           retention-days: 30
+
+      # Publie aussi l'APK comme asset de release GitHub (en plus de
+      # l'artifact d'Action ci-dessus) : les artifacts d'Action redirigent
+      # vers un stockage blob tiers que certains réseaux d'entreprise
+      # bloquent, alors que les assets de release sont servis depuis un
+      # domaine github.com et passent presque partout.
+      - name: Publier l'APK en asset de release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: apk-latest
+          name: "APK de test — dernier build"
+          body: |
+            Build automatique déclenché sur `${{ github.ref_name }}` (${{ github.sha }}).
+            Cette release est mise à jour à chaque nouveau build ; l'APK ci-dessous est toujours le plus récent.
+          files: build/app/outputs/flutter-apk/app-release.apk
