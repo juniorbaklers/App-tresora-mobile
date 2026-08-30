@@ -426,82 +426,68 @@ class _CorpsGroupeCharge extends ConsumerWidget {
           if (evenementsActifs.isNotEmpty) ...[
             Text('Événements', style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 12),
-            Card(
-              child: Column(
-                children: [
-                  for (final e in evenementsActifs) ...[
-                    if (e != evenementsActifs.first) const Divider(height: 1),
-                    ListTile(
-                      title: Text(e.nom),
-                      subtitle: e.montantCible == null
-                          ? null
-                          : Text(
-                              '${formatMontant(e.montantCollecte)} / ${formatMontant(e.montantCible!)}'),
-                      trailing: e.progression == null
-                          ? null
-                          : Text(
-                              '${(e.progression! * 100).clamp(0, 100).round()}%'),
-                    ),
-                  ],
-                ],
+            for (final e in evenementsActifs) ...[
+              _LigneDashboard(
+                titre: e.nom,
+                sousTitre: e.montantCible == null
+                    ? null
+                    : '${formatMontant(e.montantCollecte)} / ${formatMontant(e.montantCible!)}',
+                trailing: e.progression == null
+                    ? null
+                    : Text(
+                        '${(e.progression! * 100).clamp(0, 100).round()}%',
+                        style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.texteEncre)),
               ),
-            ),
+              if (e != evenementsActifs.last) const SizedBox(height: 8),
+            ],
             const SizedBox(height: 24),
           ],
           if (contributionsRecues.isNotEmpty) ...[
             Text('Contributions demandées par l\'église',
                 style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 12),
-            Card(
-              child: Column(
-                children: [
-                  for (final c in contributionsRecues) ...[
-                    if (c != contributionsRecues.first)
-                      const Divider(height: 1),
-                    ListTile(
-                      title: Text(c.projet),
-                      subtitle: Text(
-                          '${formatMontant(c.montantRecu)} / ${formatMontant(c.montantDemande)}'),
-                      trailing: Chip(
-                        label: Text(c.statut.libelle),
-                        visualDensity: VisualDensity.compact,
-                      ),
-                    ),
-                  ],
-                ],
+            for (final c in contributionsRecues) ...[
+              _LigneDashboard(
+                titre: c.projet,
+                sousTitre:
+                    '${formatMontant(c.montantRecu)} / ${formatMontant(c.montantDemande)}',
+                trailing: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: AppColors.or.withValues(alpha: .15),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(c.statut.libelle,
+                      style: const TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.or)),
+                ),
               ),
-            ),
+              if (c != contributionsRecues.last) const SizedBox(height: 8),
+            ],
             const SizedBox(height: 24),
           ],
           if (derniersTop5.isNotEmpty) ...[
             Text('Derniers paiements',
                 style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 12),
-            Card(
-              child: Column(
-                children: [
-                  for (final p in derniersTop5) ...[
-                    if (p != derniersTop5.first) const Divider(height: 1),
-                    ListTile(
-                      leading: CircleAvatar(
-                        radius: 16,
-                        backgroundColor: AppColors.graphite,
-                        child: Text(
-                          p.membre.nomComplet.isNotEmpty
-                              ? p.membre.nomComplet[0].toUpperCase()
-                              : '?',
-                          style: const TextStyle(
-                              color: Colors.white, fontSize: 12),
-                        ),
-                      ),
-                      title: Text(p.membre.nomComplet),
-                      trailing: Text(formatMontant(p.montant),
-                          style: const TextStyle(color: AppColors.palme)),
-                    ),
-                  ],
-                ],
+            for (final p in derniersTop5) ...[
+              _LigneDashboard(
+                initiales: p.membre.nomComplet.isNotEmpty
+                    ? p.membre.nomComplet[0].toUpperCase()
+                    : '?',
+                titre: p.membre.nomComplet,
+                trailing: Text(formatMontant(p.montant),
+                    style: AppFonts.montant(
+                        fontSize: 13, color: AppColors.palme)),
               ),
-            ),
+              if (p != derniersTop5.last) const SizedBox(height: 8),
+            ],
             const SizedBox(height: 24),
           ],
           Text('Recettes / Dépenses $annee',
@@ -959,6 +945,69 @@ class _BlocCompte extends StatelessWidget {
           Text(libelle,
               style: const TextStyle(
                   fontSize: 10, color: AppColors.texteSecondaire)),
+        ],
+      ),
+    );
+  }
+}
+
+/// Ligne de liste plate bordée — carte à part par élément, cohérente avec le
+/// pattern déjà utilisé sur les autres écrans refaits (tresorerie_list,
+/// cotisation_detail, evenement_detail) plutôt qu'un `Card`+`ListTile` par
+/// défaut avec `Divider` interne.
+class _LigneDashboard extends StatelessWidget {
+  final String? initiales;
+  final String titre;
+  final String? sousTitre;
+  final Widget? trailing;
+
+  const _LigneDashboard({
+    this.initiales,
+    required this.titre,
+    this.sousTitre,
+    this.trailing,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.carte,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.bordure),
+      ),
+      child: Row(
+        children: [
+          if (initiales != null) ...[
+            CircleAvatar(
+              radius: 16,
+              backgroundColor: AppColors.graphite,
+              child: Text(initiales!,
+                  style: const TextStyle(color: Colors.white, fontSize: 12)),
+            ),
+            const SizedBox(width: 12),
+          ],
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(titre,
+                    style: AppFonts.heading(
+                        fontSize: 13, color: AppColors.texteEncre)),
+                if (sousTitre != null) ...[
+                  const SizedBox(height: 3),
+                  Text(sousTitre!,
+                      style: const TextStyle(
+                          fontSize: 12, color: AppColors.texteSecondaire)),
+                ],
+              ],
+            ),
+          ),
+          if (trailing != null) ...[
+            const SizedBox(width: 8),
+            trailing!,
+          ],
         ],
       ),
     );
