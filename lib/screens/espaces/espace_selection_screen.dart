@@ -220,9 +220,12 @@ class _CarteInvitationState extends ConsumerState<_CarteInvitation> {
   }
 }
 
-/// Carte d'espace en "pile de carnets" : deux feuillets décalés et
-/// légèrement pivotés derrière la carte principale, comme une pile de
-/// carnets vue de dessus — chaque espace est un carnet de comptes séparé.
+/// Carte d'espace — d'après la maquette « Mes espaces » du canvas de
+/// design : carte plate, lisière tissée en accent, pastille d'initiales.
+/// Pas de solde affiché ici : l'app n'a pas de solde agrégé par espace en
+/// dehors de l'espace courant (le calculer pour chaque espace de la liste
+/// nécessiterait une requête par espace, ce que la rule flutter.md interdit
+/// sans un vrai `fetchPourXxx(List<String> ids)` groupé).
 class _CarteEspace extends StatelessWidget {
   final EspaceAvecRole espaceAvecRole;
   final int index;
@@ -244,129 +247,66 @@ class _CarteEspace extends StatelessWidget {
     final espace = espaceAvecRole.espace;
     final tonalite = _tonalites[index % _tonalites.length];
 
-    return Padding(
-      padding: const EdgeInsets.only(top: 10, bottom: 8),
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          // Feuillet du fond : nettement plus sombre et le plus décalé, pour
-          // qu'il se lise sans ambiguïté comme "en dessous" plutôt que comme
-          // un artefact de rendu de la carte principale.
-          Positioned(
-            top: 16,
-            left: 14,
-            right: -10,
-            child: Transform.rotate(
-              angle: -0.05,
-              child: Container(
-                height: 74,
-                decoration: BoxDecoration(
-                  color: AppColors.bordure,
-                  borderRadius: BorderRadius.circular(14),
-                  boxShadow: [
-                    BoxShadow(
-                        color: Colors.black.withValues(alpha: .10),
-                        blurRadius: 6,
-                        offset: const Offset(0, 3)),
-                  ],
-                ),
-              ),
-            ),
+    return Material(
+      color: AppColors.carte,
+      borderRadius: BorderRadius.circular(16),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            border: Border.all(color: AppColors.bordure),
+            borderRadius: BorderRadius.circular(16),
           ),
-          Positioned(
-            top: 8,
-            left: 7,
-            right: -5,
-            child: Transform.rotate(
-              angle: 0.03,
-              child: Container(
-                height: 74,
-                decoration: BoxDecoration(
-                  boxShadow: [
-                    BoxShadow(
-                        color: Colors.black.withValues(alpha: .07),
-                        blurRadius: 5,
-                        offset: const Offset(0, 2)),
-                  ],
-                  color: AppColors.carte,
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: AppColors.bordure),
-                ),
-              ),
-            ),
-          ),
-          Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: onTap,
-              borderRadius: BorderRadius.circular(14),
-              child: Container(
-                clipBehavior: Clip.antiAlias,
-                decoration: BoxDecoration(
-                  color: AppColors.carte,
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: AppColors.bordure),
-                  boxShadow: [
-                    BoxShadow(
-                        color: Colors.black.withValues(alpha: .08),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4)),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    LisiereVerticale(tonalite: tonalite, epaisseur: 5),
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Row(
+          child: Row(
+            children: [
+              LisiereVerticale(tonalite: tonalite, epaisseur: 5),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 46,
+                        height: 46,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: AppColors.graphite,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          espace.initiales,
+                          style: const TextStyle(
+                              color: AppColors.or, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Container(
-                              width: 48,
-                              height: 48,
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                color: AppColors.graphite,
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Text(
-                                espace.initiales,
-                                style: const TextStyle(
-                                    color: AppColors.or,
-                                    fontWeight: FontWeight.bold),
-                              ),
+                            Text(espace.nom,
+                                style: AppFonts.heading(
+                                    fontSize: 16, color: AppColors.texteEncre)),
+                            const SizedBox(height: 2),
+                            Text(
+                              '${espace.type.libelle} · ${espaceAvecRole.role.libelle}',
+                              style: const TextStyle(
+                                  fontSize: 12,
+                                  color: AppColors.texteSecondaire),
                             ),
-                            const SizedBox(width: 14),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(espace.nom,
-                                      style: AppFonts.heading(
-                                          fontSize: 16,
-                                          color: AppColors.texteEncre)),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    '${espace.type.libelle} · ${espaceAvecRole.role.libelle}',
-                                    style: const TextStyle(
-                                        fontSize: 12,
-                                        color: AppColors.texteSecondaire),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const Icon(Icons.chevron_right,
-                                color: AppColors.texteSecondaire),
                           ],
                         ),
                       ),
-                    ),
-                  ],
+                      const Icon(Icons.chevron_right,
+                          color: AppColors.texteSecondaire),
+                    ],
+                  ),
                 ),
               ),
-            ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
