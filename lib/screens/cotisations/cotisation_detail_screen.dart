@@ -50,13 +50,46 @@ class CotisationDetailScreen extends ConsumerWidget {
           ),
         ],
       ),
+      floatingActionButton: RoleGate(
+        peutAcceder: (r) => r.peutGererMembres,
+        child: FloatingActionButton.extended(
+          onPressed: () {
+            final dejaInclus = (ref
+                        .read(paiementsCotisationProvider(cotisation.id))
+                        .valueOrNull ??
+                    [])
+                .map((p) => p.membreId)
+                .toSet();
+            showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              builder: (_) => _DialogueEncaisserMembre(
+                cotisation: cotisation,
+                membres: membres,
+                dejaInclus: dejaInclus,
+              ),
+            );
+          },
+          icon: const Icon(Icons.payments_outlined),
+          label: const Text('Encaisser'),
+        ),
+      ),
       body: paiementsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Erreur : $e')),
         data: (paiements) {
           if (paiements.isEmpty) {
             return const Center(
-                child: Text('Aucun membre assigné à cette cotisation'));
+                child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 32),
+              child: Text(
+                'Aucun membre assigné à cette cotisation. '
+                'Utilise "Encaisser" pour en ajouter un et enregistrer '
+                'directement son versement.',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: AppColors.texteSecondaire),
+              ),
+            ));
           }
           final totalDu = paiements.fold(0.0, (a, p) => a + p.montantDu);
           final totalPaye = paiements.fold(0.0, (a, p) => a + p.montantPaye);
@@ -273,6 +306,175 @@ class _DialogueAjouterMembresState
                     ? 'AJOUTER'
                     : 'AJOUTER (${_selectionnes.length})'),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Cherche un membre pas encore assigné à cette cotisation et enregistre
+/// directement son versement (au lieu de devoir d'abord passer par
+/// "Ajouter des membres" puis revenir le chercher pour le payer) — reprend
+/// la recherche de _DialogueAjouterMembres, mais une sélection déclenche
+/// l'assignation + l'ouverture du flux d'encaissement au lieu d'un ajout
+/// en lot.
+class _DialogueEncaisserMembre extends ConsumerStatefulWidget {
+  final Cotisation cotisation;
+  final List<Membre> membres;
+  final Set<String> dejaInclus;
+
+  const _DialogueEncaisserMembre({
+    required this.cotisation,
+    required this.membres,
+    required this.dejaInclus,
+  });
+
+  @override
+  ConsumerState<_DialogueEncaisserMembre> createState() =>
+      _DialogueEncaisserMembreState();
+}
+
+class _DialogueEncaisserMembreState
+    extends ConsumerState<_DialogueEncaisserMembre> {
+  String _recherche = '';
+  bool _enCours = false;
+  String? _erreur;
+
+  Future<void> _choisir(Membre membre) async {
+    setState(() {
+      _enCours = true;
+      _erreur = null;
+    });
+    try {
+      final paiement =
+          await ref.read(cotisationsServiceProvider).ajouterMembreEtRecuperer(
+                widget.cotisation.id,
+                widget.cotisation.montant,
+                membre.id,
+              );
+      if (!mounted) return;
+      Navigator.of(context).pop();
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => PaiementMoyenScreen(
+            paiementCotisationId: paiement.id,
+            membreNom: membre.nomComplet,
+            cotisationNom: widget.cotisation.nom,
+            montantRestant: paiement.montantDu,
+          ),
+        ),
+      );
+    } catch (e) {
+      setState(() => _erreur = "Impossible de continuer : ${e.toString()}");
+      setState(() => _enCours = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final disponibles = widget.membres
+        .where((m) => !widget.dejaInclus.contains(m.id))
+        .where((m) =>
+            _recherche.isEmpty ||
+            m.nomComplet.toLowerCase().contains(_recherche.toLowerCase()))
+        .toList();
+
+    return Padding(
+      padding: EdgeInsets.only(
+        left: 20,
+        right: 20,
+        top: 20,
+        bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text('Encaisser un membre',
+              style:
+                  AppFonts.heading(fontSize: 18, color: AppColors.texteEncre)),
+          const SizedBox(height: 4),
+          Text(
+            'Choisis un membre qui n\'est pas encore assigné à cette '
+            'cotisation — il sera ajouté et son versement de '
+            '${formatMontant(widget.cotisation.montant)} enregistré directement.',
+            style: const TextStyle(
+                fontSize: 12, color: AppColors.texteSecondaire),
+          ),
+          const SizedBox(height: 16),
+          TextField(
+            enabled: !_enCours,
+            decoration: const InputDecoration(
+                prefixIcon: Icon(Icons.search),
+                hintText: 'Rechercher un membre…'),
+            onChanged: (v) => setState(() => _recherche = v.trim()),
+          ),
+          const SizedBox(height: 8),
+          SizedBox(
+            height: 280,
+            child: widget.membres.isEmpty
+                ? const Center(
+                    child: Text('Cet espace n\'a encore aucun membre.',
+                        style: TextStyle(color: AppColors.texteSecondaire)))
+                : disponibles.isEmpty
+                    ? Center(
+                        child: Text(
+                          _recherche.isNotEmpty
+                              ? 'Aucun membre trouvé.'
+                              : 'Tous les membres de cet espace font déjà partie de cette cotisation.',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                              color: AppColors.texteSecondaire),
+                        ),
+                      )
+                    : ListView.separated(
+                        itemCount: disponibles.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 6),
+                        itemBuilder: (context, i) {
+                          final m = disponibles[i];
+                          return Material(
+                            color: AppColors.carte,
+                            borderRadius: BorderRadius.circular(12),
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(12),
+                              onTap: _enCours ? null : () => _choisir(m),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 14, vertical: 12),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12),
+                                  border:
+                                      Border.all(color: AppColors.bordure),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                        child: Text(m.nomComplet,
+                                            style: const TextStyle(
+                                                fontWeight:
+                                                    FontWeight.w600))),
+                                    const Icon(Icons.chevron_right,
+                                        color: AppColors.texteSecondaire),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+          ),
+          if (_erreur != null) ...[
+            const SizedBox(height: 8),
+            Text(_erreur!, style: const TextStyle(color: AppColors.terre)),
+          ],
+          if (_enCours) ...[
+            const SizedBox(height: 12),
+            const Center(
+                child: SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2))),
+          ],
         ],
       ),
     );

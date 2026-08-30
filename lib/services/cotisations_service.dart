@@ -54,6 +54,24 @@ class CotisationsService {
         },
     ]);
   }
+
+  /// Assigne un seul membre à la cotisation et renvoie la ligne créée —
+  /// pour encaisser directement un membre qui n'y était pas encore assigné
+  /// (au lieu de devoir d'abord passer par "Ajouter des membres" puis
+  /// revenir le chercher dans la liste pour le payer).
+  Future<PaiementCotisation> ajouterMembreEtRecuperer(
+      String cotisationId, double montant, String membreId) async {
+    final row = await _client
+        .from('paiements_cotisation')
+        .insert({
+          'cotisation_id': cotisationId,
+          'membre_id': membreId,
+          'montant_du': montant,
+        })
+        .select()
+        .single();
+    return PaiementCotisation.fromMap(row);
+  }
 }
 
 /// Table `paiements_cotisation` — statut de paiement d'un membre pour une
