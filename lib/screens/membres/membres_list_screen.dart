@@ -95,20 +95,52 @@ class _InvitationTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Card(
-      child: ListTile(
-        leading: const CircleAvatar(child: Icon(Icons.mail_outline)),
-        title: Text(invitation.email),
-        subtitle: Text('Invité comme ${invitation.role.libelle}'),
-        trailing: RoleGate(
-          peutAcceder: (r) => r.peutAdministrer,
-          child: IconButton(
-            icon: const Icon(Icons.close),
-            tooltip: 'Annuler l\'invitation',
-            onPressed: () =>
-                ref.read(invitationsServiceProvider).supprimer(invitation.id),
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.carte,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.bordure),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 38,
+            height: 38,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: AppColors.fond,
+              borderRadius: BorderRadius.circular(11),
+            ),
+            child: const Icon(Icons.mail_outline,
+                size: 19, color: AppColors.texteSecondaire),
           ),
-        ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(invitation.email,
+                    style: AppFonts.heading(
+                        fontSize: 13, color: AppColors.texteEncre)),
+                const SizedBox(height: 3),
+                Text('Invité comme ${invitation.role.libelle}',
+                    style: const TextStyle(
+                        fontSize: 12, color: AppColors.texteSecondaire)),
+              ],
+            ),
+          ),
+          RoleGate(
+            peutAcceder: (r) => r.peutAdministrer,
+            child: IconButton(
+              icon: const Icon(Icons.close),
+              tooltip: 'Annuler l\'invitation',
+              onPressed: () => ref
+                  .read(invitationsServiceProvider)
+                  .supprimer(invitation.id),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -223,37 +255,74 @@ class _MembreTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Card(
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: membre.actif
-              ? AppColors.palme.withValues(alpha: .12)
-              : AppColors.texteSecondaire.withValues(alpha: .15),
-          child: Icon(Icons.person,
-              color: membre.actif
-                  ? AppColors.palme
-                  : AppColors.texteSecondaire),
-        ),
-        title: Text(membre.nomComplet,
-            style: TextStyle(
-                color: membre.actif ? null : AppColors.texteSecondaire)),
-        subtitle: Text(
-          [
-            if (membre.fonction?.isNotEmpty == true) membre.fonction!,
-            if (membre.telephone.isNotEmpty) membre.telephone,
-          ].join(' · ').ifEmpty('Pas de détails'),
-        ),
-        trailing: RoleGate(
-          peutAcceder: (r) => r.peutGererMembres,
-          child: Switch(
-            value: membre.actif,
-            onChanged: (v) => ref
-                .read(membresServiceProvider)
-                .modifier(membre.id, {'statut': v ? 'actif' : 'inactif'}),
-          ),
-        ),
+    return Material(
+      color: AppColors.carte,
+      borderRadius: BorderRadius.circular(14),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(14),
         onTap: () => Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => MembreDetailScreen(membre: membre)),
+          MaterialPageRoute(
+              builder: (_) => MembreDetailScreen(membre: membre)),
+        ),
+        child: Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: AppColors.bordure),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 38,
+                height: 38,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: membre.actif
+                      ? AppColors.palme.withValues(alpha: .12)
+                      : AppColors.texteSecondaire.withValues(alpha: .15),
+                  borderRadius: BorderRadius.circular(11),
+                ),
+                child: Icon(Icons.person,
+                    size: 19,
+                    color: membre.actif
+                        ? AppColors.palme
+                        : AppColors.texteSecondaire),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(membre.nomComplet,
+                        style: AppFonts.heading(
+                            fontSize: 13,
+                            color: membre.actif
+                                ? AppColors.texteEncre
+                                : AppColors.texteSecondaire)),
+                    const SizedBox(height: 3),
+                    Text(
+                      [
+                        if (membre.fonction?.isNotEmpty == true)
+                          membre.fonction!,
+                        if (membre.telephone.isNotEmpty) membre.telephone,
+                      ].join(' · ').ifEmpty('Pas de détails'),
+                      style: const TextStyle(
+                          fontSize: 12, color: AppColors.texteSecondaire),
+                    ),
+                  ],
+                ),
+              ),
+              RoleGate(
+                peutAcceder: (r) => r.peutGererMembres,
+                child: Switch(
+                  value: membre.actif,
+                  onChanged: (v) => ref
+                      .read(membresServiceProvider)
+                      .modifier(membre.id, {'statut': v ? 'actif' : 'inactif'}),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

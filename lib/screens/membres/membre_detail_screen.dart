@@ -185,36 +185,65 @@ class _HistoriqueFinancier extends StatelessWidget {
     }
 
     if (lignes.isEmpty) {
-      return const Card(
-        child: Padding(
-          padding: EdgeInsets.all(16),
-          child: Text('Aucune cotisation associée à ce membre.',
-              style: TextStyle(color: AppColors.texteSecondaire)),
+      return Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.carte,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: AppColors.bordure),
         ),
+        child: const Text('Aucune cotisation associée à ce membre.',
+            style: TextStyle(color: AppColors.texteSecondaire)),
       );
     }
 
-    return Card(
-      child: Column(
-        children: [
-          for (final (cotisation, paiement) in lignes) ...[
-            if (cotisation != lignes.first.$1) const Divider(height: 1),
-            ListTile(
-              title: Text(cotisation.nom),
-              subtitle: Text(
-                  '${formatMontant(paiement.montantPaye)} / ${formatMontant(paiement.montantDu)}'),
-              trailing: Chip(
-                label: Text(paiement.statut.libelle),
-                visualDensity: VisualDensity.compact,
-                backgroundColor:
-                    _couleurStatutCarte(paiement.statut).withValues(alpha: .15),
-                labelStyle:
-                    TextStyle(color: _couleurStatutCarte(paiement.statut)),
-              ),
+    return Column(
+      children: [
+        for (final (cotisation, paiement) in lignes) ...[
+          Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: AppColors.carte,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: AppColors.bordure),
             ),
-          ],
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(cotisation.nom,
+                          style: AppFonts.heading(
+                              fontSize: 13, color: AppColors.texteEncre)),
+                      const SizedBox(height: 3),
+                      Text(
+                          '${formatMontant(paiement.montantPaye)} / ${formatMontant(paiement.montantDu)}',
+                          style: const TextStyle(
+                              fontSize: 12, color: AppColors.texteSecondaire)),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: _couleurStatutCarte(paiement.statut)
+                        .withValues(alpha: .15),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(paiement.statut.libelle,
+                      style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                          color: _couleurStatutCarte(paiement.statut))),
+                ),
+              ],
+            ),
+          ),
+          if (cotisation != lignes.last.$1) const SizedBox(height: 8),
         ],
-      ),
+      ],
     );
   }
 
