@@ -78,6 +78,7 @@ alter table contribution_versements enable row level security;
 alter table notifications enable row level security;
 alter table entrees_journal enable row level security;
 alter table clotures enable row level security;
+alter table abonnements enable row level security;
 
 -- ============================================================
 -- PROFILS
@@ -363,3 +364,17 @@ create policy "clotures_lecture" on clotures for select using (est_membre_espace
 create policy "clotures_ecriture" on clotures for insert with check (peut_gerer(espace_id));
 create policy "clotures_maj" on clotures for update using (peut_gerer(espace_id));
 create policy "clotures_suppr" on clotures for delete using (peut_administrer(espace_id));
+
+-- ============================================================
+-- ABONNEMENTS — lecture réservée à proprietaire/administrateur (même
+-- périmètre que les réglages de l'espace). Pas de policy insert/update/
+-- delete pour l'instant : tant que la facturation n'est pas activée pour
+-- de vrai, ces lignes sont gérées manuellement côté back-office (clé
+-- service_role), jamais par l'espace lui-même — laisser un propriétaire
+-- confirmer son propre paiement lui permettrait de se déclarer "actif"
+-- sans avoir réellement payé. Testé en transaction+rollback : le
+-- propriétaire lit sa ligne, un tiers n'en voit aucune, et même le
+-- propriétaire ne peut pas insérer (RLS le bloque, comme voulu).
+-- ============================================================
+
+create policy "abonnements_lecture" on abonnements for select using (peut_administrer(espace_id));

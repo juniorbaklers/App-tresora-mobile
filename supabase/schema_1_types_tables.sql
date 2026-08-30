@@ -322,6 +322,34 @@ create table clotures (
 );
 
 -- ============================================================
+-- 12. ABONNEMENTS — un espace = au plus un abonnement Trésora. Structure
+-- posée en attendant le premier usage pilote réel avant toute facturation
+-- effective (décision producer, cf. GAP-REPORT.md). Distinct de la
+-- trésorerie de l'espace lui-même (recettes/dépenses) : ce que l'espace
+-- paie à Trésora n'est jamais une recette de journal (entrees_journal) de
+-- l'espace, ce serait mélanger l'argent de l'organisation avec ce qu'elle
+-- paie pour l'outil.
+-- ============================================================
+
+create type statut_abonnement as enum ('essai', 'actif', 'expire', 'suspendu');
+
+create table abonnements (
+  id uuid primary key default gen_random_uuid(),
+  espace_id uuid not null unique references espaces(id) on delete cascade,
+  statut statut_abonnement not null default 'essai',
+  prix_mensuel numeric(14,2) not null default 5000,
+  devise text not null default 'XOF',
+  date_debut_essai date not null default current_date,
+  date_fin_essai date not null default (current_date + 30),
+  derniere_confirmation_paiement date,
+  confirme_par text,
+  reference_paiement text,
+  notes text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+-- ============================================================
 -- Index utiles
 -- ============================================================
 
@@ -339,3 +367,5 @@ create index idx_contributions_demandeur on contributions(espace_demandeur_id);
 create index idx_contributions_cible on contributions(espace_cible_id);
 create index idx_notifications_user on notifications(user_id, lue);
 create index idx_journal_espace_date on entrees_journal(espace_id, date);
+create index idx_abonnements_espace on abonnements(espace_id);
+create index idx_abonnements_statut on abonnements(statut);

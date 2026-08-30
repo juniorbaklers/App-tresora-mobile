@@ -171,6 +171,12 @@ dashboard en priorité, cf. décisions producer ci-dessous).
 2. Design : écran d'accueil + dashboard en priorité absolue.
 3. Monétisation : gratuit pour l'instant, abonnement par espace une fois la
    RLS auditée (fait) et après un premier usage réel sur des espaces pilotes.
+   **2026-08-30** : structure posée en avance (table `abonnements` + RLS +
+   `.claude/rules/billing.md`, détails dans `docs/pricing.md`), toujours
+   sans aucune ligne réelle ni écran Flutter — la condition "après un
+   premier usage pilote" reste celle qui déclenche l'activation.
+   Rail retenu : Mobile Money à confirmation manuelle (pas Stripe, écarté
+   pour décalage avec l'audience réelle de l'app).
 4. `tresora-app` (web) / `app-tresora-mobile` : codebases séparées, un seul
    backend Supabase partagé visé — migration réelle à planifier (les deux
    projets Supabase existants sont aujourd'hui distincts, cf. §1).
