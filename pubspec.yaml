@@ -39,6 +39,10 @@ dev_dependencies:
 flutter:
   uses-material-design: true
 
+  # Pastille de marque (le losange ambre/graphite) — splash et connexion.
+  assets:
+    - assets/images/logo-mark.png
+
   # Typographie de marque embarquée en assets locaux (téléchargées depuis
   # google/fonts, licence OFL) : plus aucun appel réseau au premier
   # affichage, contrairement au paquet google_fonts en mode "runtime fetch".

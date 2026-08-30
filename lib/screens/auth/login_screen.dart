@@ -58,16 +58,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Container(
-                      width: 64,
-                      height: 64,
-                      decoration: BoxDecoration(
-                        color: AppColors.graphite,
-                        borderRadius: BorderRadius.circular(18),
-                      ),
-                      child: const Icon(Icons.church,
-                          size: 32, color: AppColors.or),
-                    ),
+                    Image.asset('assets/images/logo-mark.png',
+                        width: 64, height: 64),
                     const SizedBox(height: 16),
                     Text(
                       'Trésora',

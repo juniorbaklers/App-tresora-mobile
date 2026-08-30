@@ -3,10 +3,10 @@ import '../../theme/app_theme.dart';
 import '../../widgets/motif.dart';
 import '../../main.dart';
 
-/// Écran de démarrage : la pastille et le nom apparaissent, puis le motif
-/// de tissage se "tisse" de gauche à droite — reprend l'identité déjà
-/// utilisée sur l'écran de connexion (pastille indigo/église + "Trésora"),
-/// juste animée. Bascule ensuite vers AuthGate sans laisser de route
+/// Écran de démarrage : le losange de marque et le nom apparaissent, puis
+/// le motif de tissage se "tisse" de gauche à droite — reprend l'identité
+/// déjà utilisée sur l'écran de connexion (losange + "Trésora"), juste
+/// animée. Bascule ensuite vers AuthGate sans laisser de route
 /// intermédiaire dans la pile (retour arrière impossible vers le splash).
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -74,17 +74,8 @@ class _SplashScreenState extends State<SplashScreen>
                     scale: 0.7 + 0.3 * _apparitionPastille.value.clamp(0, 1),
                     child: Opacity(
                       opacity: _apparitionPastille.value.clamp(0, 1),
-                      child: Container(
-                        width: 76,
-                        height: 76,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          color: AppColors.or,
-                          borderRadius: BorderRadius.circular(22),
-                        ),
-                        child: const Icon(Icons.church,
-                            size: 38, color: AppColors.graphite),
-                      ),
+                      child: Image.asset('assets/images/logo-mark.png',
+                          width: 76, height: 76),
                     ),
                   ),
                   const SizedBox(height: 20),
