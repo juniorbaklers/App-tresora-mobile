@@ -19,6 +19,12 @@ class AppColors {
   static const degradeDebut = Color(0xFFFFC220);
   static const degradeFin = Color(0xFFF26522);
 
+  /// Teintes recette/dépense pour texte sur fond sombre (carte solde) —
+  /// reprises telles quelles de la maquette, distinctes de `or`/`terre` qui
+  /// sont calibrées pour un fond clair.
+  static const orSurSombre = Color(0xFFFFC96B);
+  static const terreSurSombre = Color(0xFFF7B39B);
+
   static const degradeMarque = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,

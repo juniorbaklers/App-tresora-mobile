@@ -605,14 +605,14 @@ class _CarteSolde extends StatelessWidget {
                 child: _MiniStat(
                     label: 'Recettes',
                     valeur: totalRecettes,
-                    couleur: const Color(0xFFFFC96B)),
+                    couleur: AppColors.orSurSombre),
               ),
               const SizedBox(width: 10),
               Expanded(
                 child: _MiniStat(
                     label: 'Dépenses',
                     valeur: totalDepenses,
-                    couleur: const Color(0xFFF7B39B)),
+                    couleur: AppColors.terreSurSombre),
               ),
             ],
           ),

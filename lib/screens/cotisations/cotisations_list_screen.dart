@@ -87,9 +87,9 @@ class _CotisationTile extends StatelessWidget {
             ? const Chip(
                 label: Text('Clôturée'), visualDensity: VisualDensity.compact)
             : enRetard
-                ? const Chip(
-                    label: Text('En retard'),
-                    backgroundColor: Color(0x22B34A24),
+                ? Chip(
+                    label: const Text('En retard'),
+                    backgroundColor: AppColors.terre.withValues(alpha: .13),
                     visualDensity: VisualDensity.compact,
                   )
                 : null,
