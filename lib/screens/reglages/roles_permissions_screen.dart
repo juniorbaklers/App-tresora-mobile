@@ -116,30 +116,31 @@ class RolesPermissionsScreen extends StatelessWidget {
             childAspectRatio: 4.2,
             children: [
               for (final r in _roles)
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(14),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(r.label,
-                            style: AppFonts.heading(
-                                fontSize: 16, color: AppColors.texteEncre)),
-                        const SizedBox(height: 2),
-                        Text(r.description,
-                            style: const TextStyle(
-                                fontSize: 12,
-                                color: AppColors.texteSecondaire)),
-                        const SizedBox(height: 2),
-                        Text(
-                          '${r.permissions.length} permission${r.permissions.length > 1 ? 's' : ''}',
+                Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: AppColors.carte,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: AppColors.bordure),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(r.label,
+                          style: AppFonts.heading(
+                              fontSize: 16, color: AppColors.texteEncre)),
+                      const SizedBox(height: 2),
+                      Text(r.description,
                           style: const TextStyle(
-                              fontSize: 11,
-                              color: AppColors.texteSecondaire),
-                        ),
-                      ],
-                    ),
+                              fontSize: 12, color: AppColors.texteSecondaire)),
+                      const SizedBox(height: 2),
+                      Text(
+                        '${r.permissions.length} permission${r.permissions.length > 1 ? 's' : ''}',
+                        style: const TextStyle(
+                            fontSize: 11, color: AppColors.texteSecondaire),
+                      ),
+                    ],
                   ),
                 ),
             ],
@@ -151,7 +152,12 @@ class RolesPermissionsScreen extends StatelessWidget {
                   color: AppColors.texteSecondaire,
                   fontWeight: FontWeight.w700)),
           const SizedBox(height: 8),
-          Card(
+          Container(
+            decoration: BoxDecoration(
+              color: AppColors.carte,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: AppColors.bordure),
+            ),
             clipBehavior: Clip.antiAlias,
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,

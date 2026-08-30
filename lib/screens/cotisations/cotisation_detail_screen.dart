@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../models/cotisation.dart';
 import '../../models/membre.dart';
-import '../../providers/auth_providers.dart';
 import '../../providers/data_providers.dart';
 import '../../theme/app_theme.dart';
 import '../../utils/format.dart';
 import '../../widgets/role_gate.dart';
+import '../paiement/paiement_moyen_screen.dart';
 
 class CotisationDetailScreen extends ConsumerWidget {
   final Cotisation cotisation;
@@ -89,6 +89,7 @@ class CotisationDetailScreen extends ConsumerWidget {
                     final membre = membresParId[paiement.membreId];
                     return _LignePaiement(
                       nomMembre: membre?.nomComplet ?? 'Membre inconnu',
+                      cotisationNom: cotisation.nom,
                       paiement: paiement,
                     );
                   },
@@ -280,9 +281,13 @@ class _DialogueAjouterMembresState
 
 class _LignePaiement extends ConsumerWidget {
   final String nomMembre;
+  final String cotisationNom;
   final PaiementCotisation paiement;
 
-  const _LignePaiement({required this.nomMembre, required this.paiement});
+  const _LignePaiement(
+      {required this.nomMembre,
+      required this.cotisationNom,
+      required this.paiement});
 
   Color get _couleurStatut => switch (paiement.statut) {
         StatutPaiement.paye => AppColors.palme,
@@ -294,26 +299,54 @@ class _LignePaiement extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Card(
-      child: ListTile(
-        title: Text(nomMembre),
-        subtitle: Text(
-            '${formatMontant(paiement.montantPaye)} / ${formatMontant(paiement.montantDu)}'),
-        trailing: RoleGate(
-          peutAcceder: (r) => r.peutGererMembres,
-          remplacement: Chip(
-            label: Text(paiement.statut.libelle),
-            backgroundColor: _couleurStatut.withValues(alpha: .15),
-            labelStyle: TextStyle(color: _couleurStatut, fontSize: 12),
-            visualDensity: VisualDensity.compact,
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.carte,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.bordure),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(nomMembre,
+                    style: AppFonts.heading(
+                        fontSize: 13, color: AppColors.texteEncre)),
+                const SizedBox(height: 3),
+                Text(
+                    '${formatMontant(paiement.montantPaye)} / ${formatMontant(paiement.montantDu)}',
+                    style: const TextStyle(
+                        fontSize: 12, color: AppColors.texteSecondaire)),
+              ],
+            ),
           ),
-          child: TextButton(
-            onPressed: paiement.statut == StatutPaiement.paye
-                ? null
-                : () => _ouvrirAjoutTranche(context, ref),
-            child: Text(paiement.statut.libelle),
+          const SizedBox(width: 8),
+          RoleGate(
+            peutAcceder: (r) => r.peutGererMembres,
+            remplacement: Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              decoration: BoxDecoration(
+                color: _couleurStatut.withValues(alpha: .15),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(paiement.statut.libelle,
+                  style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w700,
+                      color: _couleurStatut)),
+            ),
+            child: TextButton(
+              onPressed: paiement.statut == StatutPaiement.paye
+                  ? null
+                  : () => _ouvrirAjoutTranche(context, ref),
+              child: Text(paiement.statut.libelle),
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

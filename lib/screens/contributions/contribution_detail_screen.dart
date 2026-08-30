@@ -65,19 +65,30 @@ class ContributionDetailScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 16),
-          ListTile(
-            contentPadding: EdgeInsets.zero,
-            leading: Icon(estCible ? Icons.call_received : Icons.call_made),
-            title: Text(estCible ? 'Demandé par' : 'Demandé à'),
-            subtitle: Text(autreEspace ?? '—'),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14),
+            decoration: BoxDecoration(
+              color: AppColors.carte,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: AppColors.bordure),
+            ),
+            child: Column(
+              children: [
+                _LigneInfo(
+                  icone: estCible ? Icons.call_received : Icons.call_made,
+                  titre: estCible ? 'Demandé par' : 'Demandé à',
+                  valeur: autreEspace ?? '—',
+                ),
+                const Divider(height: 1, color: AppColors.bordure),
+                _LigneInfo(
+                  icone: Icons.event_outlined,
+                  titre: 'Échéance',
+                  valeur: formatDate(contribution.dateLimite),
+                ),
+              ],
+            ),
           ),
-          ListTile(
-            contentPadding: EdgeInsets.zero,
-            leading: const Icon(Icons.event_outlined),
-            title: const Text('Échéance'),
-            subtitle: Text(formatDate(contribution.dateLimite)),
-          ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 16),
           Text('VERSEMENTS',
               style: TextStyle(
                   fontSize: 11,
@@ -94,15 +105,43 @@ class ContributionDetailScreen extends ConsumerWidget {
               }
               return Column(
                 children: [
-                  for (final v in versements)
-                    Card(
-                      child: ListTile(
-                        leading: const Icon(Icons.arrow_downward,
-                            color: AppColors.palme),
-                        title: Text(formatMontant(v.montant)),
-                        subtitle: Text(formatDate(v.date)),
+                  for (final v in versements) ...[
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: AppColors.carte,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: AppColors.bordure),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 34,
+                            height: 34,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: AppColors.palme.withValues(alpha: .13),
+                              borderRadius: BorderRadius.circular(11),
+                            ),
+                            child: const Icon(Icons.arrow_downward,
+                                color: AppColors.palme, size: 16),
+                          ),
+                          const SizedBox(width: 11),
+                          Expanded(
+                            child: Text(formatMontant(v.montant),
+                                style: AppFonts.montant(
+                                    fontSize: 13,
+                                    color: AppColors.texteEncre)),
+                          ),
+                          Text(formatDate(v.date),
+                              style: const TextStyle(
+                                  fontSize: 11,
+                                  color: AppColors.texteSecondaire)),
+                        ],
                       ),
                     ),
+                    if (v != versements.last) const SizedBox(height: 8),
+                  ],
                 ],
               );
             },
@@ -149,6 +188,38 @@ class _Resume extends StatelessWidget {
           const SizedBox(height: 4),
           Text(formatMontant(montant),
               style: AppFonts.montant(fontSize: 16, color: couleur)),
+        ],
+      ),
+    );
+  }
+}
+
+class _LigneInfo extends StatelessWidget {
+  final IconData icone;
+  final String titre;
+  final String valeur;
+
+  const _LigneInfo(
+      {required this.icone, required this.titre, required this.valeur});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      child: Row(
+        children: [
+          Icon(icone, size: 18, color: AppColors.texteSecondaire),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(titre,
+                style: const TextStyle(
+                    fontSize: 13, color: AppColors.texteSecondaire)),
+          ),
+          Text(valeur,
+              style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.texteEncre)),
         ],
       ),
     );

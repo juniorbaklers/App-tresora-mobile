@@ -84,41 +84,70 @@ class _EvenementDetailScreenState extends ConsumerState<EvenementDetailScreen> {
                     fontSize: 12, color: AppColors.texteSecondaire)),
           ],
           const SizedBox(height: 16),
-          ListTile(
-            contentPadding: EdgeInsets.zero,
-            leading: const Icon(Icons.calendar_today_outlined),
-            title: const Text('Période'),
-            subtitle: Text(
-                '${formatDate(evenement.dateDebut)} → ${formatDate(evenement.dateFin)}'),
-          ),
-          ListTile(
-            contentPadding: EdgeInsets.zero,
-            leading: const Icon(Icons.groups_outlined),
-            title: const Text('Participants'),
-            subtitle: Text('${evenement.participants}'),
-          ),
-          if (evenement.montantSuggere != null)
-            ListTile(
-              contentPadding: EdgeInsets.zero,
-              leading: const Icon(Icons.sell_outlined),
-              title: const Text('Montant suggéré par personne'),
-              subtitle: Text(formatMontant(evenement.montantSuggere!)),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14),
+            decoration: BoxDecoration(
+              color: AppColors.carte,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: AppColors.bordure),
             ),
-          ListTile(
-            contentPadding: EdgeInsets.zero,
-            leading: const Icon(Icons.flag_outlined),
-            title: const Text('Statut'),
-            subtitle: Text(evenement.statut.libelle),
-            trailing: RoleGate(
-              peutAcceder: (r) => r.peutGererMembres,
-              child: PopupMenuButton<StatutEvenement>(
-                onSelected: (statut) => ref
-                    .read(evenementsServiceProvider)
-                    .changerStatut(evenement.id, statut),
-                itemBuilder: (_) => StatutEvenement.values
-                    .map((s) => PopupMenuItem(value: s, child: Text(s.libelle)))
-                    .toList(),
-              ),
+            child: Column(
+              children: [
+                _LigneInfo(
+                  icone: Icons.calendar_today_outlined,
+                  titre: 'Période',
+                  valeur:
+                      '${formatDate(evenement.dateDebut)} → ${formatDate(evenement.dateFin)}',
+                ),
+                const Divider(height: 1, color: AppColors.bordure),
+                _LigneInfo(
+                  icone: Icons.groups_outlined,
+                  titre: 'Participants',
+                  valeur: '${evenement.participants}',
+                ),
+                if (evenement.montantSuggere != null) ...[
+                  const Divider(height: 1, color: AppColors.bordure),
+                  _LigneInfo(
+                    icone: Icons.sell_outlined,
+                    titre: 'Montant suggéré par personne',
+                    valeur: formatMontant(evenement.montantSuggere!),
+                  ),
+                ],
+                const Divider(height: 1, color: AppColors.bordure),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.flag_outlined,
+                          size: 18, color: AppColors.texteSecondaire),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text('Statut',
+                            style: const TextStyle(
+                                fontSize: 13,
+                                color: AppColors.texteSecondaire)),
+                      ),
+                      Text(evenement.statut.libelle,
+                          style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.texteEncre)),
+                      RoleGate(
+                        peutAcceder: (r) => r.peutGererMembres,
+                        child: PopupMenuButton<StatutEvenement>(
+                          onSelected: (statut) => ref
+                              .read(evenementsServiceProvider)
+                              .changerStatut(evenement.id, statut),
+                          itemBuilder: (_) => StatutEvenement.values
+                              .map((s) =>
+                                  PopupMenuItem(value: s, child: Text(s.libelle)))
+                              .toList(),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
           const SizedBox(height: 24),
@@ -195,6 +224,38 @@ class _Resume extends StatelessWidget {
   }
 }
 
+class _LigneInfo extends StatelessWidget {
+  final IconData icone;
+  final String titre;
+  final String valeur;
+
+  const _LigneInfo(
+      {required this.icone, required this.titre, required this.valeur});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      child: Row(
+        children: [
+          Icon(icone, size: 18, color: AppColors.texteSecondaire),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(titre,
+                style: const TextStyle(
+                    fontSize: 13, color: AppColors.texteSecondaire)),
+          ),
+          Text(valeur,
+              style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.texteEncre)),
+        ],
+      ),
+    );
+  }
+}
+
 /// Une fiche de contribution : qui a donné, combien, comment et quand.
 class _LigneContribution extends StatelessWidget {
   final ContributionEvenement contribution;
@@ -203,14 +264,35 @@ class _LigneContribution extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 6),
-      child: ListTile(
-        title: Text(contribution.nomContributeur),
-        subtitle: Text(
-            '${contribution.modePaiement.libelle} · ${formatDate(contribution.date)}'),
-        trailing: Text(formatMontant(contribution.montant),
-            style: AppFonts.montant(fontSize: 14)),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.carte,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.bordure),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(contribution.nomContributeur,
+                    style: AppFonts.heading(
+                        fontSize: 13, color: AppColors.texteEncre)),
+                const SizedBox(height: 3),
+                Text(
+                    '${contribution.modePaiement.libelle} · ${formatDate(contribution.date)}',
+                    style: const TextStyle(
+                        fontSize: 12, color: AppColors.texteSecondaire)),
+              ],
+            ),
+          ),
+          Text(formatMontant(contribution.montant),
+              style: AppFonts.montant(
+                  fontSize: 14, color: AppColors.texteEncre)),
+        ],
       ),
     );
   }

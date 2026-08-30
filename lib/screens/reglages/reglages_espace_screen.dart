@@ -39,27 +39,36 @@ class ReglagesEspaceScreen extends ConsumerWidget {
                   color: AppColors.texteSecondaire,
                   fontWeight: FontWeight.w700)),
           const SizedBox(height: 8),
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    title: Text(espace.nom,
-                        style: AppFonts.heading(
-                            fontSize: 16, color: AppColors.texteEncre)),
-                    subtitle: Text(
-                        '${espace.type.libelle} · ${espace.devise} · solde initial ${formatMontant(espace.soldeInitial)}'),
-                    trailing: TextButton(
-                      onPressed: () =>
-                          _ouvrirFormulaireModification(context, espace),
-                      child: const Text('Modifier'),
-                    ),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: AppColors.carte,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: AppColors.bordure),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(espace.nom,
+                          style: AppFonts.heading(
+                              fontSize: 16, color: AppColors.texteEncre)),
+                      const SizedBox(height: 3),
+                      Text(
+                          '${espace.type.libelle} · ${espace.devise} · solde initial ${formatMontant(espace.soldeInitial)}',
+                          style: const TextStyle(
+                              fontSize: 12, color: AppColors.texteSecondaire)),
+                    ],
                   ),
-                ],
-              ),
+                ),
+                TextButton(
+                  onPressed: () =>
+                      _ouvrirFormulaireModification(context, espace),
+                  child: const Text('Modifier'),
+                ),
+              ],
             ),
           ),
           const SizedBox(height: 24),
@@ -82,35 +91,38 @@ class ReglagesEspaceScreen extends ConsumerWidget {
                   color: AppColors.texteSecondaire,
                   fontWeight: FontWeight.w700)),
           const SizedBox(height: 8),
-          Card(
+          Container(
+            decoration: BoxDecoration(
+              color: AppColors.carte,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: AppColors.bordure),
+            ),
+            clipBehavior: Clip.antiAlias,
             child: Column(
               children: [
-                ListTile(
-                  leading: const Icon(Icons.history),
-                  title: const Text('Journal d\'audit'),
-                  trailing: const Icon(Icons.chevron_right),
+                _LigneOutil(
+                  icone: Icons.history,
+                  titre: 'Journal d\'audit',
                   onTap: () => Navigator.of(context).push(
                     MaterialPageRoute(
                         builder: (_) => const JournalListScreen()),
                   ),
                 ),
                 if (afficherClotures) ...[
-                  const Divider(height: 1),
-                  ListTile(
-                    leading: const Icon(Icons.fact_check_outlined),
-                    title: const Text('Clôtures'),
-                    trailing: const Icon(Icons.chevron_right),
+                  const Divider(height: 1, color: AppColors.bordure),
+                  _LigneOutil(
+                    icone: Icons.fact_check_outlined,
+                    titre: 'Clôtures',
                     onTap: () => Navigator.of(context).push(
                       MaterialPageRoute(
                           builder: (_) => const CloturesListScreen()),
                     ),
                   ),
                 ],
-                const Divider(height: 1),
-                ListTile(
-                  leading: const Icon(Icons.shield_outlined),
-                  title: const Text('Rôles et permissions'),
-                  trailing: const Icon(Icons.chevron_right),
+                const Divider(height: 1, color: AppColors.bordure),
+                _LigneOutil(
+                  icone: Icons.shield_outlined,
+                  titre: 'Rôles et permissions',
                   onTap: () => Navigator.of(context).push(
                     MaterialPageRoute(
                         builder: (_) => const RolesPermissionsScreen()),
@@ -147,6 +159,43 @@ class ReglagesEspaceScreen extends ConsumerWidget {
   }
 }
 
+class _LigneOutil extends StatelessWidget {
+  final IconData icone;
+  final String titre;
+  final VoidCallback onTap;
+
+  const _LigneOutil(
+      {required this.icone, required this.titre, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: AppColors.carte,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          child: Row(
+            children: [
+              Icon(icone, size: 20, color: AppColors.texteSecondaire),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Text(titre,
+                    style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.texteEncre)),
+              ),
+              const Icon(Icons.chevron_right,
+                  color: AppColors.texteSecondaire, size: 20),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _SectionModules extends ConsumerWidget {
   final Espace espace;
 
@@ -155,11 +204,18 @@ class _SectionModules extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final espaceCourant = ref.watch(currentEspaceProvider)?.espace ?? espace;
-    return Card(
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.carte,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.bordure),
+      ),
+      clipBehavior: Clip.antiAlias,
       child: Column(
         children: [
           for (final module in ModuleEspace.values) ...[
-            if (module != ModuleEspace.values.first) const Divider(height: 1),
+            if (module != ModuleEspace.values.first)
+              const Divider(height: 1, color: AppColors.bordure),
             CheckboxListTile(
               value: espaceCourant.aModule(module),
               title: Text(module.libelle),
@@ -195,51 +251,102 @@ class _MembreCompteTile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final espaceId = ref.watch(currentEspaceIdProvider);
-    return Card(
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: AppColors.graphite,
-          child: Text(
-            (membreCompte.profil.nomComplet.isNotEmpty
-                    ? membreCompte.profil.nomComplet[0]
-                    : '?')
-                .toUpperCase(),
-            style: const TextStyle(
-                color: Colors.white, fontWeight: FontWeight.bold),
-          ),
-        ),
-        title: Text(membreCompte.profil.nomComplet + (estMoi ? ' (toi)' : '')),
-        subtitle: Text(membreCompte.profil.email),
-        trailing: membreCompte.role == RoleEspace.proprietaire
-            ? const Chip(
-                label: Text('Propriétaire'),
-                visualDensity: VisualDensity.compact)
-            : PopupMenuButton<Object>(
-                child: Chip(
-                    label: Text(membreCompte.role.libelle),
-                    visualDensity: VisualDensity.compact),
-                itemBuilder: (_) => [
-                  for (final r in RoleEspace.values
-                      .where((r) => r != RoleEspace.proprietaire))
-                    PopupMenuItem(value: r, child: Text(r.libelle)),
-                  const PopupMenuDivider(),
-                  const PopupMenuItem(
-                      value: 'retirer', child: Text('Retirer de l\'espace')),
-                ],
-                onSelected: (valeur) {
-                  if (espaceId == null) return;
-                  if (valeur == 'retirer') {
-                    ref
-                        .read(espacesServiceProvider)
-                        .retirerMembre(espaceId, membreCompte.profil.id);
-                  } else if (valeur is RoleEspace) {
-                    ref
-                        .read(espacesServiceProvider)
-                        .changerRole(espaceId, membreCompte.profil.id, valeur);
-                  }
-                },
-              ),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.carte,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.bordure),
       ),
+      child: Row(
+        children: [
+          Container(
+            width: 38,
+            height: 38,
+            alignment: Alignment.center,
+            decoration: const BoxDecoration(
+              color: AppColors.graphite,
+              shape: BoxShape.circle,
+            ),
+            child: Text(
+              (membreCompte.profil.nomComplet.isNotEmpty
+                      ? membreCompte.profil.nomComplet[0]
+                      : '?')
+                  .toUpperCase(),
+              style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                    membreCompte.profil.nomComplet +
+                        (estMoi ? ' (toi)' : ''),
+                    style: AppFonts.heading(
+                        fontSize: 13, color: AppColors.texteEncre)),
+                const SizedBox(height: 3),
+                Text(membreCompte.profil.email,
+                    style: const TextStyle(
+                        fontSize: 12, color: AppColors.texteSecondaire)),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          membreCompte.role == RoleEspace.proprietaire
+              ? _BadgeRole(libelle: 'Propriétaire')
+              : PopupMenuButton<Object>(
+                  child: _BadgeRole(libelle: membreCompte.role.libelle),
+                  itemBuilder: (_) => [
+                    for (final r in RoleEspace.values
+                        .where((r) => r != RoleEspace.proprietaire))
+                      PopupMenuItem(value: r, child: Text(r.libelle)),
+                    const PopupMenuDivider(),
+                    const PopupMenuItem(
+                        value: 'retirer', child: Text('Retirer de l\'espace')),
+                  ],
+                  onSelected: (valeur) {
+                    if (espaceId == null) return;
+                    if (valeur == 'retirer') {
+                      ref
+                          .read(espacesServiceProvider)
+                          .retirerMembre(espaceId, membreCompte.profil.id);
+                    } else if (valeur is RoleEspace) {
+                      ref.read(espacesServiceProvider).changerRole(
+                          espaceId, membreCompte.profil.id, valeur);
+                    }
+                  },
+                ),
+        ],
+      ),
+    );
+  }
+}
+
+class _BadgeRole extends StatelessWidget {
+  final String libelle;
+
+  const _BadgeRole({required this.libelle});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: AppColors.fond,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.bordure),
+      ),
+      child: Text(libelle,
+          style: const TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w700,
+              color: AppColors.texteSecondaire)),
     );
   }
 }

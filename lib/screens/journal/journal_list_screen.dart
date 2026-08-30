@@ -22,9 +22,9 @@ class JournalListScreen extends ConsumerWidget {
             return const Center(child: Text('Aucune entrée pour l\'instant'));
           }
           return ListView.separated(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(16),
             itemCount: entrees.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 6),
+            separatorBuilder: (_, __) => const SizedBox(height: 8),
             itemBuilder: (context, i) => _EntreeTile(entree: entrees[i]),
           );
         },
@@ -40,16 +40,52 @@ class _EntreeTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: ListTile(
-        leading: const Icon(Icons.history, color: AppColors.texteSecondaire),
-        title: Text(entree.action),
-        subtitle: Text(
-          '${entree.utilisateur.isEmpty ? 'Système' : entree.utilisateur}'
-          '${entree.role.isEmpty ? '' : ' · ${entree.role}'}\n'
-          '${formatDate(entree.date)} à ${entree.heure}',
-        ),
-        isThreeLine: true,
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.carte,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.bordure),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 38,
+            height: 38,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: AppColors.fond,
+              borderRadius: BorderRadius.circular(11),
+            ),
+            child: const Icon(Icons.history,
+                size: 19, color: AppColors.texteSecondaire),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(entree.action,
+                    style: AppFonts.heading(
+                        fontSize: 13, color: AppColors.texteEncre)),
+                const SizedBox(height: 3),
+                Text(
+                  '${entree.utilisateur.isEmpty ? 'Système' : entree.utilisateur}'
+                  '${entree.role.isEmpty ? '' : ' · ${entree.role}'}',
+                  style: const TextStyle(
+                      fontSize: 12, color: AppColors.texteSecondaire),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  '${formatDate(entree.date)} à ${entree.heure}',
+                  style: const TextStyle(
+                      fontSize: 10, color: AppColors.texteSecondaire),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

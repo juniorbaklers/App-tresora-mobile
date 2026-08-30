@@ -40,7 +40,7 @@ class ContributionsListScreen extends ConsumerWidget {
                   child: Text('Aucune contribution inter-espaces'));
             }
             return ListView(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(16),
               children: [
                 if (recues.isNotEmpty) ...[
                   const _EnTeteSection(
@@ -98,34 +98,84 @@ class _ContributionTile extends StatelessWidget {
     final autreEspace = estCible
         ? contribution.nomEspaceDemandeur
         : contribution.nomEspaceCible;
-    return Card(
-      child: ListTile(
-        onTap: () => Navigator.of(context).push(
-          MaterialPageRoute(
-              builder: (_) => ContributionDetailScreen(
-                  contribution: contribution, estCible: estCible)),
-        ),
-        title: Text(contribution.projet),
-        subtitle: Text(
-          '${estCible ? 'Demandé par' : 'Demandé à'} ${autreEspace ?? '—'} · Échéance ${formatDate(contribution.dateLimite)}',
-        ),
-        trailing: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Text(
-                '${formatMontant(contribution.montantRecu)} / ${formatMontant(contribution.montantDemande)}',
-                style: AppFonts.montant(
-                    fontSize: 13, color: AppColors.texteEncre)),
-            const SizedBox(height: 4),
-            Chip(
-              label: Text(contribution.statut.libelle),
-              backgroundColor: _couleurStatut.withValues(alpha: .15),
-              labelStyle: TextStyle(color: _couleurStatut, fontSize: 11),
-              visualDensity: VisualDensity.compact,
-              padding: EdgeInsets.zero,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Material(
+        color: AppColors.carte,
+        borderRadius: BorderRadius.circular(14),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(14),
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute(
+                builder: (_) => ContributionDetailScreen(
+                    contribution: contribution, estCible: estCible)),
+          ),
+          child: Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: AppColors.bordure),
             ),
-          ],
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 38,
+                  height: 38,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: AppColors.fond,
+                    borderRadius: BorderRadius.circular(11),
+                  ),
+                  child: Icon(
+                      estCible ? Icons.call_received : Icons.call_made,
+                      size: 19,
+                      color: AppColors.texteSecondaire),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(contribution.projet,
+                          style: AppFonts.heading(
+                              fontSize: 13, color: AppColors.texteEncre)),
+                      const SizedBox(height: 3),
+                      Text(
+                        '${estCible ? 'Demandé par' : 'Demandé à'} ${autreEspace ?? '—'} · Échéance ${formatDate(contribution.dateLimite)}',
+                        style: const TextStyle(
+                            fontSize: 12, color: AppColors.texteSecondaire),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                        '${formatMontant(contribution.montantRecu)} / ${formatMontant(contribution.montantDemande)}',
+                        style: AppFonts.montant(
+                            fontSize: 12, color: AppColors.texteEncre)),
+                    const SizedBox(height: 4),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: _couleurStatut.withValues(alpha: .15),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(contribution.statut.libelle,
+                          style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              color: _couleurStatut)),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );

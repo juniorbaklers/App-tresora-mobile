@@ -50,7 +50,7 @@ class CotisationsListScreen extends ConsumerWidget {
             return const Center(child: Text('Aucune cotisation'));
           }
           return ListView.separated(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(16),
             itemCount: cotisations.length,
             separatorBuilder: (_, __) => const SizedBox(height: 8),
             itemBuilder: (context, i) =>
@@ -72,30 +72,75 @@ class _CotisationTile extends StatelessWidget {
     final enRetard = !cotisation.active
         ? false
         : cotisation.dateLimite.isBefore(DateTime.now());
-    return Card(
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: AppColors.or.withValues(alpha: .15),
-          child: const Icon(Icons.savings_outlined, color: AppColors.or),
-        ),
-        title: Text(cotisation.nom),
-        subtitle: Text(
-          '${formatMontant(cotisation.montant)} · ${cotisation.periodicite.libelle} · '
-          'Échéance ${formatDate(cotisation.dateLimite)}',
-        ),
-        trailing: !cotisation.active
-            ? const Chip(
-                label: Text('Clôturée'), visualDensity: VisualDensity.compact)
-            : enRetard
-                ? Chip(
-                    label: const Text('En retard'),
-                    backgroundColor: AppColors.terre.withValues(alpha: .13),
-                    visualDensity: VisualDensity.compact,
-                  )
-                : null,
+    return Material(
+      color: AppColors.carte,
+      borderRadius: BorderRadius.circular(14),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(14),
         onTap: () => Navigator.of(context).push(
           MaterialPageRoute(
               builder: (_) => CotisationDetailScreen(cotisation: cotisation)),
+        ),
+        child: Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: AppColors.bordure),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 38,
+                height: 38,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: AppColors.or.withValues(alpha: .15),
+                  borderRadius: BorderRadius.circular(11),
+                ),
+                child: const Icon(Icons.savings_outlined,
+                    size: 19, color: AppColors.or),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(cotisation.nom,
+                        style: AppFonts.heading(
+                            fontSize: 13, color: AppColors.texteEncre)),
+                    const SizedBox(height: 3),
+                    Text(
+                      '${formatMontant(cotisation.montant)} · ${cotisation.periodicite.libelle} · '
+                      'Échéance ${formatDate(cotisation.dateLimite)}',
+                      style: const TextStyle(
+                          fontSize: 12, color: AppColors.texteSecondaire),
+                    ),
+                  ],
+                ),
+              ),
+              if (!cotisation.active || enRetard) ...[
+                const SizedBox(width: 8),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: !cotisation.active
+                        ? AppColors.texteSecondaire.withValues(alpha: .13)
+                        : AppColors.terre.withValues(alpha: .13),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(!cotisation.active ? 'Clôturée' : 'En retard',
+                      style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                          color: !cotisation.active
+                              ? AppColors.texteSecondaire
+                              : AppColors.terre)),
+                ),
+              ],
+            ],
+          ),
         ),
       ),
     );

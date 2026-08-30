@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/auth_providers.dart';
 import '../../theme/app_theme.dart';
+import '../../widgets/motif.dart';
 
 class SignupScreen extends ConsumerStatefulWidget {
   const SignupScreen({super.key});
@@ -74,6 +75,31 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
+                          Container(
+                            width: 56,
+                            height: 56,
+                            decoration: BoxDecoration(
+                              color: AppColors.graphite,
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: const Icon(Icons.church,
+                                size: 28, color: AppColors.or),
+                          ),
+                          const SizedBox(height: 14),
+                          Text(
+                            'Trésora',
+                            textAlign: TextAlign.center,
+                            style: AppFonts.heading(
+                                fontSize: 24, color: AppColors.graphite),
+                          ),
+                          const SizedBox(height: 12),
+                          const Center(
+                            child: SizedBox(
+                                width: 100,
+                                child: BandeTissee(
+                                    tonalite: Tonalite.mixte, epaisseur: 4)),
+                          ),
+                          const SizedBox(height: 24),
                           TextFormField(
                             controller: _nomCtrl,
                             decoration:
