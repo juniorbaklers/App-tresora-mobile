@@ -1,4 +1,4 @@
-import 'cotisation.dart' show ModePaiement;
+import 'cotisation.dart' show ModePaiement, OperateurMobileMoney;
 
 enum StatutEvenement {
   planifie('planifie', 'Planifié'),
@@ -84,6 +84,8 @@ class ContributionEvenement {
   final String nomContributeur;
   final double montant;
   final ModePaiement modePaiement;
+  final OperateurMobileMoney? operateur;
+  final String? reference;
   final String responsable;
   final DateTime date;
 
@@ -93,6 +95,8 @@ class ContributionEvenement {
     required this.nomContributeur,
     required this.montant,
     required this.modePaiement,
+    this.operateur,
+    this.reference,
     required this.responsable,
     required this.date,
   });
@@ -104,6 +108,8 @@ class ContributionEvenement {
         nomContributeur: map['nom_contributeur'] as String,
         montant: (map['montant'] as num).toDouble(),
         modePaiement: ModePaiement.fromBdd(map['mode_paiement'] as String?),
+        operateur: OperateurMobileMoney.fromBdd(map['operateur'] as String?),
+        reference: map['reference'] as String?,
         responsable: map['responsable'] as String? ?? '',
         date: DateTime.parse(map['date'] as String),
       );
@@ -113,6 +119,8 @@ class ContributionEvenement {
         'nom_contributeur': nomContributeur,
         'montant': montant,
         'mode_paiement': modePaiement.valeurBdd,
+        'operateur': operateur?.valeurBdd,
+        'reference': reference,
         'responsable': responsable,
       };
 }

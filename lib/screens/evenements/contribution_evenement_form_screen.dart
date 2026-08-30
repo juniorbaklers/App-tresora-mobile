@@ -1,37 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../models/cotisation.dart';
+import '../../models/evenement.dart';
+import '../../models/membre.dart';
 import '../../providers/auth_providers.dart';
 import '../../providers/data_providers.dart';
 import '../../providers/espace_providers.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/saisie_paiement.dart';
-import 'paiement_recu_screen.dart';
+import '../paiement/paiement_recu_screen.dart';
 
-/// Saisie du montant et du moyen de paiement pour un versement de
-/// cotisation — d'après la maquette « Paiement · {membre} » du canvas de
-/// design : carte montant sombre texturée, grille de moyens de paiement,
-/// sélecteur d'opérateur Mobile Money, référence de transaction.
-class PaiementMoyenScreen extends ConsumerStatefulWidget {
-  final String paiementCotisationId;
-  final String membreNom;
-  final String cotisationNom;
-  final double montantRestant;
+/// Enregistrement d'une contribution à un événement (collecte ponctuelle) —
+/// même flux riche que l'encaissement d'une cotisation (grille de moyens de
+/// paiement, opérateur Mobile Money, référence, reçu PDF partageable), à la
+/// différence près que le contributeur est saisi en texte libre plutôt que
+/// choisi dans la liste des membres : une collecte accueille aussi des
+/// donateurs qui n'ont jamais été enregistrés comme membres.
+class ContributionEvenementFormScreen extends ConsumerStatefulWidget {
+  final Evenement evenement;
 
-  const PaiementMoyenScreen({
-    super.key,
-    required this.paiementCotisationId,
-    required this.membreNom,
-    required this.cotisationNom,
-    required this.montantRestant,
-  });
+  const ContributionEvenementFormScreen({super.key, required this.evenement});
 
   @override
-  ConsumerState<PaiementMoyenScreen> createState() =>
-      _PaiementMoyenScreenState();
+  ConsumerState<ContributionEvenementFormScreen> createState() =>
+      _ContributionEvenementFormScreenState();
 }
 
-class _PaiementMoyenScreenState extends ConsumerState<PaiementMoyenScreen> {
+class _ContributionEvenementFormScreenState
+    extends ConsumerState<ContributionEvenementFormScreen> {
+  final _nomCtrl = TextEditingController();
   late final TextEditingController _montantCtrl;
   final _referenceCtrl = TextEditingController();
   ModePaiement _mode = ModePaiement.especes;
@@ -43,21 +40,23 @@ class _PaiementMoyenScreenState extends ConsumerState<PaiementMoyenScreen> {
   void initState() {
     super.initState();
     _montantCtrl = TextEditingController(
-        text: widget.montantRestant.toStringAsFixed(0));
+        text: widget.evenement.montantSuggere?.toStringAsFixed(0) ?? '');
   }
 
   @override
   void dispose() {
+    _nomCtrl.dispose();
     _montantCtrl.dispose();
     _referenceCtrl.dispose();
     super.dispose();
   }
 
-  void _fixerMontant(double v) {
-    setState(() => _montantCtrl.text = v.toStringAsFixed(0));
-  }
-
   Future<void> _valider() async {
+    final nom = _nomCtrl.text.trim();
+    if (nom.isEmpty) {
+      setState(() => _erreur = 'Nom du contributeur requis');
+      return;
+    }
     final montant = double.tryParse(_montantCtrl.text.replaceAll(',', '.'));
     if (montant == null || montant <= 0) {
       setState(() => _erreur = 'Montant invalide');
@@ -73,25 +72,29 @@ class _PaiementMoyenScreenState extends ConsumerState<PaiementMoyenScreen> {
       final maintenant = DateTime.now();
       final reference = _referenceCtrl.text.trim();
 
-      await ref.read(tranchesServiceProvider).creer(Tranche(
-            id: '',
-            paiementCotisationId: widget.paiementCotisationId,
-            date: maintenant,
-            montant: montant,
-            responsable: responsable,
-            modePaiement: _mode,
-            operateur: _mode == ModePaiement.mobileMoney ? _operateur : null,
-            reference: reference.isEmpty ? null : reference,
-          ));
-      ref.invalidate(paiementsEspaceProvider);
+      await ref.read(contributionsEvenementServiceProvider).creer(
+            ContributionEvenement(
+              id: '',
+              evenementId: widget.evenement.id,
+              nomContributeur: nom,
+              montant: montant,
+              modePaiement: _mode,
+              operateur: _mode == ModePaiement.mobileMoney ? _operateur : null,
+              reference: reference.isEmpty ? null : reference,
+              responsable: responsable,
+              date: maintenant,
+            ),
+          );
 
+      if (mounted) await _proposerAjoutMembre(nom);
       if (!mounted) return;
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (_) => PaiementRecuScreen(
             espaceNom: espace?.nom ?? 'Trésora',
-            membreNom: widget.membreNom,
-            affectation: widget.cotisationNom,
+            membreNom: nom,
+            labelContributeur: 'Contributeur',
+            affectation: widget.evenement.nom,
             montant: montant,
             modePaiement: _mode,
             operateur: _mode == ModePaiement.mobileMoney ? _operateur : null,
@@ -108,17 +111,70 @@ class _PaiementMoyenScreenState extends ConsumerState<PaiementMoyenScreen> {
     }
   }
 
+  /// Si le contributeur saisi ne correspond à aucun membre existant de
+  /// l'espace, propose de l'ajouter au registre des membres — pour qu'un
+  /// donateur régulier ne reste pas invisible du suivi des cotisations.
+  Future<void> _proposerAjoutMembre(String nom) async {
+    final espaceId = widget.evenement.espaceId;
+    final membres = ref.read(membresStreamProvider).valueOrNull ?? [];
+    final dejaMembre = membres
+        .any((m) => m.nomComplet.trim().toLowerCase() == nom.toLowerCase());
+    if (dejaMembre) return;
+
+    final ajouter = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Ajouter comme membre ?'),
+        content: Text(
+            "$nom n'est pas encore membre de cet espace. L'ajouter au registre des membres ?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Non merci'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('Ajouter'),
+          ),
+        ],
+      ),
+    );
+    if (ajouter != true || !mounted) return;
+
+    final parts = nom.split(RegExp(r'\s+'));
+    final prenom = parts.first;
+    final nomFamille = parts.length > 1 ? parts.sublist(1).join(' ') : '';
+    await ref.read(membresServiceProvider).creer(Membre(
+          id: '',
+          espaceId: espaceId,
+          nom: nomFamille,
+          prenom: prenom,
+          telephone: '',
+          actif: true,
+        ));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Paiement · ${widget.membreNom}')),
+      appBar: AppBar(title: Text('Contribution · ${widget.evenement.nom}')),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          TextField(
+            controller: _nomCtrl,
+            textCapitalization: TextCapitalization.words,
+            decoration:
+                const InputDecoration(labelText: 'Nom du contributeur'),
+          ),
+          const SizedBox(height: 16),
           CarteMontantSaisie(
             controller: _montantCtrl,
-            onMoitie: () => _fixerMontant(widget.montantRestant / 2),
-            onSolde: () => _fixerMontant(widget.montantRestant),
+            libelleSolde: 'Suggéré',
+            onSolde: widget.evenement.montantSuggere == null
+                ? null
+                : () => setState(() => _montantCtrl.text =
+                    widget.evenement.montantSuggere!.toStringAsFixed(0)),
           ),
           const SizedBox(height: 20),
           Text('Moyen', style: Theme.of(context).textTheme.titleMedium),
@@ -181,11 +237,10 @@ class _PaiementMoyenScreenState extends ConsumerState<PaiementMoyenScreen> {
                     child: CircularProgressIndicator(
                         strokeWidth: 2, color: Colors.white),
                   )
-                : const Text("VALIDER L'ENCAISSEMENT"),
+                : const Text('ENREGISTRER LA CONTRIBUTION'),
           ),
         ],
       ),
     );
   }
 }
-

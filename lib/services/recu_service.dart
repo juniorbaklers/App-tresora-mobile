@@ -11,6 +11,7 @@ class RecuService {
   Future<Uint8List> genererRecu({
     required String espaceNom,
     required String membreNom,
+    String labelContributeur = 'Membre',
     required String affectation,
     required double montant,
     required ModePaiement modePaiement,
@@ -42,7 +43,7 @@ class RecuService {
             ),
             pw.SizedBox(height: 20),
             pw.Divider(),
-            _ligne('Membre', membreNom),
+            _ligne(labelContributeur, membreNom),
             _ligne('Affectation', affectation),
             _ligne('Moyen', modePaiement.libelle),
             if (operateur != null) _ligne('Opérateur', operateur.libelle),

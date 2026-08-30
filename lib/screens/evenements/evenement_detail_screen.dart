@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../models/cotisation.dart' show ModePaiement;
 import '../../models/evenement.dart';
-import '../../models/membre.dart';
-import '../../providers/auth_providers.dart';
 import '../../providers/data_providers.dart';
 import '../../theme/app_theme.dart';
 import '../../utils/format.dart';
 import '../../widgets/role_gate.dart';
+import 'contribution_evenement_form_screen.dart';
 
 class EvenementDetailScreen extends ConsumerStatefulWidget {
   final Evenement evenement;
@@ -182,10 +180,11 @@ class _EvenementDetailScreenState extends ConsumerState<EvenementDetailScreen> {
   }
 
   void _ouvrirAjoutCollecte(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (_) => _FormulaireCollecte(evenement: widget.evenement),
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) =>
+            ContributionEvenementFormScreen(evenement: widget.evenement),
+      ),
     );
   }
 }
@@ -298,166 +297,3 @@ class _LigneContribution extends StatelessWidget {
   }
 }
 
-class _FormulaireCollecte extends ConsumerStatefulWidget {
-  final Evenement evenement;
-
-  const _FormulaireCollecte({required this.evenement});
-
-  @override
-  ConsumerState<_FormulaireCollecte> createState() =>
-      _FormulaireCollecteState();
-}
-
-class _FormulaireCollecteState extends ConsumerState<_FormulaireCollecte> {
-  final _formKey = GlobalKey<FormState>();
-  final _nomCtrl = TextEditingController();
-  late final _montantCtrl = TextEditingController(
-    text: widget.evenement.montantSuggere?.toStringAsFixed(0) ?? '',
-  );
-  ModePaiement _mode = ModePaiement.especes;
-  bool _enCours = false;
-  String? _erreur;
-
-  Future<void> _enregistrer() async {
-    if (!_formKey.currentState!.validate()) return;
-    setState(() {
-      _enCours = true;
-      _erreur = null;
-    });
-    try {
-      final nom = _nomCtrl.text.trim();
-      final responsable = ref.read(currentUserProvider)?.email ?? '';
-      await ref
-          .read(contributionsEvenementServiceProvider)
-          .creer(ContributionEvenement(
-            id: '',
-            evenementId: widget.evenement.id,
-            nomContributeur: nom,
-            montant: double.parse(_montantCtrl.text.replaceAll(',', '.')),
-            modePaiement: _mode,
-            responsable: responsable,
-            date: DateTime.now(),
-          ));
-      if (mounted) await _proposerAjoutMembre(nom);
-      if (mounted) Navigator.of(context).pop();
-    } catch (e) {
-      setState(() => _erreur = "Enregistrement impossible : ${e.toString()}");
-    } finally {
-      if (mounted) setState(() => _enCours = false);
-    }
-  }
-
-  /// Si le contributeur saisi ne correspond à aucun membre existant de
-  /// l'espace, propose de l'ajouter au registre des membres — pour qu'un
-  /// donateur régulier ne reste pas invisible du suivi des cotisations.
-  Future<void> _proposerAjoutMembre(String nom) async {
-    final espaceId = widget.evenement.espaceId;
-    final membres = ref.read(membresStreamProvider).valueOrNull ?? [];
-    final dejaMembre = membres
-        .any((m) => m.nomComplet.trim().toLowerCase() == nom.toLowerCase());
-    if (dejaMembre) return;
-
-    final ajouter = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Ajouter comme membre ?'),
-        content: Text(
-            "$nom n'est pas encore membre de cet espace. L'ajouter au registre des membres ?"),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Non merci'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('Ajouter'),
-          ),
-        ],
-      ),
-    );
-    if (ajouter != true || !mounted) return;
-
-    final parts = nom.split(RegExp(r'\s+'));
-    final prenom = parts.first;
-    final nomFamille = parts.length > 1 ? parts.sublist(1).join(' ') : '';
-    await ref.read(membresServiceProvider).creer(Membre(
-          id: '',
-          espaceId: espaceId,
-          nom: nomFamille,
-          prenom: prenom,
-          telephone: '',
-          actif: true,
-        ));
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(
-        left: 20,
-        right: 20,
-        top: 20,
-        bottom: MediaQuery.of(context).viewInsets.bottom + 20,
-      ),
-      child: Form(
-        key: _formKey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text('Enregistrer une contribution',
-                style: AppFonts.heading(
-                    fontSize: 18, color: AppColors.texteEncre)),
-            const SizedBox(height: 16),
-            TextFormField(
-              controller: _nomCtrl,
-              textCapitalization: TextCapitalization.words,
-              decoration:
-                  const InputDecoration(labelText: 'Nom du contributeur'),
-              validator: (v) =>
-                  (v == null || v.trim().isEmpty) ? 'Nom requis' : null,
-            ),
-            const SizedBox(height: 14),
-            TextFormField(
-              controller: _montantCtrl,
-              keyboardType:
-                  const TextInputType.numberWithOptions(decimal: true),
-              decoration:
-                  const InputDecoration(labelText: 'Montant reçu (FCFA)'),
-              validator: (v) {
-                final n = double.tryParse((v ?? '').replaceAll(',', '.'));
-                return (n == null || n <= 0) ? 'Montant invalide' : null;
-              },
-            ),
-            const SizedBox(height: 14),
-            DropdownButtonFormField<ModePaiement>(
-              initialValue: _mode,
-              decoration: const InputDecoration(labelText: 'Mode de paiement'),
-              items: ModePaiement.values
-                  .map(
-                      (m) => DropdownMenuItem(value: m, child: Text(m.libelle)))
-                  .toList(),
-              onChanged: (v) => setState(() => _mode = v!),
-            ),
-            if (_erreur != null) ...[
-              const SizedBox(height: 12),
-              Text(_erreur!, style: const TextStyle(color: AppColors.terre)),
-            ],
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _enCours ? null : _enregistrer,
-              child: _enCours
-                  ? const SizedBox(
-                      height: 18,
-                      width: 18,
-                      child: CircularProgressIndicator(
-                          strokeWidth: 2, color: Colors.white),
-                    )
-                  : const Text('ENREGISTRER'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}

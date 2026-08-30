@@ -16,6 +16,7 @@ import '../../utils/format.dart';
 class PaiementRecuScreen extends ConsumerStatefulWidget {
   final String espaceNom;
   final String membreNom;
+  final String labelContributeur;
   final String affectation;
   final double montant;
   final ModePaiement modePaiement;
@@ -28,6 +29,7 @@ class PaiementRecuScreen extends ConsumerStatefulWidget {
     super.key,
     required this.espaceNom,
     required this.membreNom,
+    this.labelContributeur = 'Membre',
     required this.affectation,
     required this.montant,
     required this.modePaiement,
@@ -51,6 +53,7 @@ class _PaiementRecuScreenState extends ConsumerState<PaiementRecuScreen> {
       final bytes = await ref.read(recuServiceProvider).genererRecu(
             espaceNom: widget.espaceNom,
             membreNom: widget.membreNom,
+            labelContributeur: widget.labelContributeur,
             affectation: widget.affectation,
             montant: widget.montant,
             modePaiement: widget.modePaiement,
@@ -120,7 +123,9 @@ class _PaiementRecuScreenState extends ConsumerState<PaiementRecuScreen> {
                       padding: EdgeInsets.symmetric(vertical: 16),
                       child: Divider(height: 1),
                     ),
-                    _LigneRecu(libelle: 'Membre', valeur: widget.membreNom),
+                    _LigneRecu(
+                        libelle: widget.labelContributeur,
+                        valeur: widget.membreNom),
                     _LigneRecu(
                         libelle: 'Affectation', valeur: widget.affectation),
                     _LigneRecu(

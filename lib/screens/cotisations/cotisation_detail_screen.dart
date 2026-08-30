@@ -342,7 +342,7 @@ class _LignePaiement extends ConsumerWidget {
             child: TextButton(
               onPressed: paiement.statut == StatutPaiement.paye
                   ? null
-                  : () => _ouvrirAjoutTranche(context, ref),
+                  : () => _ouvrirEncaissement(context),
               child: Text(paiement.statut.libelle),
             ),
           ),
@@ -351,121 +351,15 @@ class _LignePaiement extends ConsumerWidget {
     );
   }
 
-  void _ouvrirAjoutTranche(BuildContext context, WidgetRef ref) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (_) =>
-          _FormulaireTranche(nomMembre: nomMembre, paiement: paiement),
-    );
-  }
-}
-
-class _FormulaireTranche extends ConsumerStatefulWidget {
-  final String nomMembre;
-  final PaiementCotisation paiement;
-
-  const _FormulaireTranche({required this.nomMembre, required this.paiement});
-
-  @override
-  ConsumerState<_FormulaireTranche> createState() => _FormulaireTrancheState();
-}
-
-class _FormulaireTrancheState extends ConsumerState<_FormulaireTranche> {
-  final _formKey = GlobalKey<FormState>();
-  final _montantCtrl = TextEditingController();
-  ModePaiement _mode = ModePaiement.especes;
-  bool _enCours = false;
-  String? _erreur;
-
-  Future<void> _enregistrer() async {
-    if (!_formKey.currentState!.validate()) return;
-    setState(() {
-      _enCours = true;
-      _erreur = null;
-    });
-    try {
-      final responsable = ref.read(currentUserProvider)?.email ?? '';
-      await ref.read(tranchesServiceProvider).creer(Tranche(
-            id: '',
-            paiementCotisationId: widget.paiement.id,
-            date: DateTime.now(),
-            montant: double.parse(_montantCtrl.text.replaceAll(',', '.')),
-            responsable: responsable,
-            modePaiement: _mode,
-          ));
-      if (mounted) Navigator.of(context).pop();
-    } catch (e) {
-      setState(() => _erreur = "Enregistrement impossible : ${e.toString()}");
-    } finally {
-      if (mounted) setState(() => _enCours = false);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final restant = widget.paiement.montantDu - widget.paiement.montantPaye;
-    return Padding(
-      padding: EdgeInsets.only(
-        left: 20,
-        right: 20,
-        top: 20,
-        bottom: MediaQuery.of(context).viewInsets.bottom + 20,
-      ),
-      child: Form(
-        key: _formKey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text('Enregistrer un versement',
-                style: AppFonts.heading(
-                    fontSize: 18, color: AppColors.texteEncre)),
-            const SizedBox(height: 4),
-            Text(widget.nomMembre,
-                style: const TextStyle(fontWeight: FontWeight.w600)),
-            const SizedBox(height: 2),
-            Text('Reste dû : ${formatMontant(restant)}',
-                style: const TextStyle(color: AppColors.texteSecondaire)),
-            const SizedBox(height: 16),
-            TextFormField(
-              controller: _montantCtrl,
-              keyboardType:
-                  const TextInputType.numberWithOptions(decimal: true),
-              decoration:
-                  const InputDecoration(labelText: 'Montant versé (FCFA)'),
-              validator: (v) {
-                final n = double.tryParse((v ?? '').replaceAll(',', '.'));
-                return (n == null || n <= 0) ? 'Montant invalide' : null;
-              },
-            ),
-            const SizedBox(height: 14),
-            DropdownButtonFormField<ModePaiement>(
-              initialValue: _mode,
-              decoration: const InputDecoration(labelText: 'Mode de paiement'),
-              items: ModePaiement.values
-                  .map(
-                      (m) => DropdownMenuItem(value: m, child: Text(m.libelle)))
-                  .toList(),
-              onChanged: (v) => setState(() => _mode = v!),
-            ),
-            if (_erreur != null) ...[
-              const SizedBox(height: 12),
-              Text(_erreur!, style: const TextStyle(color: AppColors.terre)),
-            ],
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _enCours ? null : _enregistrer,
-              child: _enCours
-                  ? const SizedBox(
-                      height: 18,
-                      width: 18,
-                      child: CircularProgressIndicator(
-                          strokeWidth: 2, color: Colors.white),
-                    )
-                  : const Text('ENREGISTRER'),
-            ),
-          ],
+  void _ouvrirEncaissement(BuildContext context) {
+    final restant = paiement.montantDu - paiement.montantPaye;
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => PaiementMoyenScreen(
+          paiementCotisationId: paiement.id,
+          membreNom: nomMembre,
+          cotisationNom: cotisationNom,
+          montantRestant: restant,
         ),
       ),
     );

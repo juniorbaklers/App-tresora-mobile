@@ -236,6 +236,8 @@ create table contributions_evenement (
   nom_contributeur text not null,
   montant numeric(14,2) not null check (montant > 0),
   mode_paiement mode_paiement,
+  operateur operateur_mobile_money,
+  reference text,
   responsable text not null default '',
   date timestamptz not null default now()
 );
