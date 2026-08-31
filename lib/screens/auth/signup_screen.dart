@@ -60,8 +60,8 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                         const SizedBox(height: 16),
                         const Text(
                           'Compte créé. Vérifie ta boîte mail pour confirmer ton adresse, '
-                          'puis connecte-toi.\n\nLe premier compte créé sur la base devient '
-                          'automatiquement Trésorier Principal.',
+                          'puis connecte-toi.\n\nTu pourras ensuite créer ton propre espace '
+                          'ou rejoindre celui d\'une organisation qui t\'invite par email.',
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 20),

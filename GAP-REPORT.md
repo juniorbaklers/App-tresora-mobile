@@ -272,6 +272,35 @@ mais dont l'action échoue silencieusement — ce n'était le cas nulle part.
   (rien n'est cassé), plutôt une fonctionnalité absente ; à trancher si un
   jour un vrai besoin de suppression de membre est exprimé.
 
+## 8. Onboarding d'une nouvelle personne — vérifié le 2026-08-31
+
+Question producer : que se passe-t-il quand l'app est partagée avec une
+nouvelle personne, et l'app est-elle prête pour un usage à plusieurs ?
+Parcours vérifié dans le code (inscription → confirmation email → "Mes
+espaces" vide → création d'espace ou acceptation d'invitation) : correct.
+
+- **[CORRIGÉ] Message d'inscription trompeur.** L'écran de confirmation
+  après `SignupScreen` affichait *"Le premier compte créé sur la base
+  devient automatiquement Trésorier Principal"* — faux pour ce produit :
+  le trigger `gerer_nouvel_utilisateur` (`schema_2_triggers.sql`) ne crée
+  qu'un `profils`, jamais d'espace ni de rôle automatique, et
+  "Trésorier Principal" n'existe même pas dans l'enum `role_espace` de
+  cette app (`proprietaire`/`administrateur`/`tresorier`/`responsable`/
+  `membre`) — c'est le nom des rôles de l'*autre* produit, Gestion Caisse
+  Église (voir §1). Texte visiblement copié-collé du mauvais projet et
+  jamais corrigé. → message et commentaire de code (`auth_service.dart`)
+  corrigés pour refléter le vrai comportement : un nouveau compte doit
+  créer son propre espace ou se faire inviter.
+- **[OUVERT, non testable dans cette session] Signup + confirmation email
+  + invitation jamais vérifiés avec un vrai deuxième compte.** Un seul
+  compte réel existe sur le projet Supabase (`juniorbaklers@gmail.com`) —
+  le code du parcours (RPC `accepter_invitation`, envoi d'email de
+  confirmation Supabase) est correct à la lecture mais n'a jamais tourné
+  en conditions réelles avec une deuxième adresse email. À tester une
+  fois avant de compter dessus à grande échelle (en particulier que
+  l'email de confirmation Supabase arrive bien — les projets gratuits ont
+  des limites d'envoi).
+
 ## Décisions producer validées le 2026-08-28
 
 1. Gaps de sécurité (RLS) traités en premier — fait pour les points critiques
