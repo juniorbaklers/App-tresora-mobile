@@ -74,6 +74,31 @@ directement en base (migration `audit_rls_durcissement`) :
   ça doit être bloqué (ex. exiger qu'il reste toujours au moins un
   `'proprietaire'`) une fois l'écran Rôles retravaillé.
 
+- **[CRITIQUE — corrigé le 2026-08-31] Fuite de lecture permanente sur
+  `espaces`.** La policy `espaces_lecture` réellement en base contenait
+  `est_membre_espace(id) OR created_by = auth.uid()` — un `OR` absent du
+  schéma tracké (`schema_3_rls.sql`), donc jamais revu. Ce `OR` donnait au
+  créateur d'un espace un accès en lecture **permanent** à cet espace, même
+  après en avoir été entièrement retiré de `espace_membres` (ex. transfert
+  de propriété suivi du retrait du créateur d'origine) : violation directe
+  du cloisonnement multi-tenant que la policy est censée garantir. Trouvé
+  en écrivant le tout premier test automatisé du projet
+  (`supabase/tests/001_isolation_espaces.sql`, voir §2), qui l'a fait
+  échouer immédiatement.
+  Cause probable du `OR` : `EspacesService.creer()` faisait
+  `insert(...).select().single()` en un seul appel, et le trigger qui rend
+  le créateur `proprietaire` (`espace_membres`) n'est pas visible à la
+  clause RETURNING de ce même statement — seulement à une requête séparée
+  ultérieure (vérifié empiriquement : `est_membre_espace(id)` renvoie
+  `false` dans un `WITH ... INSERT ... RETURNING`, `true` dans un second
+  statement de la même transaction). Le `OR` contournait ce problème au
+  prix d'une fuite. → policy corrigée (migration
+  `fix_espaces_lecture_isolation_leak`, retrait du `OR`) **et**
+  `EspacesService.creer()` changé pour générer l'id côté client (UUID v4,
+  `dart:math`) et faire insert + select comme deux appels séparés, sans
+  dépendre du contournement RLS. Test re-exécuté après les deux
+  correctifs : passe.
+
 - **[À surveiller, non corrigé] `notifications_creation`** autorise tout
   `'administrateur'`/`'proprietaire'`/`'tresorier'` à insérer une notification
   pour n'importe quel `user_id`, y compris hors de l'espace. Risque faible
@@ -102,14 +127,21 @@ ou les fusionner un jour — pas un chantier d'infrastructure.
 **Décision producer du 2026-08-29** : les deux produits restent séparés
 pour l'instant (Trésora et Gestion Caisse Église). Rien à faire.
 
-## 2. Zéro test automatisé
+## 2. Zéro test automatisé — premier test ajouté le 2026-08-31
 
-`test/` est vide dans tout le dépôt. Pas de couverture sur les calculs
-financiers (tranches, cotisations, clôtures), les triggers de recalcul, ni les
-policies RLS elles-mêmes (pgTAP ou équivalent serait idéal pour ces dernières
-vu ce qui a été trouvé en §1). Pas traité dans cette passe — recommandé
-d'ajouter des tests au fil de l'eau sur ce qui est touché plutôt qu'un chantier
-séparé.
+`test/` reste vide côté Dart (pas de couverture sur les calculs financiers —
+tranches, cotisations, clôtures — ni les triggers de recalcul). Côté RLS,
+premier test ajouté : `supabase/tests/001_isolation_espaces.sql`, SQL brut
+(pas pgTAP — pas de CLI Supabase locale dans cet environnement), transaction
++ `ROLLBACK` systématique, exécuté via le SQL Editor Supabase ou
+`mcp__Supabase__execute_sql`. Ce test a immédiatement trouvé un vrai bug (voir
+§1, fuite `espaces_lecture`) — preuve de la valeur de la règle
+`.claude/rules/tests.md` qui l'exigeait. Voir `supabase/tests/README.md`
+pour la méthode (impersonation via `SET LOCAL ROLE` + `request.jwt.claims`)
+et comment étendre la suite aux autres tables `espace_id`.
+Reste à faire : couverture RLS pour les autres tables sensibles
+(`cotisations`/`paiements_cotisation`, `recettes`/`depenses`, `abonnements`,
+`membres`), et tests Dart sur les calculs financiers.
 
 ## 3. Journal d'audit incomplet — comblé le 2026-08-28
 

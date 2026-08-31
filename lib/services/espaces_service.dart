@@ -1,3 +1,5 @@
+import 'dart:math';
+import 'dart:typed_data';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/espace.dart';
 import '../models/membre_compte.dart';
@@ -5,6 +7,19 @@ import '../models/module_espace.dart';
 import '../models/profil.dart';
 import '../models/role.dart';
 import '../utils/cache_hors_ligne.dart';
+
+/// UUID v4 généré côté client (aucun paquet supplémentaire) — nécessaire
+/// pour `EspacesService.creer()`, voir le commentaire sur cette méthode.
+String _genererUuidV4() {
+  final octets = Uint8List.fromList(
+      List<int>.generate(16, (_) => Random.secure().nextInt(256)));
+  octets[6] = (octets[6] & 0x0f) | 0x40;
+  octets[8] = (octets[8] & 0x3f) | 0x80;
+  final hex = octets.map((o) => o.toRadixString(16).padLeft(2, '0')).join();
+  return '${hex.substring(0, 8)}-${hex.substring(8, 12)}-'
+      '${hex.substring(12, 16)}-${hex.substring(16, 20)}-'
+      '${hex.substring(20)}';
+}
 
 /// Tables `espaces` + `espace_membres` — le concept central : chaque
 /// organisation est une trésorerie indépendante, et un utilisateur peut en
@@ -46,7 +61,14 @@ class EspacesService {
   }
 
   /// Crée un espace ; le créateur en devient automatiquement propriétaire
-  /// (trigger SQL `gerer_nouvel_espace`).
+  /// (trigger SQL `gerer_nouvel_espace`, ajout dans `espace_membres`).
+  ///
+  /// L'id est généré côté client puis l'insert et la lecture sont deux
+  /// appels séparés (pas de `.select()` chaîné sur l'insert) : la policy
+  /// RLS `espaces_lecture` n'autorise que les membres de l'espace, et le
+  /// trigger qui fait du créateur un membre n'est pas encore visible à la
+  /// clause RETURNING d'un insert — seulement à une requête ultérieure
+  /// distincte (vérifié empiriquement sur ce projet).
   Future<Espace> creer({
     required String nom,
     required EspaceType type,
@@ -62,18 +84,17 @@ class EspacesService {
         .join();
     final modules =
         ModuleEspace.parDefaut(estEglise: type == EspaceType.eglise);
-    final row = await _client
-        .from('espaces')
-        .insert({
-          'nom': nom,
-          'type': type.valeurBdd,
-          'initiales': initiales.isEmpty ? '?' : initiales,
-          'devise': devise,
-          'created_by': createdBy,
-          'modules': modules.map((m) => m.valeurBdd).toList(),
-        })
-        .select()
-        .single();
+    final id = _genererUuidV4();
+    await _client.from('espaces').insert({
+      'id': id,
+      'nom': nom,
+      'type': type.valeurBdd,
+      'initiales': initiales.isEmpty ? '?' : initiales,
+      'devise': devise,
+      'created_by': createdBy,
+      'modules': modules.map((m) => m.valeurBdd).toList(),
+    });
+    final row = await _client.from('espaces').select().eq('id', id).single();
     return Espace.fromMap(row);
   }
 
