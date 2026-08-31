@@ -54,12 +54,12 @@ class CotisationDetailScreen extends ConsumerWidget {
         peutAcceder: (r) => r.peutGererMembres,
         child: FloatingActionButton.extended(
           onPressed: () {
-            final paiementsParMembre = {
-              for (final p in ref
-                      .read(paiementsCotisationProvider(cotisation.id))
-                      .valueOrNull ??
-                  [])
-                p.membreId: p,
+            final paiements = ref
+                    .read(paiementsCotisationProvider(cotisation.id))
+                    .valueOrNull ??
+                <PaiementCotisation>[];
+            final paiementsParMembre = <String, PaiementCotisation>{
+              for (final p in paiements) p.membreId: p,
             };
             showModalBottomSheet(
               context: context,
