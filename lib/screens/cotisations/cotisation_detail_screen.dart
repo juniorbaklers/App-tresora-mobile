@@ -54,24 +54,25 @@ class CotisationDetailScreen extends ConsumerWidget {
         peutAcceder: (r) => r.peutGererMembres,
         child: FloatingActionButton.extended(
           onPressed: () {
-            final dejaInclus = (ref
-                        .read(paiementsCotisationProvider(cotisation.id))
-                        .valueOrNull ??
-                    [])
-                .map((p) => p.membreId)
-                .toSet();
+            final paiementsParMembre = {
+              for (final p in ref
+                      .read(paiementsCotisationProvider(cotisation.id))
+                      .valueOrNull ??
+                  [])
+                p.membreId: p,
+            };
             showModalBottomSheet(
               context: context,
               isScrollControlled: true,
               builder: (_) => _DialogueEncaisserMembre(
                 cotisation: cotisation,
                 membres: membres,
-                dejaInclus: dejaInclus,
+                paiementsParMembre: paiementsParMembre,
               ),
             );
           },
           icon: const Icon(Icons.payments_outlined),
-          label: const Text('Encaisser'),
+          label: const Text('Enregistrer un paiement'),
         ),
       ),
       body: paiementsAsync.when(
@@ -84,8 +85,8 @@ class CotisationDetailScreen extends ConsumerWidget {
               padding: EdgeInsets.symmetric(horizontal: 32),
               child: Text(
                 'Aucun membre assigné à cette cotisation. '
-                'Utilise "Encaisser" pour en ajouter un et enregistrer '
-                'directement son versement.',
+                'Utilise "Enregistrer un paiement" pour en ajouter un et '
+                'enregistrer directement son versement.',
                 textAlign: TextAlign.center,
                 style: TextStyle(color: AppColors.texteSecondaire),
               ),
@@ -312,21 +313,22 @@ class _DialogueAjouterMembresState
   }
 }
 
-/// Cherche un membre pas encore assigné à cette cotisation et enregistre
-/// directement son versement (au lieu de devoir d'abord passer par
-/// "Ajouter des membres" puis revenir le chercher pour le payer) — reprend
-/// la recherche de _DialogueAjouterMembres, mais une sélection déclenche
-/// l'assignation + l'ouverture du flux d'encaissement au lieu d'un ajout
-/// en lot.
+/// Cherche n'importe quel membre de l'espace — déjà assigné à cette
+/// cotisation ou pas encore — et enregistre directement son versement.
+/// S'il n'est pas encore assigné, il l'est au passage (même montant dû que
+/// la cotisation) ; s'il l'est déjà, on reprend sa ligne existante
+/// (paiement_cotisation) et le solde restant. Un seul point d'entrée pour
+/// « le trésorier reçoit Junior, ouvre la cotisation, enregistre son
+/// versement » — que Junior soit déjà dans la liste ou non.
 class _DialogueEncaisserMembre extends ConsumerStatefulWidget {
   final Cotisation cotisation;
   final List<Membre> membres;
-  final Set<String> dejaInclus;
+  final Map<String, PaiementCotisation> paiementsParMembre;
 
   const _DialogueEncaisserMembre({
     required this.cotisation,
     required this.membres,
-    required this.dejaInclus,
+    required this.paiementsParMembre,
   });
 
   @override
@@ -340,18 +342,19 @@ class _DialogueEncaisserMembreState
   bool _enCours = false;
   String? _erreur;
 
-  Future<void> _choisir(Membre membre) async {
+  Future<void> _choisir(Membre membre, PaiementCotisation? existant) async {
     setState(() {
       _enCours = true;
       _erreur = null;
     });
     try {
-      final paiement =
+      final paiement = existant ??
           await ref.read(cotisationsServiceProvider).ajouterMembreEtRecuperer(
                 widget.cotisation.id,
                 widget.cotisation.montant,
                 membre.id,
               );
+      final restant = paiement.montantDu - paiement.montantPaye;
       if (!mounted) return;
       Navigator.of(context).pop();
       Navigator.of(context).push(
@@ -360,7 +363,7 @@ class _DialogueEncaisserMembreState
             paiementCotisationId: paiement.id,
             membreNom: membre.nomComplet,
             cotisationNom: widget.cotisation.nom,
-            montantRestant: paiement.montantDu,
+            montantRestant: restant,
           ),
         ),
       );
@@ -373,7 +376,6 @@ class _DialogueEncaisserMembreState
   @override
   Widget build(BuildContext context) {
     final disponibles = widget.membres
-        .where((m) => !widget.dejaInclus.contains(m.id))
         .where((m) =>
             _recherche.isEmpty ||
             m.nomComplet.toLowerCase().contains(_recherche.toLowerCase()))
@@ -390,16 +392,14 @@ class _DialogueEncaisserMembreState
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text('Encaisser un membre',
+          Text('Enregistrer un paiement',
               style:
                   AppFonts.heading(fontSize: 18, color: AppColors.texteEncre)),
           const SizedBox(height: 4),
-          Text(
-            'Choisis un membre qui n\'est pas encore assigné à cette '
-            'cotisation — il sera ajouté et son versement de '
-            '${formatMontant(widget.cotisation.montant)} enregistré directement.',
-            style: const TextStyle(
-                fontSize: 12, color: AppColors.texteSecondaire),
+          const Text(
+            'Cherche un membre — déjà dans la liste ou nouveau — pour '
+            'enregistrer directement son versement.',
+            style: TextStyle(fontSize: 12, color: AppColors.texteSecondaire),
           ),
           const SizedBox(height: 16),
           TextField(
@@ -417,45 +417,68 @@ class _DialogueEncaisserMembreState
                     child: Text('Cet espace n\'a encore aucun membre.',
                         style: TextStyle(color: AppColors.texteSecondaire)))
                 : disponibles.isEmpty
-                    ? Center(
-                        child: Text(
-                          _recherche.isNotEmpty
-                              ? 'Aucun membre trouvé.'
-                              : 'Tous les membres de cet espace font déjà partie de cette cotisation.',
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                              color: AppColors.texteSecondaire),
-                        ),
+                    ? const Center(
+                        child: Text('Aucun membre trouvé.',
+                            textAlign: TextAlign.center,
+                            style:
+                                TextStyle(color: AppColors.texteSecondaire)),
                       )
                     : ListView.separated(
                         itemCount: disponibles.length,
                         separatorBuilder: (_, __) => const SizedBox(height: 6),
                         itemBuilder: (context, i) {
                           final m = disponibles[i];
+                          final existant = widget.paiementsParMembre[m.id];
+                          final solde = existant != null &&
+                              existant.statut == StatutPaiement.paye;
+                          final sousTitre = existant == null
+                              ? 'Pas encore assigné à cette cotisation'
+                              : solde
+                                  ? 'Déjà réglé'
+                                  : 'Reste dû : ${formatMontant(existant.montantDu - existant.montantPaye)}';
                           return Material(
                             color: AppColors.carte,
                             borderRadius: BorderRadius.circular(12),
                             child: InkWell(
                               borderRadius: BorderRadius.circular(12),
-                              onTap: _enCours ? null : () => _choisir(m),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 14, vertical: 12),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12),
-                                  border:
-                                      Border.all(color: AppColors.bordure),
-                                ),
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                        child: Text(m.nomComplet,
-                                            style: const TextStyle(
-                                                fontWeight:
-                                                    FontWeight.w600))),
-                                    const Icon(Icons.chevron_right,
-                                        color: AppColors.texteSecondaire),
-                                  ],
+                              onTap: (_enCours || solde)
+                                  ? null
+                                  : () => _choisir(m, existant),
+                              child: Opacity(
+                                opacity: solde ? .55 : 1,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 14, vertical: 12),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(12),
+                                    border:
+                                        Border.all(color: AppColors.bordure),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(m.nomComplet,
+                                                style: const TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.w600)),
+                                            const SizedBox(height: 2),
+                                            Text(sousTitre,
+                                                style: const TextStyle(
+                                                    fontSize: 11,
+                                                    color: AppColors
+                                                        .texteSecondaire)),
+                                          ],
+                                        ),
+                                      ),
+                                      if (!solde)
+                                        const Icon(Icons.chevron_right,
+                                            color: AppColors.texteSecondaire),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
