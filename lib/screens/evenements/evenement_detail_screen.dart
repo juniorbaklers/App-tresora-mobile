@@ -6,6 +6,7 @@ import '../../theme/app_theme.dart';
 import '../../utils/format.dart';
 import '../../widgets/role_gate.dart';
 import 'contribution_evenement_form_screen.dart';
+import '../../utils/erreurs.dart';
 
 class EvenementDetailScreen extends ConsumerStatefulWidget {
   final Evenement evenement;
@@ -158,7 +159,7 @@ class _EvenementDetailScreenState extends ConsumerState<EvenementDetailScreen> {
               padding: EdgeInsets.symmetric(vertical: 16),
               child: Center(child: CircularProgressIndicator()),
             ),
-            error: (e, _) => Text('Erreur : $e',
+            error: (e, _) => Text('Erreur : ${messageErreur(e)}',
                 style: const TextStyle(color: AppColors.terre)),
             data: (contributions) {
               if (contributions.isEmpty) {

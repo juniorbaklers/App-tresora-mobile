@@ -11,6 +11,7 @@ import '../../utils/format.dart';
 import '../clotures/clotures_list_screen.dart';
 import '../journal/journal_list_screen.dart';
 import 'roles_permissions_screen.dart';
+import '../../utils/erreurs.dart';
 
 class ReglagesEspaceScreen extends ConsumerWidget {
   const ReglagesEspaceScreen({super.key});
@@ -383,7 +384,7 @@ class _FormulaireEspaceState extends ConsumerState<_FormulaireEspace> {
       });
       if (mounted) Navigator.of(context).pop();
     } catch (e) {
-      setState(() => _erreur = "Modification impossible : ${e.toString()}");
+      setState(() => _erreur = "Modification impossible : ${messageErreur(e)}");
     } finally {
       if (mounted) setState(() => _enCours = false);
     }

@@ -8,6 +8,7 @@ import '../../widgets/motif.dart';
 import '../../widgets/role_gate.dart';
 import 'evenement_detail_screen.dart';
 import 'evenement_form_screen.dart';
+import '../../utils/erreurs.dart';
 
 class EvenementsListScreen extends ConsumerWidget {
   const EvenementsListScreen({super.key});
@@ -30,7 +31,7 @@ class EvenementsListScreen extends ConsumerWidget {
       ),
       body: evenementsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Erreur : $e')),
+        error: (e, _) => Center(child: Text('Erreur : ${messageErreur(e)}')),
         data: (evenements) {
           if (evenements.isEmpty) {
             return const Center(child: Text('Aucun événement'));

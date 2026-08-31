@@ -6,6 +6,7 @@ import '../../theme/app_theme.dart';
 import '../../utils/format.dart';
 import '../../widgets/role_gate.dart';
 import 'cloture_form_screen.dart';
+import '../../utils/erreurs.dart';
 
 class CloturesListScreen extends ConsumerWidget {
   const CloturesListScreen({super.key});
@@ -28,7 +29,7 @@ class CloturesListScreen extends ConsumerWidget {
       ),
       body: cloturesAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Erreur : $e')),
+        error: (e, _) => Center(child: Text('Erreur : ${messageErreur(e)}')),
         data: (clotures) {
           if (clotures.isEmpty) {
             return const Center(child: Text('Aucune clôture enregistrée'));

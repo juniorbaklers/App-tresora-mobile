@@ -5,6 +5,7 @@ import '../../providers/data_providers.dart';
 import '../../theme/app_theme.dart';
 import '../../utils/format.dart';
 import '../../widgets/role_gate.dart';
+import '../../utils/erreurs.dart';
 
 class ContributionDetailScreen extends ConsumerWidget {
   final Contribution contribution;
@@ -97,7 +98,7 @@ class ContributionDetailScreen extends ConsumerWidget {
           const SizedBox(height: 8),
           versementsAsync.when(
             loading: () => const Center(child: CircularProgressIndicator()),
-            error: (e, _) => Text('Erreur : $e'),
+            error: (e, _) => Text('Erreur : ${messageErreur(e)}'),
             data: (versements) {
               if (versements.isEmpty) {
                 return const Text('Aucun versement enregistré',
@@ -255,7 +256,7 @@ class _FormulaireVersementState extends ConsumerState<_FormulaireVersement> {
           );
       if (mounted) Navigator.of(context).pop();
     } catch (e) {
-      setState(() => _erreur = "Enregistrement impossible : ${e.toString()}");
+      setState(() => _erreur = "Enregistrement impossible : ${messageErreur(e)}");
     } finally {
       if (mounted) setState(() => _enCours = false);
     }

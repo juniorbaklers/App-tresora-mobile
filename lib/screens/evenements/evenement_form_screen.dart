@@ -5,6 +5,7 @@ import '../../providers/data_providers.dart';
 import '../../providers/espace_providers.dart';
 import '../../theme/app_theme.dart';
 import '../../utils/format.dart';
+import '../../utils/erreurs.dart';
 
 class EvenementFormScreen extends ConsumerStatefulWidget {
   const EvenementFormScreen({super.key});
@@ -52,7 +53,7 @@ class _EvenementFormScreenState extends ConsumerState<EvenementFormScreen> {
       await ref.read(evenementsServiceProvider).creer(evenement);
       if (mounted) Navigator.of(context).pop();
     } catch (e) {
-      setState(() => _erreur = "Création impossible : ${e.toString()}");
+      setState(() => _erreur = "Création impossible : ${messageErreur(e)}");
     } finally {
       if (mounted) setState(() => _enCours = false);
     }

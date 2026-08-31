@@ -59,18 +59,38 @@ class CotisationsService {
   /// pour encaisser directement un membre qui n'y était pas encore assigné
   /// (au lieu de devoir d'abord passer par "Ajouter des membres" puis
   /// revenir le chercher dans la liste pour le payer).
+  ///
+  /// L'appelant décide s'il faut insérer à partir d'un instantané local
+  /// (le flux temps réel de la cotisation) qui peut être en retard de
+  /// quelques centaines de ms sur la base — un membre déjà assigné entre
+  /// temps (par un autre appareil, ou un double-tap) fait échouer l'insert
+  /// sur la contrainte unique (cotisation_id, membre_id). Dans ce cas,
+  /// plutôt que de remonter une erreur, on va chercher la ligne qui existe
+  /// déjà et on la renvoie : le résultat pour l'utilisateur (pouvoir
+  /// encaisser ce membre) reste le même.
   Future<PaiementCotisation> ajouterMembreEtRecuperer(
       String cotisationId, double montant, String membreId) async {
-    final row = await _client
-        .from('paiements_cotisation')
-        .insert({
-          'cotisation_id': cotisationId,
-          'membre_id': membreId,
-          'montant_du': montant,
-        })
-        .select()
-        .single();
-    return PaiementCotisation.fromMap(row);
+    try {
+      final row = await _client
+          .from('paiements_cotisation')
+          .insert({
+            'cotisation_id': cotisationId,
+            'membre_id': membreId,
+            'montant_du': montant,
+          })
+          .select()
+          .single();
+      return PaiementCotisation.fromMap(row);
+    } on PostgrestException catch (e) {
+      if (e.code != '23505') rethrow;
+      final row = await _client
+          .from('paiements_cotisation')
+          .select()
+          .eq('cotisation_id', cotisationId)
+          .eq('membre_id', membreId)
+          .single();
+      return PaiementCotisation.fromMap(row);
+    }
   }
 }
 

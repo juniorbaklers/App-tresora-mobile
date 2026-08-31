@@ -8,6 +8,7 @@ import '../../utils/format.dart';
 import '../../widgets/role_gate.dart';
 import '../rapports/rapport_screen.dart';
 import 'tresorerie_form_screen.dart';
+import '../../utils/erreurs.dart';
 
 sealed class _Ligne {
   DateTime get date;
@@ -66,10 +67,10 @@ class TresorerieListScreen extends ConsumerWidget {
       ),
       body: recettesAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Erreur : $e')),
+        error: (e, _) => Center(child: Text('Erreur : ${messageErreur(e)}')),
         data: (recettes) => depensesAsync.when(
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (e, _) => Center(child: Text('Erreur : $e')),
+          error: (e, _) => Center(child: Text('Erreur : ${messageErreur(e)}')),
           data: (depenses) {
             final lignes = <_Ligne>[
               ...recettes.map(_LigneRecette.new),

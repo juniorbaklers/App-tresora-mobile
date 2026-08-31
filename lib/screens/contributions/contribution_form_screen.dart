@@ -5,6 +5,7 @@ import '../../providers/data_providers.dart';
 import '../../providers/espace_providers.dart';
 import '../../theme/app_theme.dart';
 import '../../utils/format.dart';
+import '../../utils/erreurs.dart';
 
 class ContributionFormScreen extends ConsumerStatefulWidget {
   const ContributionFormScreen({super.key});
@@ -48,7 +49,7 @@ class _ContributionFormScreenState
           ));
       if (mounted) Navigator.of(context).pop();
     } catch (e) {
-      setState(() => _erreur = "Envoi impossible : ${e.toString()}");
+      setState(() => _erreur = "Envoi impossible : ${messageErreur(e)}");
     } finally {
       if (mounted) setState(() => _enCours = false);
     }

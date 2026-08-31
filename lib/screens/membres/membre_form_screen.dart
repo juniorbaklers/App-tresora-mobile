@@ -4,6 +4,7 @@ import '../../models/membre.dart';
 import '../../providers/data_providers.dart';
 import '../../providers/espace_providers.dart';
 import '../../theme/app_theme.dart';
+import '../../utils/erreurs.dart';
 
 class MembreFormScreen extends ConsumerStatefulWidget {
   final Membre? membre;
@@ -78,7 +79,7 @@ class _MembreFormScreenState extends ConsumerState<MembreFormScreen> {
       }
       if (mounted) Navigator.of(context).pop();
     } catch (e) {
-      setState(() => _erreur = "Enregistrement impossible : ${e.toString()}");
+      setState(() => _erreur = "Enregistrement impossible : ${messageErreur(e)}");
     } finally {
       if (mounted) setState(() => _enCours = false);
     }

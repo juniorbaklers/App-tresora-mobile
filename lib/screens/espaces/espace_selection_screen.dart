@@ -9,6 +9,7 @@ import '../../widgets/bandeau_hors_ligne.dart';
 import '../../widgets/motif.dart';
 import '../auth/login_screen.dart';
 import '../home/home_shell.dart';
+import '../../utils/erreurs.dart';
 
 /// Premier écran après connexion : choisir l'espace à gérer (ou en créer
 /// un). Chaque espace est une trésorerie indépendante — c'est le concept
@@ -51,7 +52,7 @@ class EspaceSelectionScreen extends ConsumerWidget {
           Expanded(
             child: espacesAsync.when(
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, _) => Center(child: Text('Erreur : $e')),
+              error: (e, _) => Center(child: Text('Erreur : ${messageErreur(e)}')),
               data: (espaces) {
                 if (espaces.isEmpty && invitations.isEmpty) {
                   return Center(
@@ -157,7 +158,7 @@ class _CarteInvitationState extends ConsumerState<_CarteInvitation> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text("Acceptation impossible : ${e.toString()}")));
+            content: Text("Acceptation impossible : ${messageErreur(e)}")));
         setState(() => _enCours = false);
       }
     }
@@ -351,7 +352,7 @@ class _FormulaireNouvelEspaceState
             MaterialPageRoute(builder: (_) => const HomeShell()));
       }
     } catch (e) {
-      setState(() => _erreur = "Création impossible : ${e.toString()}");
+      setState(() => _erreur = "Création impossible : ${messageErreur(e)}");
     } finally {
       if (mounted) setState(() => _enCours = false);
     }

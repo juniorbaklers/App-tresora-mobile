@@ -7,6 +7,7 @@ import '../../providers/espace_providers.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/saisie_paiement.dart';
 import 'paiement_recu_screen.dart';
+import '../../utils/erreurs.dart';
 
 /// Saisie du montant et du moyen de paiement pour un versement de
 /// cotisation — d'après la maquette « Paiement · {membre} » du canvas de
@@ -102,7 +103,7 @@ class _PaiementMoyenScreenState extends ConsumerState<PaiementMoyenScreen> {
         ),
       );
     } catch (e) {
-      setState(() => _erreur = "Enregistrement impossible : ${e.toString()}");
+      setState(() => _erreur = "Enregistrement impossible : ${messageErreur(e)}");
     } finally {
       if (mounted) setState(() => _enCours = false);
     }

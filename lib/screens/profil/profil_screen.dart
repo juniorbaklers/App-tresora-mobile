@@ -13,6 +13,7 @@ import '../espaces/espace_selection_screen.dart';
 import '../journal/journal_list_screen.dart';
 import '../reglages/reglages_espace_screen.dart';
 import '../reglages/roles_permissions_screen.dart';
+import '../../utils/erreurs.dart';
 
 /// Habillage d'après la maquette « Profil, audit & hors ligne » du canvas
 /// de design : statut de connexion réel (pas de compteur d'écritures/sync
@@ -37,7 +38,7 @@ class ProfilScreen extends ConsumerWidget {
       appBar: AppBar(title: const Text('Profil')),
       body: profilAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Erreur : $e')),
+        error: (e, _) => Center(child: Text('Erreur : ${messageErreur(e)}')),
         data: (profil) => ListView(
           padding: const EdgeInsets.all(20),
           children: [

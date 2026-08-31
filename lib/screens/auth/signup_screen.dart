@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/auth_providers.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/motif.dart';
+import '../../utils/erreurs.dart';
 
 class SignupScreen extends ConsumerStatefulWidget {
   const SignupScreen({super.key});
@@ -34,7 +35,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
           );
       setState(() => _inscritOk = true);
     } catch (e) {
-      setState(() => _erreur = "Inscription impossible : ${e.toString()}");
+      setState(() => _erreur = "Inscription impossible : ${messageErreur(e)}");
     } finally {
       if (mounted) setState(() => _enCours = false);
     }

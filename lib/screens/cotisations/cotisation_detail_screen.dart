@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../models/cotisation.dart';
 import '../../models/membre.dart';
 import '../../providers/data_providers.dart';
+import '../../providers/espace_providers.dart';
 import '../../theme/app_theme.dart';
+import '../../utils/erreurs.dart';
 import '../../utils/format.dart';
 import '../../widgets/role_gate.dart';
 import '../paiement/paiement_moyen_screen.dart';
@@ -77,7 +79,7 @@ class CotisationDetailScreen extends ConsumerWidget {
       ),
       body: paiementsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Erreur : $e')),
+        error: (e, _) => Center(child: Text('Erreur : ${messageErreur(e)}')),
         data: (paiements) {
           if (paiements.isEmpty) {
             return const Center(
@@ -210,7 +212,7 @@ class _DialogueAjouterMembresState
           _selectionnes.toList());
       if (mounted) Navigator.of(context).pop();
     } catch (e) {
-      setState(() => _erreur = "Ajout impossible : ${e.toString()}");
+      setState(() => _erreur = "Ajout impossible : ${messageErreur(e)}");
     } finally {
       if (mounted) setState(() => _enCours = false);
     }
@@ -368,8 +370,42 @@ class _DialogueEncaisserMembreState
         ),
       );
     } catch (e) {
-      setState(() => _erreur = "Impossible de continuer : ${e.toString()}");
+      setState(() => _erreur = "Impossible de continuer : ${messageErreur(e)}");
       setState(() => _enCours = false);
+    }
+  }
+
+  /// Pour quelqu'un qui vient payer sa cotisation mais n'est pas encore
+  /// dans le registre des membres de l'espace — crée le membre au passage
+  /// (nom tapé dans la recherche) puis enchaîne exactement comme pour un
+  /// membre déjà connu.
+  Future<void> _creerEtChoisir(String nomTape) async {
+    final espaceId = ref.read(currentEspaceIdProvider);
+    if (espaceId == null) return;
+    setState(() {
+      _enCours = true;
+      _erreur = null;
+    });
+    try {
+      final mots = nomTape.trim().split(RegExp(r'\s+'));
+      final prenom = mots.first;
+      final nom = mots.length > 1 ? mots.sublist(1).join(' ') : '';
+      final membre = await ref.read(membresServiceProvider).creerEtRecuperer(
+            Membre(
+              id: '',
+              espaceId: espaceId,
+              nom: nom,
+              prenom: prenom,
+              telephone: '',
+              actif: true,
+            ),
+          );
+      await _choisir(membre, null);
+    } catch (e) {
+      setState(() {
+        _erreur = "Impossible de continuer : ${messageErreur(e)}";
+        _enCours = false;
+      });
     }
   }
 
@@ -412,18 +448,18 @@ class _DialogueEncaisserMembreState
           const SizedBox(height: 8),
           SizedBox(
             height: 280,
-            child: widget.membres.isEmpty
-                ? const Center(
-                    child: Text('Cet espace n\'a encore aucun membre.',
-                        style: TextStyle(color: AppColors.texteSecondaire)))
-                : disponibles.isEmpty
+            child: disponibles.isEmpty
+                ? (_recherche.isEmpty
                     ? const Center(
-                        child: Text('Aucun membre trouvé.',
-                            textAlign: TextAlign.center,
+                        child: Text('Cet espace n\'a encore aucun membre.',
                             style:
-                                TextStyle(color: AppColors.texteSecondaire)),
-                      )
-                    : ListView.separated(
+                                TextStyle(color: AppColors.texteSecondaire)))
+                    : _CarteCreerMembre(
+                        nom: _recherche,
+                        enCours: _enCours,
+                        onTap: () => _creerEtChoisir(_recherche),
+                      ))
+                : ListView.separated(
                         itemCount: disponibles.length,
                         separatorBuilder: (_, __) => const SizedBox(height: 6),
                         itemBuilder: (context, i) {
@@ -499,6 +535,62 @@ class _DialogueEncaisserMembreState
                     child: CircularProgressIndicator(strokeWidth: 2))),
           ],
         ],
+      ),
+    );
+  }
+}
+
+/// Proposé quand la recherche ne correspond à aucun membre déjà enregistré
+/// — permet de faire payer quelqu'un sans se limiter à qui figure déjà
+/// dans le registre (ex. un donateur ponctuel, un membre pas encore
+/// ajouté). Crée un vrai membre (nom tapé) et enchaîne directement sur
+/// l'encaissement, plutôt que de forcer un aller-retour par l'écran
+/// Membres.
+class _CarteCreerMembre extends StatelessWidget {
+  final String nom;
+  final bool enCours;
+  final VoidCallback onTap;
+
+  const _CarteCreerMembre(
+      {required this.nom, required this.enCours, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: AppColors.carte,
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: enCours ? null : onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: AppColors.bordure),
+          ),
+          child: Row(
+            children: [
+              const Icon(Icons.person_add_alt, color: AppColors.or),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Créer « $nom » et enregistrer son paiement',
+                        style: const TextStyle(fontWeight: FontWeight.w600)),
+                    const SizedBox(height: 2),
+                    const Text(
+                      'Pas encore dans le registre des membres — sera '
+                      'ajouté à l\'espace.',
+                      style: TextStyle(
+                          fontSize: 11, color: AppColors.texteSecondaire),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

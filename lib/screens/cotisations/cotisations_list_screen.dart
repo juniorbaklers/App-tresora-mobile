@@ -8,6 +8,7 @@ import '../../widgets/role_gate.dart';
 import '../paiement/paiement_screen.dart';
 import 'cotisation_detail_screen.dart';
 import 'cotisation_form_screen.dart';
+import '../../utils/erreurs.dart';
 
 class CotisationsListScreen extends ConsumerWidget {
   const CotisationsListScreen({super.key});
@@ -44,7 +45,7 @@ class CotisationsListScreen extends ConsumerWidget {
       ),
       body: cotisationsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Erreur : $e')),
+        error: (e, _) => Center(child: Text('Erreur : ${messageErreur(e)}')),
         data: (cotisations) {
           if (cotisations.isEmpty) {
             return const Center(child: Text('Aucune cotisation'));

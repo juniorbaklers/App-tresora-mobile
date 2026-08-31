@@ -5,6 +5,7 @@ import '../../providers/auth_providers.dart';
 import '../../providers/espace_providers.dart';
 import '../../theme/app_theme.dart';
 import '../../utils/format.dart';
+import '../../utils/erreurs.dart';
 
 /// Habillage cohérent avec le reste de la refonte : cartes plates
 /// bordées, pastille d'icône colorée pour les notifications non lues.
@@ -34,7 +35,7 @@ class NotificationsListScreen extends ConsumerWidget {
       ),
       body: notificationsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Erreur : $e')),
+        error: (e, _) => Center(child: Text('Erreur : ${messageErreur(e)}')),
         data: (notifications) {
           if (notifications.isEmpty) {
             return const Center(

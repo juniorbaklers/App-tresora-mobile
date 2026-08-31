@@ -9,6 +9,7 @@ import '../../providers/espace_providers.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/saisie_paiement.dart';
 import '../paiement/paiement_recu_screen.dart';
+import '../../utils/erreurs.dart';
 
 /// Enregistrement d'une contribution à un événement (collecte ponctuelle) —
 /// même flux riche que l'encaissement d'une cotisation (grille de moyens de
@@ -105,7 +106,7 @@ class _ContributionEvenementFormScreenState
         ),
       );
     } catch (e) {
-      setState(() => _erreur = "Enregistrement impossible : ${e.toString()}");
+      setState(() => _erreur = "Enregistrement impossible : ${messageErreur(e)}");
     } finally {
       if (mounted) setState(() => _enCours = false);
     }

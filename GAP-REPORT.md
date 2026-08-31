@@ -195,6 +195,39 @@ Spacing codé en dur à travers les écrans, thème sombre jamais vérifié
 visuellement. Traité dans le cadre de la refonte design (écran d'accueil +
 dashboard en priorité, cf. décisions producer ci-dessous).
 
+## 6. Correctifs signalés par l'utilisateur — 2026-08-31
+
+- **[CORRIGÉ] Cotisation : erreur brute (contrainte unique) en enregistrant
+  un paiement.** `CotisationsService.ajouterMembreEtRecuperer` insérait
+  sans filet : si l'instantané local du flux temps réel de la cotisation
+  était en retard de quelques centaines de ms sur la base (un membre déjà
+  assigné entre-temps), l'insert échouait sur la contrainte unique
+  `paiements_cotisation_cotisation_id_membre_id_key` et l'exception brute
+  remontait jusqu'à l'écran. → la méthode rattrape désormais ce cas
+  précis (code Postgres `23505`) en allant chercher la ligne qui existe
+  déjà au lieu de faire échouer l'opération.
+- **[AJOUTÉ] Cotisation : payer quelqu'un qui n'est pas encore dans le
+  registre des membres.** "Enregistrer un paiement" ne proposait que les
+  membres déjà connus de l'espace. Quand la recherche ne correspond à
+  personne, un nouveau bouton crée directement un membre (nom tapé) et
+  enchaîne sur l'encaissement — `MembresService.creerEtRecuperer` (nouveau).
+- **[CORRIGÉ] Profil : `RealtimeSubscribeException` affichée à l'écran.**
+  La table `profils` n'était pas dans la publication `supabase_realtime`
+  (contrairement aux 17 autres tables applicatives) — `monProfilProvider`
+  (`.stream()`) échouait donc systématiquement à s'abonner. → migration
+  `ajoute_profils_a_publication_realtime` (`alter publication
+  supabase_realtime add table profils`). La RLS s'applique de la même
+  façon au flux realtime qu'à une requête classique, donc ça ne change
+  rien à ce qu'un utilisateur peut voir.
+- **[AJOUTÉ] Messages d'erreur en français partout.** La quasi-totalité
+  des écrans affichaient l'exception brute (`PostgrestException(message:
+  ...)`, `SocketException...`) au lieu d'un message compréhensible.
+  Nouveau `lib/utils/erreurs.dart` (`messageErreur(Object)`) qui traduit
+  les cas courants (contrainte unique, clé étrangère, RLS/42501,
+  identifiants invalides, pas de réseau) en phrases françaises, avec un
+  repli générique sinon — appliqué aux ~28 écrans qui affichaient
+  auparavant `${e.toString()}` ou `'Erreur : $e'` directement.
+
 ## Décisions producer validées le 2026-08-28
 
 1. Gaps de sécurité (RLS) traités en premier — fait pour les points critiques

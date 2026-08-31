@@ -10,6 +10,7 @@ import '../../theme/app_theme.dart';
 import '../../widgets/role_gate.dart';
 import 'membre_detail_screen.dart';
 import 'membre_form_screen.dart';
+import '../../utils/erreurs.dart';
 
 class MembresListScreen extends ConsumerWidget {
   const MembresListScreen({super.key});
@@ -47,7 +48,7 @@ class MembresListScreen extends ConsumerWidget {
       ),
       body: membresAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Erreur : $e')),
+        error: (e, _) => Center(child: Text('Erreur : ${messageErreur(e)}')),
         data: (membres) {
           if (membres.isEmpty && invitationsEnAttente.isEmpty) {
             return const Center(child: Text('Aucun membre enregistré'));
@@ -182,7 +183,7 @@ class _FormulaireInvitationState extends ConsumerState<_FormulaireInvitation> {
           ));
       if (mounted) Navigator.of(context).pop();
     } catch (e) {
-      setState(() => _erreur = "Invitation impossible : ${e.toString()}");
+      setState(() => _erreur = "Invitation impossible : ${messageErreur(e)}");
     } finally {
       if (mounted) setState(() => _enCours = false);
     }

@@ -6,6 +6,7 @@ import '../../providers/data_providers.dart';
 import '../../providers/espace_providers.dart';
 import '../../theme/app_theme.dart';
 import '../../utils/format.dart';
+import '../../utils/erreurs.dart';
 
 enum _Periode { mois, trimestre, annee, personnalise }
 
@@ -108,7 +109,7 @@ class _RapportScreenState extends ConsumerState<RapportScreen> {
           bytes: pdfBytes,
           filename: 'rapport-${espace.nom}-${formatDate(_fin)}.pdf');
     } catch (e) {
-      setState(() => _erreur = "Génération impossible : ${e.toString()}");
+      setState(() => _erreur = "Génération impossible : ${messageErreur(e)}");
     } finally {
       if (mounted) setState(() => _enCours = false);
     }

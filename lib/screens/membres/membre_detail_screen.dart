@@ -7,6 +7,7 @@ import '../../theme/app_theme.dart';
 import '../../utils/format.dart';
 import '../../widgets/role_gate.dart';
 import 'membre_form_screen.dart';
+import '../../utils/erreurs.dart';
 
 /// Fiche d'un membre : coordonnées + historique financier (ses cotisations
 /// et leur statut). Reprend `MembreDetail` de tresora-app
@@ -126,13 +127,13 @@ class MembreDetailScreen extends ConsumerWidget {
               padding: EdgeInsets.symmetric(vertical: 24),
               child: Center(child: CircularProgressIndicator()),
             ),
-            error: (e, _) => Text('Erreur : $e'),
+            error: (e, _) => Text('Erreur : ${messageErreur(e)}'),
             data: (cotisations) => paiementsAsync.when(
               loading: () => const Padding(
                 padding: EdgeInsets.symmetric(vertical: 24),
                 child: Center(child: CircularProgressIndicator()),
               ),
-              error: (e, _) => Text('Erreur : $e'),
+              error: (e, _) => Text('Erreur : ${messageErreur(e)}'),
               data: (paiements) => _HistoriqueFinancier(
                 cotisations: cotisations,
                 paiements: paiements,

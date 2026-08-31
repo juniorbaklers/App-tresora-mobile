@@ -4,6 +4,7 @@ import '../../providers/auth_providers.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/motif.dart';
 import 'signup_screen.dart';
+import '../../utils/erreurs.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -38,7 +39,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             motDePasse: _motDePasseCtrl.text,
           );
     } catch (e) {
-      setState(() => _erreur = "Connexion impossible : ${e.toString()}");
+      setState(() => _erreur = "Connexion impossible : ${messageErreur(e)}");
     } finally {
       if (mounted) setState(() => _enCours = false);
     }

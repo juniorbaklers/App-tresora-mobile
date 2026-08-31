@@ -18,6 +18,7 @@ import '../contributions/contributions_list_screen.dart';
 import '../notifications/notifications_list_screen.dart';
 import '../rapports/rapport_screen.dart';
 import '../tresorerie/tresorerie_form_screen.dart';
+import '../../utils/erreurs.dart';
 
 /// Tableau de bord : l'écran s'adapte au type d'espace, comme tresora-app
 /// (src/app/espace/[espaceId]/dashboard/page.tsx) qui choisit entre
@@ -83,10 +84,10 @@ class _CorpsEglise extends ConsumerWidget {
 
     return recettesAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, _) => Center(child: Text('Erreur : $e')),
+      error: (e, _) => Center(child: Text('Erreur : ${messageErreur(e)}')),
       data: (recettes) => depensesAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Erreur : $e')),
+        error: (e, _) => Center(child: Text('Erreur : ${messageErreur(e)}')),
         data: (depenses) {
           final annee = DateTime.now().year;
           final totalRecettes = recettes.fold(0.0, (a, r) => a + r.montant);
@@ -209,10 +210,10 @@ class _CorpsGroupe extends ConsumerWidget {
 
     return recettesAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, _) => Center(child: Text('Erreur : $e')),
+      error: (e, _) => Center(child: Text('Erreur : ${messageErreur(e)}')),
       data: (recettes) => depensesAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Erreur : $e')),
+        error: (e, _) => Center(child: Text('Erreur : ${messageErreur(e)}')),
         data: (depenses) => _CorpsGroupeCharge(
             espace: espace, recettes: recettes, depenses: depenses),
       ),

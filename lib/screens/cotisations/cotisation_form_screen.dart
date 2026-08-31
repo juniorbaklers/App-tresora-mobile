@@ -5,6 +5,7 @@ import '../../providers/data_providers.dart';
 import '../../providers/espace_providers.dart';
 import '../../theme/app_theme.dart';
 import '../../utils/format.dart';
+import '../../utils/erreurs.dart';
 
 class CotisationFormScreen extends ConsumerStatefulWidget {
   const CotisationFormScreen({super.key});
@@ -51,7 +52,7 @@ class _CotisationFormScreenState extends ConsumerState<CotisationFormScreen> {
           .creer(cotisation, membreIdsActifs: membreIdsActifs);
       if (mounted) Navigator.of(context).pop();
     } catch (e) {
-      setState(() => _erreur = "Création impossible : ${e.toString()}");
+      setState(() => _erreur = "Création impossible : ${messageErreur(e)}");
     } finally {
       if (mounted) setState(() => _enCours = false);
     }

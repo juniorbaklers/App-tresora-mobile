@@ -8,6 +8,7 @@ import '../../providers/data_providers.dart';
 import '../../providers/espace_providers.dart';
 import '../../theme/app_theme.dart';
 import '../../utils/format.dart';
+import '../../utils/erreurs.dart';
 
 enum _TypeEcriture { recette, depense }
 
@@ -90,7 +91,7 @@ class _TresorerieFormScreenState extends ConsumerState<TresorerieFormScreen> {
       }
       if (mounted) Navigator.of(context).pop();
     } catch (e) {
-      setState(() => _erreur = "Enregistrement impossible : ${e.toString()}");
+      setState(() => _erreur = "Enregistrement impossible : ${messageErreur(e)}");
     } finally {
       if (mounted) setState(() => _enCours = false);
     }

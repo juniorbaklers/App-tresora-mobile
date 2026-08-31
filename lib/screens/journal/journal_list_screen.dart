@@ -4,6 +4,7 @@ import '../../models/entree_journal.dart';
 import '../../providers/data_providers.dart';
 import '../../theme/app_theme.dart';
 import '../../utils/format.dart';
+import '../../utils/erreurs.dart';
 
 class JournalListScreen extends ConsumerWidget {
   const JournalListScreen({super.key});
@@ -16,7 +17,7 @@ class JournalListScreen extends ConsumerWidget {
       appBar: AppBar(title: const Text('Journal d\'audit')),
       body: journalAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Erreur : $e')),
+        error: (e, _) => Center(child: Text('Erreur : ${messageErreur(e)}')),
         data: (entrees) {
           if (entrees.isEmpty) {
             return const Center(child: Text('Aucune entrée pour l\'instant'));

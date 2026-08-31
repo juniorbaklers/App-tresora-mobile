@@ -6,6 +6,7 @@ import '../../providers/data_providers.dart';
 import '../../theme/app_theme.dart';
 import '../../utils/format.dart';
 import 'paiement_moyen_screen.dart';
+import '../../utils/erreurs.dart';
 
 class _Du {
   final Cotisation cotisation;
@@ -79,15 +80,15 @@ class _PaiementScreenState extends ConsumerState<PaiementScreen> {
               child: membresAsync.when(
                 loading: () =>
                     const Center(child: CircularProgressIndicator()),
-                error: (e, _) => Center(child: Text('Erreur : $e')),
+                error: (e, _) => Center(child: Text('Erreur : ${messageErreur(e)}')),
                 data: (membres) => cotisationsAsync.when(
                   loading: () =>
                       const Center(child: CircularProgressIndicator()),
-                  error: (e, _) => Center(child: Text('Erreur : $e')),
+                  error: (e, _) => Center(child: Text('Erreur : ${messageErreur(e)}')),
                   data: (cotisations) => paiementsAsync.when(
                     loading: () =>
                         const Center(child: CircularProgressIndicator()),
-                    error: (e, _) => Center(child: Text('Erreur : $e')),
+                    error: (e, _) => Center(child: Text('Erreur : ${messageErreur(e)}')),
                     data: (paiements) => _Liste(
                       membres: membres,
                       cotisations: cotisations,

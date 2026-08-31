@@ -7,6 +7,7 @@ import '../../utils/format.dart';
 import '../../widgets/role_gate.dart';
 import 'contribution_detail_screen.dart';
 import 'contribution_form_screen.dart';
+import '../../utils/erreurs.dart';
 
 class ContributionsListScreen extends ConsumerWidget {
   const ContributionsListScreen({super.key});
@@ -30,10 +31,10 @@ class ContributionsListScreen extends ConsumerWidget {
       ),
       body: envoyeesAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Erreur : $e')),
+        error: (e, _) => Center(child: Text('Erreur : ${messageErreur(e)}')),
         data: (envoyees) => recuesAsync.when(
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (e, _) => Center(child: Text('Erreur : $e')),
+          error: (e, _) => Center(child: Text('Erreur : ${messageErreur(e)}')),
           data: (recues) {
             if (envoyees.isEmpty && recues.isEmpty) {
               return const Center(
