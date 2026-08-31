@@ -1,5 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/invitation.dart';
+import '../utils/cache_hors_ligne.dart';
 
 /// Table `invitations` + RPC `accepter_invitation`.
 class InvitationsService {
@@ -8,11 +9,12 @@ class InvitationsService {
   /// Invitations émises pour un espace donné — vue admin (gestion des
   /// membres).
   Stream<List<Invitation>> streamInvitationsEspace(String espaceId) {
-    return _client
+    final flux = _client
         .from('invitations')
         .stream(primaryKey: ['id'])
         .eq('espace_id', espaceId)
-        .order('date', ascending: false)
+        .order('date', ascending: false);
+    return avecCacheHorsLigne('invitations_espace_$espaceId', flux)
         .map((rows) => rows.map(Invitation.fromMap).toList());
   }
 
@@ -21,20 +23,25 @@ class InvitationsService {
   /// ne supporte pas les jointures : le nom de l'espace est récupéré à
   /// part et recombiné, comme pour `EspacesService.streamMesEspaces`.
   Stream<List<Invitation>> streamMesInvitations(String email) {
-    return _client
+    final emailNormalise = email.trim().toLowerCase();
+    final flux = _client
         .from('invitations')
         .stream(primaryKey: ['id'])
-        .eq('email', email.trim().toLowerCase())
+        .eq('email', emailNormalise)
         .eq('acceptee', false)
-        .order('date', ascending: false)
+        .order('date', ascending: false);
+    return avecCacheHorsLigne('mes_invitations_$emailNormalise', flux)
         .asyncMap((rows) async {
           if (rows.isEmpty) return <Invitation>[];
           final espaceIds =
               rows.map((r) => r['espace_id'] as String).toSet().toList();
-          final espaces = await _client
-              .from('espaces')
-              .select('id, nom')
-              .inFilter('id', espaceIds);
+          final espaces = await avecCacheHorsLigneFuture(
+            'mes_invitations_noms_espaces_$emailNormalise',
+            () => _client
+                .from('espaces')
+                .select('id, nom')
+                .inFilter('id', espaceIds),
+          );
           final nomsParId = {
             for (final e in espaces) e['id'] as String: e['nom'] as String
           };

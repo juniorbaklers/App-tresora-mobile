@@ -1,5 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/contribution.dart';
+import '../utils/cache_hors_ligne.dart';
 
 /// Tables `contributions` + `contribution_versements`. `.stream()` ne
 /// supportant pas les filtres OR, les demandes envoyées et reçues sont
@@ -8,20 +9,22 @@ class ContributionsService {
   final SupabaseClient _client = Supabase.instance.client;
 
   Stream<List<Contribution>> streamEnvoyees(String espaceId) {
-    return _client
+    final flux = _client
         .from('contributions')
         .stream(primaryKey: ['id'])
         .eq('espace_demandeur_id', espaceId)
-        .order('date_limite')
+        .order('date_limite');
+    return avecCacheHorsLigne('contributions_envoyees_$espaceId', flux)
         .asyncMap(_avecNomsEspaceCible);
   }
 
   Stream<List<Contribution>> streamRecues(String espaceId) {
-    return _client
+    final flux = _client
         .from('contributions')
         .stream(primaryKey: ['id'])
         .eq('espace_cible_id', espaceId)
-        .order('date_limite')
+        .order('date_limite');
+    return avecCacheHorsLigne('contributions_recues_$espaceId', flux)
         .asyncMap(_avecNomsEspaceDemandeur);
   }
 
@@ -40,8 +43,10 @@ class ContributionsService {
   }) async {
     if (rows.isEmpty) return <Contribution>[];
     final ids = rows.map((r) => r[colonneAResoudre] as String).toSet().toList();
-    final espaces =
-        await _client.from('espaces').select('id, nom').inFilter('id', ids);
+    final espaces = await avecCacheHorsLigneFuture(
+      'contributions_noms_espaces_$colonneAResoudre',
+      () => _client.from('espaces').select('id, nom').inFilter('id', ids),
+    );
     final nomsParId = {
       for (final e in espaces) e['id'] as String: e['nom'] as String
     };
@@ -58,11 +63,12 @@ class ContributionsService {
       _client.from('contributions').insert(contribution.toInsertMap());
 
   Stream<List<ContributionVersement>> streamVersements(String contributionId) {
-    return _client
+    final flux = _client
         .from('contribution_versements')
         .stream(primaryKey: ['id'])
         .eq('contribution_id', contributionId)
-        .order('date', ascending: false)
+        .order('date', ascending: false);
+    return avecCacheHorsLigne('contribution_versements_$contributionId', flux)
         .map((rows) => rows.map(ContributionVersement.fromMap).toList());
   }
 

@@ -110,15 +110,18 @@ class EspacesService {
   /// rôles dans Réglages. `.stream()` ne supportant pas les jointures, le
   /// profil de chaque membre est récupéré à part.
   Stream<List<MembreCompte>> streamMembresCompte(String espaceId) {
-    return _client
+    final flux = _client
         .from('espace_membres')
         .stream(primaryKey: ['espace_id', 'user_id'])
-        .eq('espace_id', espaceId)
+        .eq('espace_id', espaceId);
+    return avecCacheHorsLigne('membres_compte_$espaceId', flux)
         .asyncMap((lignes) async {
           if (lignes.isEmpty) return <MembreCompte>[];
           final userIds = lignes.map((l) => l['user_id'] as String).toList();
-          final profilsData =
-              await _client.from('profils').select().inFilter('id', userIds);
+          final profilsData = await avecCacheHorsLigneFuture(
+            'membres_compte_profils_$espaceId',
+            () => _client.from('profils').select().inFilter('id', userIds),
+          );
           final profilsParId = {
             for (final p in profilsData) p['id'] as String: Profil.fromMap(p)
           };

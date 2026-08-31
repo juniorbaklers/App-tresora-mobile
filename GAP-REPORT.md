@@ -228,6 +228,50 @@ dashboard en priorité, cf. décisions producer ci-dessous).
   repli générique sinon — appliqué aux ~28 écrans qui affichaient
   auparavant `${e.toString()}` ou `'Erreur : $e'` directement.
 
+## 7. Audit des menus — incohérences de comportement entre écrans — 2026-08-31
+
+Demande explicite : vérifier les différents menus de chaque espace pour des
+incohérences fonctionnelles. Deux angles vérifiés :
+
+**Permissions (RoleGate côté app vs RLS côté base).** Comparé chaque
+`RoleGate.peutAcceder` de `lib/screens/**` à la policy RLS réelle de
+l'opération qu'il déclenche (table, `polcmd`, `with_check`/`using`) pour
+tous les onglets (Trésorerie, Cotisations, Événements, Membres, Profil,
+Contributions inter-espaces, Clôtures). **Aucune incohérence trouvée** :
+chaque bouton/action gaté correspond exactement à ce que la policy RLS de
+la table qu'il touche autorise (ex. "Verser" sur une contribution n'est
+proposé que côté espace cible, exactement ce qu'exige
+`versements_creation`). Un bug de ce type aurait produit un bouton visible
+mais dont l'action échoue silencieusement — ce n'était le cas nulle part.
+
+- **[CORRIGÉ] Cache hors-ligne appliqué de façon inégale entre menus.**
+  `avecCacheHorsLigne`/`avecCacheHorsLigneFuture` couvrait déjà cotisations,
+  recettes, dépenses, événements, membres, clôtures, journal, notifications
+  — mais pas six autres flux temps réel, dont un onglet principal :
+  - `ProfilsService.streamMonProfil` (onglet **Profil** lui-même) — sur
+    coupure réseau, l'onglet le plus consulté de l'app (accessible même
+    hors ligne pour les autres onglets) se serait retrouvé bloqué en
+    chargement, contrairement à Tableau de bord/Trésorerie/Cotisations/
+    Événements/Membres qui continuent d'afficher leurs dernières données
+    connues. C'est l'incohérence la plus visible.
+  - `InvitationsService.streamInvitationsEspace`/`streamMesInvitations`
+    (onglet Membres + écran de sélection d'espace).
+  - `ContributionsService.streamEnvoyees`/`streamRecues`/`streamVersements`
+    (dashboard "Contributions inter-espaces" + son écran de détail).
+  - `EspacesService.streamMembresCompte` (Réglages → Rôles & permissions).
+  → les six alignés sur le même pattern que le reste de l'app. Pour les
+  flux qui enrichissent leurs lignes par une requête annexe (noms
+  d'espaces, profils), la requête annexe passe elle aussi par
+  `avecCacheHorsLigneFuture` — sinon le repli hors-ligne du flux principal
+  aurait quand même tenté un appel réseau pour l'enrichissement et échoué
+  offline.
+- **[CONSTATÉ, pas un bug fonctionnel] `MembresService.supprimer` n'a
+  aucun point d'appel** dans l'app (ni bouton "Supprimer un membre" nulle
+  part) — la RLS (`membres_suppr`, `peut_administrer`) existe côté base
+  mais rien côté app ne l'utilise. Pas une incohérence de comportement
+  (rien n'est cassé), plutôt une fonctionnalité absente ; à trancher si un
+  jour un vrai besoin de suppression de membre est exprimé.
+
 ## Décisions producer validées le 2026-08-28
 
 1. Gaps de sécurité (RLS) traités en premier — fait pour les points critiques
