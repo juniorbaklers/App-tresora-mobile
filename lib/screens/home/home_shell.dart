@@ -34,6 +34,14 @@ class HomeShell extends ConsumerStatefulWidget {
 
 class _HomeShellState extends ConsumerState<HomeShell> {
   int _index = 0;
+  // Onglets déjà visités : IndexedStack garde tous ses enfants dans l'arbre,
+  // donc construire les 6 onglets d'un coup ouvrirait d'un coup tous leurs
+  // flux temps réel (dashboard + trésorerie + cotisations + événements +
+  // membres + profil), qui se mettent alors en concurrence pour la bande
+  // passante et ralentissent le tout premier écran affiché. On ne construit
+  // donc un onglet (et ses providers) qu'à sa première visite ; une fois
+  // construit il reste dans l'arbre (état + données préservés).
+  final Set<int> _ongletsVisites = {0};
 
   @override
   Widget build(BuildContext context) {
@@ -70,6 +78,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
     ];
 
     final index = _index.clamp(0, onglets.length - 1);
+    _ongletsVisites.add(index);
 
     return Scaffold(
       body: Column(
@@ -77,7 +86,13 @@ class _HomeShellState extends ConsumerState<HomeShell> {
           const BandeauHorsLigne(),
           Expanded(
               child: IndexedStack(
-                  index: index, children: [for (final o in onglets) o.ecran])),
+                  index: index,
+                  children: [
+                    for (var i = 0; i < onglets.length; i++)
+                      _ongletsVisites.contains(i)
+                          ? onglets[i].ecran
+                          : const SizedBox.shrink(),
+                  ])),
         ],
       ),
       bottomNavigationBar: _NavBasse(
